@@ -1,0 +1,21 @@
+customize
+{
+	layout
+	{
+		theme = "theme_2"
+		variant = "variant_2"
+	}
+
+	font = "lato"
+
+	color options
+	{
+		color = "11"
+	}
+
+	logo
+	{
+		preference = "app_icon"
+		placement = "left"
+	}
+}

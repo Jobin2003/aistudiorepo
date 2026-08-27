@@ -1,0 +1,24 @@
+menu
+{
+	space Application
+	{
+		displayname = "Test"
+		icon = "business-chart-bar-33"
+
+		section SharedAnalytics_Section
+		{
+			type = shared_user_report_section
+			displayname = "Reports"
+			icon = "business-chart-bar-33"
+		}
+	}
+
+	preference
+	{
+		icon
+		{
+			style = outline
+			show = {space,section,component}
+		}
+	}
+}

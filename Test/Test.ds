@@ -1,0 +1,60 @@
+application "Test"
+{
+	date format = "dd-MMM-yyyy"
+	time zone = "Asia/Kolkata"
+	time format = "24-hr"
+
+
+
+	web
+	{
+	forms
+	{
+	}
+	menu
+	{
+		space Application
+		{
+			displayname = "Test"
+			icon = "business-chart-bar-33"
+	
+			section SharedAnalytics_Section
+			{
+				type = shared_user_report_section
+				displayname = "Reports"
+				icon = "business-chart-bar-33"
+			}
+		}
+	
+		preference
+		{
+			icon
+			{
+				style = outline
+				show = {space,section,component}
+			}
+		}
+	}
+	customize
+	{
+		layout
+		{
+			theme = "theme_2"
+			variant = "variant_2"
+		}
+	
+		font = "lato"
+	
+		color options
+		{
+			color = "11"
+		}
+	
+		logo
+		{
+			preference = "app_icon"
+			placement = "left"
+		}
+	}
+	}
+}
