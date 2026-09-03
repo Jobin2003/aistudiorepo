@@ -1,0 +1,88 @@
+report All_Requests
+{
+    quickview
+    (
+        layout
+        (
+            type = -1
+            datablock1
+            (
+                layout type = -1
+                fields
+                (
+                    Request_ID
+                    Requester_Name
+                    Department
+                    Estimated_Cost
+                    Approval_Tier
+                    Status
+                    Priority
+                    SLA_Due_Date
+                )
+            )
+        )
+        menu
+        (
+            header
+            (
+                Edit
+                Duplicate
+                Delete
+            )
+            record
+            (
+                Edit
+                Duplicate
+                Delete
+            )
+        )
+        action
+        (
+            on click
+            (
+                View Record
+            )
+            on right click
+            (
+                Edit
+                Delete
+                Duplicate
+                View Record
+            )
+        )
+    )
+    detailview
+    (
+        layout
+        (
+            type = 1
+            datablock1
+            (
+                layout type = -2
+                fields
+                (
+                    Request_ID
+                    Requester_Name
+                    Department
+                    Item_Description
+                    Estimated_Cost
+                    Approval_Tier
+                    Status
+                    Priority
+                    SLA_Due_Date
+                    Justification
+                    Submitted_Date
+                )
+            )
+        )
+        menu
+        (
+            header
+            (
+                Edit
+                Duplicate
+                Delete
+            )
+        )
+    )
+}

@@ -1,0 +1,52 @@
+menu
+{
+    space Budget_Approval
+    {
+        displayname = "Zylker Budget Approval"
+        icon = "business-briefcase-25"
+
+        section Modules
+        {
+            displayname = "Modules"
+            icon = "business-chart"
+
+            page Request_Intake  { icon = "business-notes" }
+            page Approvals       { icon = "business-signature" }
+            page Dashboard       { icon = "business-chart-bar-33" }
+        }
+
+        section Data_Management
+        {
+            displayname = "Data Management"
+            icon = "business-contacts"
+
+            form Spend_Request       { icon = "business-notes" }
+            report All_Requests      { icon = "business-notes" }
+            report Pending_Requests  { icon = "business-agenda" }
+            form Employee_Directory  { icon = "business-business-contact-87" }
+            report All_Employees     { icon = "business-business-contact-88" }
+            form Request_Catalog     { icon = "business-books" }
+            report Catalog_Items     { icon = "business-books" }
+            form Approval_Log        { icon = "business-agenda" }
+            report All_Decisions     { icon = "business-agenda" }
+            form Approval_Action     { icon = "business-sign" }
+            report Approval_Actions  { icon = "business-sign" }
+        }
+
+        section SharedAnalytics_Section
+        {
+            type = shared_user_report_section
+            displayname = "Reports"
+            icon = "business-chart-bar-33"
+        }
+    }
+
+    preference
+    {
+        icon
+        {
+            style = outline
+            show = {space, section, component}
+        }
+    }
+}

@@ -1,0 +1,508 @@
+Spend_Request_Blueprint as "Spend Request Approval Lifecycle"
+{
+    type = blueprint
+    form = Spend_Request
+
+    start
+    {
+        start stage = "Submitted"
+    }
+
+    stages
+    {
+        "Submitted"         { }
+        "Auto_Approved"     { }
+        "Pending_RM"        { }
+        "Pending_Dept_Head" { }
+        "Pending_Finance"   { }
+        "Approved"          { }
+        "Rejected"          { }
+        "On_Hold"           { }
+    }
+
+    transitions
+    {
+        Auto_Approve as "Auto Approve"
+        {
+            type = normal
+            from stage = "Submitted"
+            to stage   = "Auto_Approved"
+
+            before
+            {
+                transition criteria = ( Estimated_Cost <= 1000 )
+            }
+
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        update Spend_Request[ID == input.ID]
+                        [
+                            Status = "Auto_Approved"
+                        ];
+                    )
+                }
+            }
+        }
+
+        Route_To_RM as "Route to Reporting Manager"
+        {
+            type = normal
+            from stage = "Submitted"
+            to stage   = "Pending_RM"
+
+            before
+            {
+                transition criteria = ( Estimated_Cost > 1000 )
+            }
+
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        update Spend_Request[ID == input.ID]
+                        [
+                            Status = "Pending_RM"
+                        ];
+                    )
+                }
+            }
+        }
+
+        RM_Approve_2Person as "RM Approve (2-Person)"
+        {
+            type = normal
+            from stage = "Pending_RM"
+            to stage   = "Pending_Finance"
+
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Reporting_Manager"}
+                )
+                transition criteria = ( Estimated_Cost > 1000 && Estimated_Cost <= 50000 )
+            }
+
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        update Spend_Request[ID == input.ID]
+                        [
+                            Status = "Pending_Finance"
+                        ];
+                        req_id_val = input.Request_ID;
+                        insert into Approval_Log
+                        [
+                            Request_ID_Ref = req_id_val
+                            Stage = "Reporting Manager"
+                            Approver_Name = zoho.loginuserid
+                            Decision = "Approved"
+                            Decision_Timestamp = zoho.currenttime
+                            Comments = "Approved by Reporting Manager; routed directly to Finance (2-Person tier)"
+                        ];
+                    )
+                }
+            }
+        }
+
+        RM_Approve_3Person as "RM Approve (3-Person)"
+        {
+            type = normal
+            from stage = "Pending_RM"
+            to stage   = "Pending_Dept_Head"
+
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Reporting_Manager"}
+                )
+                transition criteria = ( Estimated_Cost > 50000 )
+            }
+
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        update Spend_Request[ID == input.ID]
+                        [
+                            Status = "Pending_Dept_Head"
+                        ];
+                        req_id_val = input.Request_ID;
+                        insert into Approval_Log
+                        [
+                            Request_ID_Ref = req_id_val
+                            Stage = "Reporting Manager"
+                            Approver_Name = zoho.loginuserid
+                            Decision = "Approved"
+                            Decision_Timestamp = zoho.currenttime
+                            Comments = "Approved by Reporting Manager; routed to Department Head (3-Person tier)"
+                        ];
+                    )
+                }
+            }
+        }
+
+        Dept_Head_Approve as "Department Head Approve"
+        {
+            type = normal
+            from stage = "Pending_Dept_Head"
+            to stage   = "Pending_Finance"
+
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Department_Head"}
+                )
+            }
+
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        update Spend_Request[ID == input.ID]
+                        [
+                            Status = "Pending_Finance"
+                        ];
+                        req_id_val = input.Request_ID;
+                        insert into Approval_Log
+                        [
+                            Request_ID_Ref = req_id_val
+                            Stage = "Department Head"
+                            Approver_Name = zoho.loginuserid
+                            Decision = "Approved"
+                            Decision_Timestamp = zoho.currenttime
+                            Comments = "Approved by Department Head; routed to Finance Controller"
+                        ];
+                    )
+                }
+            }
+        }
+
+        Finance_Approve as "Finance Controller Approve"
+        {
+            type = normal
+            from stage = "Pending_Finance"
+            to stage   = "Approved"
+
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Finance_Controller"}
+                )
+            }
+
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        update Spend_Request[ID == input.ID]
+                        [
+                            Status = "Approved"
+                        ];
+                        req_id_val = input.Request_ID;
+                        insert into Approval_Log
+                        [
+                            Request_ID_Ref = req_id_val
+                            Stage = "Finance Controller"
+                            Approver_Name = zoho.loginuserid
+                            Decision = "Approved"
+                            Decision_Timestamp = zoho.currenttime
+                            Comments = "Final approval by Finance Controller. Request fully approved."
+                        ];
+                    )
+                }
+            }
+        }
+
+        RM_Hold as "RM Place on Hold"
+        {
+            type = normal
+            from stage = "Pending_RM"
+            to stage   = "On_Hold"
+
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Reporting_Manager"}
+                )
+            }
+
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        update Spend_Request[ID == input.ID]
+                        [
+                            Status = "On_Hold"
+                        ];
+                        req_id_val = input.Request_ID;
+                        insert into Approval_Log
+                        [
+                            Request_ID_Ref = req_id_val
+                            Stage = "Reporting Manager"
+                            Approver_Name = zoho.loginuserid
+                            Decision = "On Hold"
+                            Decision_Timestamp = zoho.currenttime
+                            Comments = "Request placed on hold by Reporting Manager."
+                        ];
+                    )
+                }
+            }
+        }
+
+        Dept_Hold as "Department Head Place on Hold"
+        {
+            type = normal
+            from stage = "Pending_Dept_Head"
+            to stage   = "On_Hold"
+
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Department_Head"}
+                )
+            }
+
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        update Spend_Request[ID == input.ID]
+                        [
+                            Status = "On_Hold"
+                        ];
+                        req_id_val = input.Request_ID;
+                        insert into Approval_Log
+                        [
+                            Request_ID_Ref = req_id_val
+                            Stage = "Department Head"
+                            Approver_Name = zoho.loginuserid
+                            Decision = "On Hold"
+                            Decision_Timestamp = zoho.currenttime
+                            Comments = "Request placed on hold by Department Head."
+                        ];
+                    )
+                }
+            }
+        }
+
+        Finance_Hold as "Finance Controller Place on Hold"
+        {
+            type = normal
+            from stage = "Pending_Finance"
+            to stage   = "On_Hold"
+
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Finance_Controller"}
+                )
+            }
+
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        update Spend_Request[ID == input.ID]
+                        [
+                            Status = "On_Hold"
+                        ];
+                        req_id_val = input.Request_ID;
+                        insert into Approval_Log
+                        [
+                            Request_ID_Ref = req_id_val
+                            Stage = "Finance Controller"
+                            Approver_Name = zoho.loginuserid
+                            Decision = "On Hold"
+                            Decision_Timestamp = zoho.currenttime
+                            Comments = "Request placed on hold by Finance Controller."
+                        ];
+                    )
+                }
+            }
+        }
+
+        RM_Reject as "RM Reject"
+        {
+            type = normal
+            from stage = "Pending_RM"
+            to stage   = "Rejected"
+
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Reporting_Manager"}
+                )
+            }
+
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        update Spend_Request[ID == input.ID]
+                        [
+                            Status = "Rejected"
+                        ];
+                        req_id_val = input.Request_ID;
+                        insert into Approval_Log
+                        [
+                            Request_ID_Ref = req_id_val
+                            Stage = "Reporting Manager"
+                            Approver_Name = zoho.loginuserid
+                            Decision = "Rejected"
+                            Decision_Timestamp = zoho.currenttime
+                            Comments = "Rejected by Reporting Manager."
+                        ];
+                    )
+                }
+            }
+        }
+
+        Dept_Reject as "Department Head Reject"
+        {
+            type = normal
+            from stage = "Pending_Dept_Head"
+            to stage   = "Rejected"
+
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Department_Head"}
+                )
+            }
+
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        update Spend_Request[ID == input.ID]
+                        [
+                            Status = "Rejected"
+                        ];
+                        req_id_val = input.Request_ID;
+                        insert into Approval_Log
+                        [
+                            Request_ID_Ref = req_id_val
+                            Stage = "Department Head"
+                            Approver_Name = zoho.loginuserid
+                            Decision = "Rejected"
+                            Decision_Timestamp = zoho.currenttime
+                            Comments = "Rejected by Department Head."
+                        ];
+                    )
+                }
+            }
+        }
+
+        Finance_Reject as "Finance Controller Reject"
+        {
+            type = normal
+            from stage = "Pending_Finance"
+            to stage   = "Rejected"
+
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Finance_Controller"}
+                )
+            }
+
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        update Spend_Request[ID == input.ID]
+                        [
+                            Status = "Rejected"
+                        ];
+                        req_id_val = input.Request_ID;
+                        insert into Approval_Log
+                        [
+                            Request_ID_Ref = req_id_val
+                            Stage = "Finance Controller"
+                            Approver_Name = zoho.loginuserid
+                            Decision = "Rejected"
+                            Decision_Timestamp = zoho.currenttime
+                            Comments = "Rejected by Finance Controller."
+                        ];
+                    )
+                }
+            }
+        }
+
+        Resubmit_From_Hold as "Resubmit from Hold"
+        {
+            type = normal
+            from stage = "On_Hold"
+            to stage   = "Submitted"
+
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Requester"}
+                )
+            }
+
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        update Spend_Request[ID == input.ID]
+                        [
+                            Status = "Submitted"
+                        ];
+                        req_id_val = input.Request_ID;
+                        insert into Approval_Log
+                        [
+                            Request_ID_Ref = req_id_val
+                            Stage = "System"
+                            Approver_Name = zoho.loginuserid
+                            Decision = "Submitted"
+                            Decision_Timestamp = zoho.currenttime
+                            Comments = "Request resubmitted by requester from On Hold state."
+                        ];
+                    )
+                }
+            }
+        }
+    }
+}

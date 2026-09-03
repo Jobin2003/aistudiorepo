@@ -1,0 +1,73 @@
+form Approval_Action
+{
+    displayname = "Approval Action"
+    success message = "Decision recorded successfully. The request has been updated."
+
+    Action_Details_Section
+    (
+        type = section
+        displayname = "Action Details"
+        row = 1
+        column = 0
+    )
+    must have Request_ID_Input
+    (
+        type = text
+        displayname = "Request ID"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Approver_Name
+    (
+        type = text
+        displayname = "Approver Name"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Approver_Stage
+    (
+        type = picklist
+        displayname = "Stage"
+        values = {"Reporting Manager", "Department Head", "Finance Controller"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Decision
+    (
+        type = picklist
+        displayname = "Decision"
+        values = {"Approved", "On Hold", "Rejected"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    Comments
+    (
+        type = textarea
+        displayname = "Comments / Reason"
+        height = 80px
+        row = 1
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit_Decision
+            (
+                type = submit
+                displayname = "Submit Decision"
+            )
+            Reset_Form
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+    }
+}

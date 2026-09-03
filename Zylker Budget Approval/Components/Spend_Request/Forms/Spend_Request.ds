@@ -1,0 +1,236 @@
+form Spend_Request
+{
+    displayname = "Spend Request"
+    success message = "Your spend request has been submitted. You will be notified as it moves through the approval chain."
+
+    Requester_Details_Section
+    (
+        type = section
+        displayname = "Requester Details"
+        row = 1
+        column = 0
+    )
+    must have Requester_Name
+    (
+        type = text
+        displayname = "Requester Name"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Department
+    (
+        type = picklist
+        displayname = "Department"
+        values = {"Production", "Maintenance & Utilities", "Quality Assurance", "Procurement & Stores", "IT & Systems", "HR & Admin"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    Requester_ID
+    (
+        type = text
+        displayname = "Requester ID"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Reporting_Manager_Name
+    (
+        type = text
+        displayname = "Reporting Manager"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Department_Head_Name
+    (
+        type = text
+        displayname = "Department Head"
+        row = 1
+        column = 1
+        width = medium
+    )
+
+    Request_Details_Section
+    (
+        type = section
+        displayname = "Request Details"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    must have Item_Description
+    (
+        type = text
+        displayname = "Item / Description"
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Estimated_Cost
+    (
+        type = USD
+        displayname = "Estimated Cost (USD)"
+        decimalplace = 2
+        row = 2
+        column = 2
+        width = medium
+    )
+    Approval_Tier
+    (
+        type = formula
+        displayname = "Approval Tier"
+        value = if(Estimated_Cost <= 1000, "Auto", if(Estimated_Cost <= 50000, "2-Person", "3-Person"))
+        visibility = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Priority
+    (
+        type = picklist
+        displayname = "Priority"
+        values = {"Low", "Medium", "High"}
+        initial value = "Medium"
+        row = 2
+        column = 2
+        width = medium
+    )
+    Justification
+    (
+        type = textarea
+        displayname = "Justification"
+        height = 80px
+        row = 2
+        column = 1
+        width = medium
+    )
+    Attachment
+    (
+        type = upload file
+        displayname = "Attachment (Vendor Quotation)"
+        file count = 1
+        browse = local_drive
+        row = 2
+        column = 2
+        width = medium
+    )
+
+    Status_Tracking_Section
+    (
+        type = section
+        displayname = "Status & Tracking"
+        visibility = true
+        row = 3
+        column = 1
+    )
+    Request_ID
+    (
+        type = text
+        displayname = "Request ID"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Status
+    (
+        type = picklist
+        displayname = "Status"
+        values = {"Submitted", "Auto_Approved", "Pending_RM", "Pending_Dept_Head", "Pending_Finance", "Approved", "Rejected", "On_Hold"}
+        initial value = "Submitted"
+        row = 3
+        column = 2
+        width = medium
+    )
+    SLA_Due_Date
+    (
+        type = date
+        displayname = "SLA Due Date"
+        row = 3
+        column = 1
+        width = medium
+    )
+    Submitted_Date
+    (
+        type = date
+        displayname = "Submitted Date"
+        row = 3
+        column = 2
+        width = medium
+    )
+    Comments
+    (
+        type = textarea
+        displayname = "Approver Comments"
+        height = 60px
+        row = 3
+        column = 1
+        width = medium
+    )
+
+    Cost_Breakdown_Section
+    (
+        type = section
+        displayname = "Cost Breakdown"
+        visibility = false
+        row = 4
+        column = 1
+    )
+    Cost_Breakdown
+    (
+        type = grid
+        displayname = "Cost Breakdown"
+        defaultrow = 1
+        maxrow = 10
+            Line_Item
+            (
+                type = text
+                displayname = "Line Item"
+            )
+            Amount
+            (
+                type = USD
+                displayname = "Amount"
+                decimalplace = 2
+            )
+        row = 4
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Save_Draft
+            (
+                type = reset
+                displayname = "Save Draft"
+            )
+            Submit_Request
+            (
+                type = submit
+                displayname = "Submit Request"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+
+    blueprint components
+    {
+        stages = {"Submitted", "Auto_Approved", "Pending_RM", "Pending_Dept_Head", "Pending_Finance", "Approved", "Rejected", "On_Hold"}
+    }
+}

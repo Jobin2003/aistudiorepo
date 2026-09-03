@@ -1,0 +1,63 @@
+form Request_Catalog
+{
+    displayname = "Request Catalog"
+
+    Catalog_Info
+    (
+        type = section
+        displayname = "Catalog Information"
+        row = 1
+        column = 0
+    )
+    must have Department
+    (
+        type = picklist
+        displayname = "Department"
+        values = {"Production", "Maintenance & Utilities", "Quality Assurance", "Procurement & Stores", "IT & Systems", "HR & Admin"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Item_Description
+    (
+        type = text
+        displayname = "Item / Description"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Catalog_Cost
+    (
+        type = USD
+        displayname = "Catalog Cost (USD)"
+        decimalplace = 2
+        row = 1
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

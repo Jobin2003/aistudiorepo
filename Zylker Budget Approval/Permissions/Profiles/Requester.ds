@@ -1,0 +1,52 @@
+"Requester"
+{
+    name        = "Requester"
+    type        = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:false, ePHIAccess:false }
+    description = "Raises spend requests for their department"
+
+    ModulePermissions
+    {
+        Spend_Request
+        {
+            enabled          = Create, View, Edit, Tab, Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Requests = {"View"}
+                Pending_Requests = {"View"}
+            }
+        }
+        Employee_Directory
+        {
+            enabled          = View, Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Employees = {"View"}
+            }
+        }
+        Request_Catalog
+        {
+            enabled          = View, Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Catalog_Items = {"View"}
+            }
+        }
+        Approval_Log
+        {
+            enabled          = View, Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Decisions = {"View"}
+            }
+        }
+        Request_Intake
+        {
+            enabled = tab
+        }
+    }
+}

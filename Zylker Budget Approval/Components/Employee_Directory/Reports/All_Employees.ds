@@ -1,0 +1,13 @@
+default list All_Employees
+{
+    displayName = "All Employees"
+    show all rows from Employee_Directory
+    (
+        Employee_Name
+        Department
+        Requester_ID
+        Reporting_Manager
+        Department_Head
+    )
+    sort by ( Employee_Name ascending )
+}

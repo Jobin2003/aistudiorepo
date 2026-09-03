@@ -1,0 +1,60 @@
+<link href='https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap' rel='stylesheet'>
+<style>
+  .ri-header-bar {
+    position: fixed;
+    top: 0;
+    left: 220px;
+    right: 0;
+    height: 56px;
+    background: #FFFFFF;
+    border-bottom: 1px solid #E5E7EB;
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    justify-content: space-between;
+    z-index: 99;
+    box-sizing: border-box;
+    font-family: 'Lato', sans-serif;
+  }
+  .ri-header-breadcrumb {
+    font-size: 14px;
+    font-weight: 700;
+    color: #374151;
+  }
+  .ri-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ri-header-icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #F3F4F6;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+  }
+  .ri-header-icon-btn i {
+    font-size: 18px;
+    color: #6B7280;
+  }
+</style>
+
+<div class="ri-header-bar">
+  <span class="ri-header-breadcrumb">Request Intake</span>
+  <div class="ri-header-actions">
+    <button class="ri-header-icon-btn" title="Accessibility">
+      <i class="zc-li-outline ui-1-eye"></i>
+    </button>
+    <button class="ri-header-icon-btn" title="Notifications">
+      <i class="zc-li-outline ui-1-bell-53"></i>
+    </button>
+    <button class="ri-header-icon-btn" title="Profile">
+      <i class="zc-li-outline ui-1-single-02"></i>
+    </button>
+  </div>
+</div>

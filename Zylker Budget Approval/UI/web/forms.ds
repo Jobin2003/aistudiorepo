@@ -1,0 +1,23 @@
+forms
+{
+    form Spend_Request
+    {
+        label placement = top
+    }
+    form Employee_Directory
+    {
+        label placement = left
+    }
+    form Request_Catalog
+    {
+        label placement = left
+    }
+    form Approval_Log
+    {
+        label placement = left
+    }
+    form Approval_Action
+    {
+        label placement = top
+    }
+}

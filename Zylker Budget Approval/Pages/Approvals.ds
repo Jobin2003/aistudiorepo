@@ -1,0 +1,79 @@
+<page linkname = "Approvals" parameters = "string active_tab, string detail_json, string log_json, string queue_json, string selected_id" displayname = "Approvals"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='ap_nav_sidebar' elementName='Nav_Sidebar'>
+          <![CDATA[htmlpage ap_nav_sidebar()
+content
+<%{%>
+    <file name:Nav_Sidebar.dshtml/>
+<%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+    <row>
+      <column width='100%'>
+        <dsp id='ap_header_bar' elementName='Header_Bar'>
+          <![CDATA[htmlpage ap_header_bar()
+content
+<%{%>
+    <file name:Header_Bar.dshtml/>
+<%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+    <row>
+      <column width='100%'>
+        <dsp id='ap_approvals_content' elementName='Approvals_Content'>
+          <![CDATA[htmlpage ap_approvals_content()
+content
+<%{%>
+    <file name:Approvals_Content.dshtml/>
+<%}%>
+          ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>
+<script>
+active_tab = input.active_tab;
+if(active_tab == null || active_tab == "")
+{
+  active_tab = "all";
+}
+selected_id = input.selected_id;
+if(selected_id == null || selected_id == "")
+{
+  selected_id = "BRQ-2026-0303";
+}
+
+if(active_tab == "rm")
+{
+  queue_records = Spend_Request[Status == "Pending_RM"];
+}
+else if(active_tab == "dept_head")
+{
+  queue_records = Spend_Request[Status == "Pending_Dept_Head"];
+}
+else if(active_tab == "finance")
+{
+  queue_records = Spend_Request[Status == "Pending_Finance"];
+}
+else
+{
+  queue_records = Spend_Request[Status != "Auto_Approved"];
+}
+queue_json = queue_records.toJSONList();
+
+detail_records = Spend_Request[Request_ID == selected_id];
+detail_json = detail_records.toJSONList();
+
+log_records = Approval_Log[Request_ID_Ref == selected_id];
+log_json = log_records.toJSONList();
+</script>

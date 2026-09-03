@@ -1,0 +1,87 @@
+form Approval_Log
+{
+    displayname = "Approval Log"
+
+    Log_Entry
+    (
+        type = section
+        displayname = "Log Entry"
+        row = 1
+        column = 0
+    )
+    must have Request_ID_Ref
+    (
+        type = text
+        displayname = "Request ID"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Stage
+    (
+        type = picklist
+        displayname = "Stage"
+        values = {"System", "Reporting Manager", "Department Head", "Finance Controller"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Approver_Name
+    (
+        type = text
+        displayname = "Approver Name"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Decision
+    (
+        type = picklist
+        displayname = "Decision"
+        values = {"Submitted", "Auto-Approved", "Approved", "On Hold", "Rejected"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Decision_Timestamp
+    (
+        type = datetime
+        displayname = "Decision Date & Time"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Comments
+    (
+        type = textarea
+        displayname = "Comments"
+        height = 60px
+        row = 1
+        column = 2
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Log Decision"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

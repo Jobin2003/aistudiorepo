@@ -1,0 +1,134 @@
+Seed_Request_Catalog as "Seed Request Catalog Data"
+{
+    type = schedule
+    start = "2030-01-01 00:00:00"
+    time zone = "America/New_York"
+
+    on start
+    {
+        actions
+        {
+            on load
+            (
+                cat_count = Request_Catalog[ID != 0].count();
+                if(cat_count == 0)
+                {
+                    /* Production */
+                    insert into Request_Catalog
+                    [
+                        Department = "Production"
+                        Item_Description = "PPE restock - gloves & face shields"
+                        Catalog_Cost = 850
+                    ];
+                    insert into Request_Catalog
+                    [
+                        Department = "Production"
+                        Item_Description = "Conveyor sensor upgrade - Line 4"
+                        Catalog_Cost = 18500
+                    ];
+                    insert into Request_Catalog
+                    [
+                        Department = "Production"
+                        Item_Description = "CNC lathe machine - Unit 2"
+                        Catalog_Cost = 128000
+                    ];
+                    /* Maintenance & Utilities */
+                    insert into Request_Catalog
+                    [
+                        Department = "Maintenance & Utilities"
+                        Item_Description = "Bearing & lubricant spares"
+                        Catalog_Cost = 620
+                    ];
+                    insert into Request_Catalog
+                    [
+                        Department = "Maintenance & Utilities"
+                        Item_Description = "Industrial vacuum pump"
+                        Catalog_Cost = 32000
+                    ];
+                    insert into Request_Catalog
+                    [
+                        Department = "Maintenance & Utilities"
+                        Item_Description = "Air compressor replacement (plant-wide)"
+                        Catalog_Cost = 94000
+                    ];
+                    /* Quality Assurance */
+                    insert into Request_Catalog
+                    [
+                        Department = "Quality Assurance"
+                        Item_Description = "Calibration gauge set"
+                        Catalog_Cost = 780
+                    ];
+                    insert into Request_Catalog
+                    [
+                        Department = "Quality Assurance"
+                        Item_Description = "Digital vernier & micrometer set"
+                        Catalog_Cost = 9500
+                    ];
+                    insert into Request_Catalog
+                    [
+                        Department = "Quality Assurance"
+                        Item_Description = "Automated inspection system"
+                        Catalog_Cost = 142000
+                    ];
+                    /* Procurement & Stores */
+                    insert into Request_Catalog
+                    [
+                        Department = "Procurement & Stores"
+                        Item_Description = "Packaging consumables restock"
+                        Catalog_Cost = 340
+                    ];
+                    insert into Request_Catalog
+                    [
+                        Department = "Procurement & Stores"
+                        Item_Description = "Pallet racking addition"
+                        Catalog_Cost = 22000
+                    ];
+                    insert into Request_Catalog
+                    [
+                        Department = "Procurement & Stores"
+                        Item_Description = "Warehouse racking automation project"
+                        Catalog_Cost = 86000
+                    ];
+                    /* IT & Systems */
+                    insert into Request_Catalog
+                    [
+                        Department = "IT & Systems"
+                        Item_Description = "Keyboard/mouse replacement batch (20 units)"
+                        Catalog_Cost = 560
+                    ];
+                    insert into Request_Catalog
+                    [
+                        Department = "IT & Systems"
+                        Item_Description = "Departmental laptop refresh (10 units)"
+                        Catalog_Cost = 48000
+                    ];
+                    insert into Request_Catalog
+                    [
+                        Department = "IT & Systems"
+                        Item_Description = "Server & network infrastructure upgrade"
+                        Catalog_Cost = 115000
+                    ];
+                    /* HR & Admin */
+                    insert into Request_Catalog
+                    [
+                        Department = "HR & Admin"
+                        Item_Description = "Stationery & printing restock"
+                        Catalog_Cost = 210
+                    ];
+                    insert into Request_Catalog
+                    [
+                        Department = "HR & Admin"
+                        Item_Description = "HRMS software license renewal"
+                        Catalog_Cost = 11000
+                    ];
+                    insert into Request_Catalog
+                    [
+                        Department = "HR & Admin"
+                        Item_Description = "Cafeteria & facility renovation"
+                        Catalog_Cost = 69000
+                    ];
+                }
+            )
+        }
+    }
+}

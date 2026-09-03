@@ -1,0 +1,85 @@
+Approval_Action_On_Success as "Update Request Status and Log Decision"
+{
+    type = form
+    form = Approval_Action
+    record event = on add
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                // Find the target Spend Request record
+                req_records = Spend_Request[Request_ID == input.Request_ID_Input];
+                for each req in req_records
+                {
+                    cost_val = req.Estimated_Cost;
+                    stage = input.Approver_Stage;
+                    decision = input.Decision;
+
+                    // Determine tier from cost
+                    if(cost_val <= 1000) { tier = "Auto"; }
+                    else if(cost_val <= 50000) { tier = "2-Person"; }
+                    else { tier = "3-Person"; }
+
+                    // Determine new status
+                    // Determine new status
+                    if(decision == "Approved")
+                    {
+                        if(stage == "Reporting Manager" && tier == "2-Person")
+                        {
+                            new_status = "Pending_Finance";
+                        }
+                        else if(stage == "Reporting Manager" && tier == "3-Person")
+                        {
+                            new_status = "Pending_Dept_Head";
+                        }
+                        else if(stage == "Department Head")
+                        {
+                            new_status = "Pending_Finance";
+                        }
+                        else if(stage == "Finance Controller")
+                        {
+                            new_status = "Approved";
+                        }
+                        else
+                        {
+                            new_status = "Pending_Finance";
+                        }
+                    }
+                    else if(decision == "On Hold")
+                    {
+                        new_status = "On_Hold";
+                    }
+                    else if(decision == "Rejected")
+                    {
+                        new_status = "Rejected";
+                    }
+                    else
+                    {
+                        new_status = "On_Hold";
+                    }
+
+                    // Update the Spend Request status
+                    update Spend_Request[ID == req.ID]
+                    [
+                        Status = new_status
+                    ];
+
+                    // Create Approval Log entry
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = input.Request_ID_Input
+                        Stage = stage
+                        Approver_Name = input.Approver_Name
+                        Decision = decision
+                        Decision_Timestamp = zoho.currenttime
+                        Comments = input.Comments
+                    ];
+                    break;
+                }
+            )
+        }
+    }
+}

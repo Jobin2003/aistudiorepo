@@ -1,0 +1,12 @@
+default list Catalog_Items
+{
+    displayName = "Catalog Items"
+    show all rows from Request_Catalog
+    (
+        Department
+        Item_Description
+        Catalog_Cost
+    )
+    filters ( Department )
+    sort by ( Department ascending )
+}

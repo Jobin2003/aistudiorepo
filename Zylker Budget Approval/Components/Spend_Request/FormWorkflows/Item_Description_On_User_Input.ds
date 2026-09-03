@@ -1,0 +1,22 @@
+Item_Description_On_User_Input as "Auto-Populate Cost on Item Selection"
+{
+    type = form
+    form = Spend_Request
+    record event = on add or edit
+
+    on user input of Item_Description
+    {
+        actions
+        {
+            custom deluge script
+            (
+                catalog_records = Request_Catalog[Department == input.Department && Item_Description == input.Item_Description];
+                for each catalog_item in catalog_records
+                {
+                    input.Estimated_Cost = catalog_item.Catalog_Cost;
+                    break;
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,78 @@
+form Employee_Directory
+{
+    displayname = "Employee Directory"
+
+    Employee_Info
+    (
+        type = section
+        displayname = "Employee Information"
+        row = 1
+        column = 0
+    )
+    must have Employee_Name
+    (
+        type = text
+        displayname = "Employee Name"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Department
+    (
+        type = picklist
+        displayname = "Department"
+        values = {"Production", "Maintenance & Utilities", "Quality Assurance", "Procurement & Stores", "IT & Systems", "HR & Admin"}
+        row = 1
+        column = 2
+        width = medium
+    )
+    Requester_ID
+    (
+        type = text
+        displayname = "Requester ID"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Reporting_Manager
+    (
+        type = text
+        displayname = "Reporting Manager"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Department_Head
+    (
+        type = text
+        displayname = "Department Head"
+        row = 1
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

@@ -1,0 +1,20 @@
+default list All_Requests
+{
+    displayName = "All Requests"
+    show all rows from Spend_Request
+    (
+        Request_ID
+        Requester_Name
+        Department
+        Item_Description
+        Estimated_Cost
+        Approval_Tier
+        Status
+        Priority
+        SLA_Due_Date
+        Justification
+        Submitted_Date
+    )
+    filters ( Status  Department  Approval_Tier  Priority )
+    sort by ( Submitted_Date descending )
+}

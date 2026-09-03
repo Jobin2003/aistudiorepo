@@ -1,0 +1,12 @@
+default list Approval_Actions
+{
+    displayName = "Approval Actions"
+    show all rows from Approval_Action
+    (
+        Request_ID_Input
+        Approver_Name
+        Approver_Stage
+        Decision
+        Comments
+    )
+}

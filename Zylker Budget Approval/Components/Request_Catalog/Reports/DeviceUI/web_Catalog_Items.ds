@@ -1,0 +1,75 @@
+report Catalog_Items
+{
+    quickview
+    (
+        layout
+        (
+            type = -1
+            datablock1
+            (
+                layout type = -1
+                fields
+                (
+                    Department
+                    Item_Description
+                    Catalog_Cost
+                )
+            )
+        )
+        menu
+        (
+            header
+            (
+                Edit
+                Duplicate
+                Delete
+            )
+            record
+            (
+                Edit
+                Duplicate
+                Delete
+            )
+        )
+        action
+        (
+            on click
+            (
+                View Record
+            )
+            on right click
+            (
+                Edit
+                Delete
+                Duplicate
+                View Record
+            )
+        )
+    )
+    detailview
+    (
+        layout
+        (
+            type = 1
+            datablock1
+            (
+                layout type = -2
+                fields
+                (
+                    Department
+                    Item_Description
+                    Catalog_Cost
+                )
+            )
+        )
+        menu
+        (
+            header
+            (
+                Edit
+                Duplicate
+                Delete
+            )
+        )
+    )
+}

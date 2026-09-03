@@ -1,0 +1,80 @@
+report All_Decisions
+{
+    quickview
+    (
+        layout
+        (
+            type = -1
+            datablock1
+            (
+                layout type = -1
+                fields
+                (
+                    Request_ID_Ref
+                    Stage
+                    Approver_Name
+                    Decision
+                    Decision_Timestamp
+                )
+            )
+        )
+        menu
+        (
+            header
+            (
+                Edit
+                Duplicate
+                Delete
+            )
+            record
+            (
+                Edit
+                Duplicate
+                Delete
+            )
+        )
+        action
+        (
+            on click
+            (
+                View Record
+            )
+            on right click
+            (
+                Edit
+                Delete
+                Duplicate
+                View Record
+            )
+        )
+    )
+    detailview
+    (
+        layout
+        (
+            type = 1
+            datablock1
+            (
+                layout type = -2
+                fields
+                (
+                    Request_ID_Ref
+                    Stage
+                    Approver_Name
+                    Decision
+                    Decision_Timestamp
+                    Comments
+                )
+            )
+        )
+        menu
+        (
+            header
+            (
+                Edit
+                Duplicate
+                Delete
+            )
+        )
+    )
+}

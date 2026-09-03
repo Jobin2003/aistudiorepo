@@ -1,0 +1,35 @@
+<page linkname="Request_Intake" displayname="Request Intake"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='ri_nav_sidebar' elementName='Nav_Sidebar'>
+          <![CDATA[htmlpage ri_nav_sidebar()
+             content
+             <%{%>
+                 <file name:Nav_Sidebar.dshtml/>
+             <%}%>
+         ]]>
+        </dsp>
+        <dsp id='ri_header_bar' elementName='Header_Bar'>
+          <![CDATA[htmlpage ri_header_bar()
+             content
+             <%{%>
+                 <file name:Header_Bar.dshtml/>
+             <%}%>
+         ]]>
+        </dsp>
+        <dsp id='ri_form_card' elementName='Form_Card'>
+          <![CDATA[htmlpage ri_form_card()
+             content
+             <%{%>
+                 <file name:Form_Card.dshtml/>
+             <%}%>
+         ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

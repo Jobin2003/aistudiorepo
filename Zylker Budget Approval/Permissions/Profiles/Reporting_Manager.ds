@@ -1,0 +1,65 @@
+"Reporting_Manager"
+{
+    name        = "Reporting_Manager"
+    type        = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:false, ePHIAccess:false }
+    description = "First-level approver on 2-Person and 3-Person tier requests"
+
+    ModulePermissions
+    {
+        Spend_Request
+        {
+            enabled          = Create, View, Viewall, Edit, Modifyall, Tab, Search, Export
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Requests = {"View", "Edit", "Delete"}
+                Pending_Requests = {"View", "Edit", "Delete"}
+            }
+        }
+        Employee_Directory
+        {
+            enabled          = View, Viewall, Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Employees = {"View"}
+            }
+        }
+        Request_Catalog
+        {
+            enabled          = View, Viewall, Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Catalog_Items = {"View"}
+            }
+        }
+        Approval_Log
+        {
+            enabled          = Create, View, Viewall, Tab, Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Decisions = {"View"}
+            }
+        }
+        Approval_Action
+        {
+            enabled          = Create, View, Viewall, Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Approval_Actions = {"View"}
+            }
+        }
+        Request_Intake
+        {
+            enabled = tab
+        }
+        Approvals
+        {
+            enabled = tab
+        }
+    }
+}

@@ -1,0 +1,346 @@
+Seed_Spend_Requests as "Seed Spend Request Records"
+{
+    type = schedule
+    start = "2030-01-01 00:00:00"
+    time zone = "America/New_York"
+
+    on start
+    {
+        actions
+        {
+            on load
+            (
+                sr_count = Spend_Request[ID != 0].count();
+                if(sr_count == 0)
+                {
+                    /* BRQ-2026-0301 - Production, Auto, Auto_Approved */
+                    r1 = insert into Spend_Request
+                    [
+                        Request_ID = "BRQ-2026-0301"
+                        Requester_Name = "Carlos Medina"
+                        Department = "Production"
+                        Requester_ID = "EMP-3011"
+                        Reporting_Manager_Name = "Jason Miller"
+                        Department_Head_Name = "Henrik Larsson"
+                        Item_Description = "PPE restock - gloves & face shields"
+                        Estimated_Cost = 850
+                        Priority = "Low"
+                        Status = "Auto_Approved"
+                        Submitted_Date = "2026-08-01"
+                        SLA_Due_Date = "2026-08-01"
+                        Justification = "Routine safety consumables restock for production floor compliance."
+                    ];
+
+                    /* BRQ-2026-0302 - Production, 2-Person, Pending_Finance */
+                    r2 = insert into Spend_Request
+                    [
+                        Request_ID = "BRQ-2026-0302"
+                        Requester_Name = "Carlos Medina"
+                        Department = "Production"
+                        Requester_ID = "EMP-3011"
+                        Reporting_Manager_Name = "Jason Miller"
+                        Department_Head_Name = "Henrik Larsson"
+                        Item_Description = "Conveyor sensor upgrade - Line 4"
+                        Estimated_Cost = 18500
+                        Priority = "Medium"
+                        Status = "Pending_Finance"
+                        Submitted_Date = "2026-09-10"
+                        SLA_Due_Date = "2026-12-10"
+                        Justification = "Line 4 sensor is misreading intermittently, causing manual stoppages; replacement restores automated flow."
+                    ];
+
+                    /* BRQ-2026-0303 - Production, 3-Person, Pending_Dept_Head */
+                    r3 = insert into Spend_Request
+                    [
+                        Request_ID = "BRQ-2026-0303"
+                        Requester_Name = "Carlos Medina"
+                        Department = "Production"
+                        Requester_ID = "EMP-3011"
+                        Reporting_Manager_Name = "Jason Miller"
+                        Department_Head_Name = "Henrik Larsson"
+                        Item_Description = "CNC lathe machine - Unit 2"
+                        Estimated_Cost = 128000
+                        Priority = "High"
+                        Status = "Pending_Dept_Head"
+                        Submitted_Date = "2026-08-25"
+                        SLA_Due_Date = "2026-11-20"
+                        Justification = "Existing lathe at Unit 2 is beyond economical repair; new unit restores full shift capacity."
+                    ];
+
+                    /* BRQ-2026-0304 - Maintenance, Auto, Auto_Approved */
+                    r4 = insert into Spend_Request
+                    [
+                        Request_ID = "BRQ-2026-0304"
+                        Requester_Name = "Wei Zhang"
+                        Department = "Maintenance & Utilities"
+                        Requester_ID = "EMP-3024"
+                        Reporting_Manager_Name = "Fatima Al-Sayed"
+                        Department_Head_Name = "Aisha Bello"
+                        Item_Description = "Bearing & lubricant spares"
+                        Estimated_Cost = 620
+                        Priority = "Low"
+                        Status = "Auto_Approved"
+                        Submitted_Date = "2026-08-03"
+                        SLA_Due_Date = "2026-08-03"
+                        Justification = "Routine maintenance stock replenishment for scheduled PM intervals."
+                    ];
+
+                    /* BRQ-2026-0305 - Maintenance, 2-Person, Approved */
+                    r5 = insert into Spend_Request
+                    [
+                        Request_ID = "BRQ-2026-0305"
+                        Requester_Name = "Wei Zhang"
+                        Department = "Maintenance & Utilities"
+                        Requester_ID = "EMP-3024"
+                        Reporting_Manager_Name = "Fatima Al-Sayed"
+                        Department_Head_Name = "Aisha Bello"
+                        Item_Description = "Industrial vacuum pump"
+                        Estimated_Cost = 32000
+                        Priority = "Medium"
+                        Status = "Approved"
+                        Submitted_Date = "2026-08-07"
+                        SLA_Due_Date = "2026-11-07"
+                        Justification = "Existing pump has exceeded service life and is impacting line availability."
+                    ];
+
+                    /* BRQ-2026-0306 - Maintenance, 3-Person, Pending_Dept_Head */
+                    r6 = insert into Spend_Request
+                    [
+                        Request_ID = "BRQ-2026-0306"
+                        Requester_Name = "Wei Zhang"
+                        Department = "Maintenance & Utilities"
+                        Requester_ID = "EMP-3024"
+                        Reporting_Manager_Name = "Fatima Al-Sayed"
+                        Department_Head_Name = "Aisha Bello"
+                        Item_Description = "Air compressor replacement (plant-wide)"
+                        Estimated_Cost = 94000
+                        Priority = "Medium"
+                        Status = "Pending_Dept_Head"
+                        Submitted_Date = "2026-08-20"
+                        SLA_Due_Date = "2026-09-10"
+                        Justification = "Plant-wide compressor is failing intermittently; replacement prevents production stoppage."
+                    ];
+
+                    /* BRQ-2026-0307 - QA, Auto, Auto_Approved */
+                    r7 = insert into Spend_Request
+                    [
+                        Request_ID = "BRQ-2026-0307"
+                        Requester_Name = "Amara Okafor"
+                        Department = "Quality Assurance"
+                        Requester_ID = "EMP-3037"
+                        Reporting_Manager_Name = "Marco Rossi"
+                        Department_Head_Name = "Takeshi Yamamoto"
+                        Item_Description = "Calibration gauge set"
+                        Estimated_Cost = 780
+                        Priority = "Low"
+                        Status = "Auto_Approved"
+                        Submitted_Date = "2026-08-05"
+                        SLA_Due_Date = "2026-08-05"
+                        Justification = "Annual calibration tool replacement per QMS schedule."
+                    ];
+
+                    /* BRQ-2026-0308 - QA, 2-Person, Approved */
+                    r8 = insert into Spend_Request
+                    [
+                        Request_ID = "BRQ-2026-0308"
+                        Requester_Name = "Amara Okafor"
+                        Department = "Quality Assurance"
+                        Requester_ID = "EMP-3037"
+                        Reporting_Manager_Name = "Marco Rossi"
+                        Department_Head_Name = "Takeshi Yamamoto"
+                        Item_Description = "Digital vernier & micrometer set"
+                        Estimated_Cost = 9500
+                        Priority = "High"
+                        Status = "Approved"
+                        Submitted_Date = "2026-08-12"
+                        SLA_Due_Date = "2026-11-12"
+                        Justification = "Current set is out of calibration range; delays are affecting QA sign-off turnaround on the line."
+                    ];
+
+                    /* BRQ-2026-0309 - QA, 3-Person, Pending_RM */
+                    r9 = insert into Spend_Request
+                    [
+                        Request_ID = "BRQ-2026-0309"
+                        Requester_Name = "Amara Okafor"
+                        Department = "Quality Assurance"
+                        Requester_ID = "EMP-3037"
+                        Reporting_Manager_Name = "Marco Rossi"
+                        Department_Head_Name = "Takeshi Yamamoto"
+                        Item_Description = "Automated inspection system"
+                        Estimated_Cost = 142000
+                        Priority = "High"
+                        Status = "Pending_RM"
+                        Submitted_Date = "2026-08-26"
+                        SLA_Due_Date = "2026-09-05"
+                        Justification = "Manual inspection is the current bottleneck on the QA line; automation reduces cycle time and human error."
+                    ];
+
+                    /* BRQ-2026-0310 - Procurement, Auto, Auto_Approved */
+                    r10 = insert into Spend_Request
+                    [
+                        Request_ID = "BRQ-2026-0310"
+                        Requester_Name = "Elena Petrova"
+                        Department = "Procurement & Stores"
+                        Requester_ID = "EMP-3042"
+                        Reporting_Manager_Name = "Grace Kim"
+                        Department_Head_Name = "Isabella Fischer"
+                        Item_Description = "Packaging consumables restock"
+                        Estimated_Cost = 340
+                        Priority = "Low"
+                        Status = "Auto_Approved"
+                        Submitted_Date = "2026-08-08"
+                        SLA_Due_Date = "2026-08-08"
+                        Justification = "Monthly packaging stock replenishment for outbound logistics."
+                    ];
+
+                    /* BRQ-2026-0311 - Procurement, 2-Person, Pending_RM */
+                    r11 = insert into Spend_Request
+                    [
+                        Request_ID = "BRQ-2026-0311"
+                        Requester_Name = "Elena Petrova"
+                        Department = "Procurement & Stores"
+                        Requester_ID = "EMP-3042"
+                        Reporting_Manager_Name = "Grace Kim"
+                        Department_Head_Name = "Isabella Fischer"
+                        Item_Description = "Pallet racking addition"
+                        Estimated_Cost = 22000
+                        Priority = "Medium"
+                        Status = "Pending_RM"
+                        Submitted_Date = "2026-09-01"
+                        SLA_Due_Date = "2026-11-15"
+                        Justification = "Additional pallet racking required for Q4 inventory volume projections."
+                    ];
+
+                    /* BRQ-2026-0312 - Procurement, 3-Person, Rejected */
+                    r12 = insert into Spend_Request
+                    [
+                        Request_ID = "BRQ-2026-0312"
+                        Requester_Name = "Elena Petrova"
+                        Department = "Procurement & Stores"
+                        Requester_ID = "EMP-3042"
+                        Reporting_Manager_Name = "Grace Kim"
+                        Department_Head_Name = "Isabella Fischer"
+                        Item_Description = "Warehouse racking automation project"
+                        Estimated_Cost = 86000
+                        Priority = "High"
+                        Status = "Rejected"
+                        Submitted_Date = "2026-08-18"
+                        SLA_Due_Date = "2026-11-18"
+                        Justification = "Current racking layout is at capacity; automation adds storage density ahead of Q3 volume growth."
+                        Comments = "Deferred to next quarter pending warehouse layout finalization."
+                    ];
+
+                    /* BRQ-2026-0313 - IT, Auto, Auto_Approved */
+                    r13 = insert into Spend_Request
+                    [
+                        Request_ID = "BRQ-2026-0313"
+                        Requester_Name = "Daniel Cohen"
+                        Department = "IT & Systems"
+                        Requester_ID = "EMP-3055"
+                        Reporting_Manager_Name = "Liam O'Connor"
+                        Department_Head_Name = "Noah Bergstrom"
+                        Item_Description = "Keyboard/mouse replacement batch (20 units)"
+                        Estimated_Cost = 560
+                        Priority = "Low"
+                        Status = "Auto_Approved"
+                        Submitted_Date = "2026-08-14"
+                        SLA_Due_Date = "2026-08-14"
+                        Justification = "Batch peripheral replacement for workstations with worn input devices."
+                    ];
+
+                    /* BRQ-2026-0314 - IT, 2-Person, Rejected */
+                    r14 = insert into Spend_Request
+                    [
+                        Request_ID = "BRQ-2026-0314"
+                        Requester_Name = "Daniel Cohen"
+                        Department = "IT & Systems"
+                        Requester_ID = "EMP-3055"
+                        Reporting_Manager_Name = "Liam O'Connor"
+                        Department_Head_Name = "Noah Bergstrom"
+                        Item_Description = "Departmental laptop refresh (10 units)"
+                        Estimated_Cost = 48000
+                        Priority = "Medium"
+                        Status = "Rejected"
+                        Submitted_Date = "2026-09-02"
+                        SLA_Due_Date = "2026-11-02"
+                        Justification = "Laptops are showing performance issues on client-facing tools; refresh improves reliability."
+                        Comments = "Refresh cycle isn't due for another 8 months per asset lifecycle policy; resubmit closer to the replacement window."
+                    ];
+
+                    /* BRQ-2026-0315 - IT, 3-Person, Pending_Finance */
+                    r15 = insert into Spend_Request
+                    [
+                        Request_ID = "BRQ-2026-0315"
+                        Requester_Name = "Daniel Cohen"
+                        Department = "IT & Systems"
+                        Requester_ID = "EMP-3055"
+                        Reporting_Manager_Name = "Liam O'Connor"
+                        Department_Head_Name = "Noah Bergstrom"
+                        Item_Description = "Server & network infrastructure upgrade"
+                        Estimated_Cost = 115000
+                        Priority = "High"
+                        Status = "Pending_Finance"
+                        Submitted_Date = "2026-08-30"
+                        SLA_Due_Date = "2026-11-25"
+                        Justification = "Existing server hardware is past end-of-support; upgrade reduces outage risk ahead of Q3 peak load."
+                    ];
+
+                    /* BRQ-2026-0316 - HR, Auto, Auto_Approved */
+                    r16 = insert into Spend_Request
+                    [
+                        Request_ID = "BRQ-2026-0316"
+                        Requester_Name = "Priya Nair"
+                        Department = "HR & Admin"
+                        Requester_ID = "EMP-3068"
+                        Reporting_Manager_Name = "Sofia Martins"
+                        Department_Head_Name = "Chidi Eze"
+                        Item_Description = "Stationery & printing restock"
+                        Estimated_Cost = 210
+                        Priority = "Low"
+                        Status = "Auto_Approved"
+                        Submitted_Date = "2026-08-10"
+                        SLA_Due_Date = "2026-08-10"
+                        Justification = "Monthly office supplies replenishment for HR and admin staff."
+                    ];
+
+                    /* BRQ-2026-0317 - HR, 2-Person, Rejected */
+                    r17 = insert into Spend_Request
+                    [
+                        Request_ID = "BRQ-2026-0317"
+                        Requester_Name = "Priya Nair"
+                        Department = "HR & Admin"
+                        Requester_ID = "EMP-3068"
+                        Reporting_Manager_Name = "Sofia Martins"
+                        Department_Head_Name = "Chidi Eze"
+                        Item_Description = "HRMS software license renewal"
+                        Estimated_Cost = 11000
+                        Priority = "Medium"
+                        Status = "Rejected"
+                        Submitted_Date = "2026-08-22"
+                        SLA_Due_Date = "2026-11-22"
+                        Justification = "Annual HRMS license renewal required to maintain system access for all HR staff."
+                        Comments = "Duplicate license already active under a company-wide HRMS agreement."
+                    ];
+
+                    /* BRQ-2026-0318 - HR, 3-Person, Approved */
+                    r18 = insert into Spend_Request
+                    [
+                        Request_ID = "BRQ-2026-0318"
+                        Requester_Name = "Priya Nair"
+                        Department = "HR & Admin"
+                        Requester_ID = "EMP-3068"
+                        Reporting_Manager_Name = "Sofia Martins"
+                        Department_Head_Name = "Chidi Eze"
+                        Item_Description = "Cafeteria & facility renovation"
+                        Estimated_Cost = 69000
+                        Priority = "High"
+                        Status = "Approved"
+                        Submitted_Date = "2026-08-15"
+                        SLA_Due_Date = "2026-11-15"
+                        Justification = "Cafeteria infrastructure is overdue for renovation to meet health and safety standards."
+                    ];
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,424 @@
+Seed_Approval_Log as "Seed Approval Log Data"
+{
+    type = schedule
+    start = "2030-01-01 00:00:00"
+    time zone = "America/New_York"
+
+    on start
+    {
+        actions
+        {
+            on load
+            (
+                log_count = Approval_Log[ID != 0].count();
+                if(log_count == 0)
+                {
+                    /* BRQ-2026-0301 - Auto-Approved */
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0301"
+                        Stage = "System"
+                        Approver_Name = "Carlos Medina"
+                        Decision = "Submitted"
+                        Decision_Timestamp = "2026-08-01 09:00:00"
+                        Comments = "Request submitted by Carlos Medina (Production)"
+                    ];
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0301"
+                        Stage = "System"
+                        Approver_Name = "System"
+                        Decision = "Auto-Approved"
+                        Decision_Timestamp = "2026-08-01 09:01:00"
+                        Comments = "Auto-approved based on amount threshold (up to $1,000)"
+                    ];
+
+                    /* BRQ-2026-0302 - Production, 2-Person, Pending Finance */
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0302"
+                        Stage = "System"
+                        Approver_Name = "Carlos Medina"
+                        Decision = "Submitted"
+                        Decision_Timestamp = "2026-09-10 09:00:00"
+                        Comments = "Request submitted by Carlos Medina (Production)"
+                    ];
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0302"
+                        Stage = "Reporting Manager"
+                        Approver_Name = "Jason Miller"
+                        Decision = "Approved"
+                        Decision_Timestamp = "2026-09-12 10:15:00"
+                        Comments = "Approved by Reporting Manager Jason Miller, routed directly to Finance (2-Person tier - Department Head not required)"
+                    ];
+
+                    /* BRQ-2026-0303 - Production, 3-Person, Pending Dept Head */
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0303"
+                        Stage = "System"
+                        Approver_Name = "Carlos Medina"
+                        Decision = "Submitted"
+                        Decision_Timestamp = "2026-08-25 10:05:00"
+                        Comments = "Request submitted by Carlos Medina (Production)"
+                    ];
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0303"
+                        Stage = "Reporting Manager"
+                        Approver_Name = "Jason Miller"
+                        Decision = "Approved"
+                        Decision_Timestamp = "2026-08-28 09:30:00"
+                        Comments = "Approved by Reporting Manager Jason Miller, routed to Department Head"
+                    ];
+
+                    /* BRQ-2026-0304 - Auto-Approved */
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0304"
+                        Stage = "System"
+                        Approver_Name = "Wei Zhang"
+                        Decision = "Submitted"
+                        Decision_Timestamp = "2026-08-03 08:30:00"
+                        Comments = "Request submitted by Wei Zhang (Maintenance & Utilities)"
+                    ];
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0304"
+                        Stage = "System"
+                        Approver_Name = "System"
+                        Decision = "Auto-Approved"
+                        Decision_Timestamp = "2026-08-03 08:31:00"
+                        Comments = "Auto-approved based on amount threshold (up to $1,000)"
+                    ];
+
+                    /* BRQ-2026-0305 - Maintenance, 2-Person, Approved */
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0305"
+                        Stage = "System"
+                        Approver_Name = "Wei Zhang"
+                        Decision = "Submitted"
+                        Decision_Timestamp = "2026-08-07 09:15:00"
+                        Comments = "Request submitted by Wei Zhang (Maintenance & Utilities)"
+                    ];
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0305"
+                        Stage = "Reporting Manager"
+                        Approver_Name = "Fatima Al-Sayed"
+                        Decision = "Approved"
+                        Decision_Timestamp = "2026-08-09 11:00:00"
+                        Comments = "Approved by Reporting Manager Fatima Al-Sayed, routed to Finance"
+                    ];
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0305"
+                        Stage = "Finance Controller"
+                        Approver_Name = "Olivia Bennett"
+                        Decision = "Approved"
+                        Decision_Timestamp = "2026-08-11 14:30:00"
+                        Comments = "Approved by Finance Controller Olivia Bennett. Purchase order authorized."
+                    ];
+
+                    /* BRQ-2026-0306 - Maintenance, 3-Person, Pending Dept Head */
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0306"
+                        Stage = "System"
+                        Approver_Name = "Wei Zhang"
+                        Decision = "Submitted"
+                        Decision_Timestamp = "2026-08-20 10:00:00"
+                        Comments = "Request submitted by Wei Zhang (Maintenance & Utilities)"
+                    ];
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0306"
+                        Stage = "Reporting Manager"
+                        Approver_Name = "Fatima Al-Sayed"
+                        Decision = "Approved"
+                        Decision_Timestamp = "2026-08-22 09:45:00"
+                        Comments = "Approved by Reporting Manager Fatima Al-Sayed, routed to Department Head"
+                    ];
+
+                    /* BRQ-2026-0307 - QA, Auto-Approved */
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0307"
+                        Stage = "System"
+                        Approver_Name = "Amara Okafor"
+                        Decision = "Submitted"
+                        Decision_Timestamp = "2026-08-05 08:00:00"
+                        Comments = "Request submitted by Amara Okafor (Quality Assurance)"
+                    ];
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0307"
+                        Stage = "System"
+                        Approver_Name = "System"
+                        Decision = "Auto-Approved"
+                        Decision_Timestamp = "2026-08-05 08:01:00"
+                        Comments = "Auto-approved based on amount threshold (up to $1,000)"
+                    ];
+
+                    /* BRQ-2026-0308 - QA, 2-Person, Approved */
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0308"
+                        Stage = "System"
+                        Approver_Name = "Amara Okafor"
+                        Decision = "Submitted"
+                        Decision_Timestamp = "2026-08-12 10:30:00"
+                        Comments = "Request submitted by Amara Okafor (Quality Assurance)"
+                    ];
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0308"
+                        Stage = "Reporting Manager"
+                        Approver_Name = "Marco Rossi"
+                        Decision = "Approved"
+                        Decision_Timestamp = "2026-08-14 11:20:00"
+                        Comments = "Approved by Reporting Manager Marco Rossi, routed to Finance"
+                    ];
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0308"
+                        Stage = "Finance Controller"
+                        Approver_Name = "Olivia Bennett"
+                        Decision = "Approved"
+                        Decision_Timestamp = "2026-08-15 15:00:00"
+                        Comments = "Approved by Finance Controller Olivia Bennett. Purchase order authorized."
+                    ];
+
+                    /* BRQ-2026-0309 - QA, 3-Person, Pending RM */
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0309"
+                        Stage = "System"
+                        Approver_Name = "Amara Okafor"
+                        Decision = "Submitted"
+                        Decision_Timestamp = "2026-08-26 09:00:00"
+                        Comments = "Request submitted by Amara Okafor (Quality Assurance)"
+                    ];
+
+                    /* BRQ-2026-0310 - Procurement, Auto-Approved */
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0310"
+                        Stage = "System"
+                        Approver_Name = "Elena Petrova"
+                        Decision = "Submitted"
+                        Decision_Timestamp = "2026-08-08 08:45:00"
+                        Comments = "Request submitted by Elena Petrova (Procurement & Stores)"
+                    ];
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0310"
+                        Stage = "System"
+                        Approver_Name = "System"
+                        Decision = "Auto-Approved"
+                        Decision_Timestamp = "2026-08-08 08:46:00"
+                        Comments = "Auto-approved based on amount threshold (up to $1,000)"
+                    ];
+
+                    /* BRQ-2026-0311 - Procurement, 2-Person, Pending RM */
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0311"
+                        Stage = "System"
+                        Approver_Name = "Elena Petrova"
+                        Decision = "Submitted"
+                        Decision_Timestamp = "2026-09-01 09:30:00"
+                        Comments = "Request submitted by Elena Petrova (Procurement & Stores)"
+                    ];
+
+                    /* BRQ-2026-0312 - Procurement, 3-Person, Rejected at Dept Head */
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0312"
+                        Stage = "System"
+                        Approver_Name = "Elena Petrova"
+                        Decision = "Submitted"
+                        Decision_Timestamp = "2026-08-18 10:00:00"
+                        Comments = "Request submitted by Elena Petrova (Procurement & Stores)"
+                    ];
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0312"
+                        Stage = "Reporting Manager"
+                        Approver_Name = "Grace Kim"
+                        Decision = "Approved"
+                        Decision_Timestamp = "2026-08-20 10:30:00"
+                        Comments = "Approved by Reporting Manager Grace Kim, routed to Department Head"
+                    ];
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0312"
+                        Stage = "Department Head"
+                        Approver_Name = "Isabella Fischer"
+                        Decision = "Rejected"
+                        Decision_Timestamp = "2026-08-25 14:00:00"
+                        Comments = "Deferred to next quarter pending warehouse layout finalization."
+                    ];
+
+                    /* BRQ-2026-0313 - IT, Auto-Approved */
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0313"
+                        Stage = "System"
+                        Approver_Name = "Daniel Cohen"
+                        Decision = "Submitted"
+                        Decision_Timestamp = "2026-08-14 11:00:00"
+                        Comments = "Request submitted by Daniel Cohen (IT & Systems)"
+                    ];
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0313"
+                        Stage = "System"
+                        Approver_Name = "System"
+                        Decision = "Auto-Approved"
+                        Decision_Timestamp = "2026-08-14 11:01:00"
+                        Comments = "Auto-approved based on amount threshold (up to $1,000)"
+                    ];
+
+                    /* BRQ-2026-0314 - IT, 2-Person, Rejected at RM */
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0314"
+                        Stage = "System"
+                        Approver_Name = "Daniel Cohen"
+                        Decision = "Submitted"
+                        Decision_Timestamp = "2026-09-02 11:20:00"
+                        Comments = "Request submitted by Daniel Cohen (IT & Systems)"
+                    ];
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0314"
+                        Stage = "Reporting Manager"
+                        Approver_Name = "Liam O'Connor"
+                        Decision = "Rejected"
+                        Decision_Timestamp = "2026-09-04 14:40:00"
+                        Comments = "Refresh cycle isn't due for another 8 months per asset lifecycle policy; resubmit closer to the replacement window."
+                    ];
+
+                    /* BRQ-2026-0315 - IT, 3-Person, Pending Finance */
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0315"
+                        Stage = "System"
+                        Approver_Name = "Daniel Cohen"
+                        Decision = "Submitted"
+                        Decision_Timestamp = "2026-08-30 09:00:00"
+                        Comments = "Request submitted by Daniel Cohen (IT & Systems)"
+                    ];
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0315"
+                        Stage = "Reporting Manager"
+                        Approver_Name = "Liam O'Connor"
+                        Decision = "Approved"
+                        Decision_Timestamp = "2026-09-01 10:00:00"
+                        Comments = "Approved by Reporting Manager Liam O'Connor, routed to Department Head"
+                    ];
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0315"
+                        Stage = "Department Head"
+                        Approver_Name = "Noah Bergstrom"
+                        Decision = "Approved"
+                        Decision_Timestamp = "2026-09-03 11:30:00"
+                        Comments = "Approved by Department Head Noah Bergstrom, routed to Finance"
+                    ];
+
+                    /* BRQ-2026-0316 - HR, Auto-Approved */
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0316"
+                        Stage = "System"
+                        Approver_Name = "Priya Nair"
+                        Decision = "Submitted"
+                        Decision_Timestamp = "2026-08-10 08:30:00"
+                        Comments = "Request submitted by Priya Nair (HR & Admin)"
+                    ];
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0316"
+                        Stage = "System"
+                        Approver_Name = "System"
+                        Decision = "Auto-Approved"
+                        Decision_Timestamp = "2026-08-10 08:31:00"
+                        Comments = "Auto-approved based on amount threshold (up to $1,000)"
+                    ];
+
+                    /* BRQ-2026-0317 - HR, 2-Person, Rejected at Finance */
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0317"
+                        Stage = "System"
+                        Approver_Name = "Priya Nair"
+                        Decision = "Submitted"
+                        Decision_Timestamp = "2026-08-22 09:00:00"
+                        Comments = "Request submitted by Priya Nair (HR & Admin)"
+                    ];
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0317"
+                        Stage = "Reporting Manager"
+                        Approver_Name = "Sofia Martins"
+                        Decision = "Approved"
+                        Decision_Timestamp = "2026-08-24 10:00:00"
+                        Comments = "Approved by Reporting Manager Sofia Martins, routed to Finance"
+                    ];
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0317"
+                        Stage = "Finance Controller"
+                        Approver_Name = "Olivia Bennett"
+                        Decision = "Rejected"
+                        Decision_Timestamp = "2026-08-26 13:00:00"
+                        Comments = "Duplicate license already active under a company-wide HRMS agreement."
+                    ];
+
+                    /* BRQ-2026-0318 - HR, 3-Person, Approved */
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0318"
+                        Stage = "System"
+                        Approver_Name = "Priya Nair"
+                        Decision = "Submitted"
+                        Decision_Timestamp = "2026-08-15 09:30:00"
+                        Comments = "Request submitted by Priya Nair (HR & Admin)"
+                    ];
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0318"
+                        Stage = "Reporting Manager"
+                        Approver_Name = "Sofia Martins"
+                        Decision = "Approved"
+                        Decision_Timestamp = "2026-08-17 11:00:00"
+                        Comments = "Approved by Reporting Manager Sofia Martins, routed to Department Head"
+                    ];
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0318"
+                        Stage = "Department Head"
+                        Approver_Name = "Chidi Eze"
+                        Decision = "Approved"
+                        Decision_Timestamp = "2026-08-19 14:00:00"
+                        Comments = "Approved by Department Head Chidi Eze, routed to Finance"
+                    ];
+                    insert into Approval_Log
+                    [
+                        Request_ID_Ref = "BRQ-2026-0318"
+                        Stage = "Finance Controller"
+                        Approver_Name = "Olivia Bennett"
+                        Decision = "Approved"
+                        Decision_Timestamp = "2026-08-21 16:00:00"
+                        Comments = "Approved by Finance Controller Olivia Bennett. Purchase order authorized."
+                    ];
+                }
+            )
+        }
+    }
+}

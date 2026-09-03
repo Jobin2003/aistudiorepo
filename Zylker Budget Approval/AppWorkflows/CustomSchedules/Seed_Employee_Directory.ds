@@ -1,0 +1,68 @@
+Seed_Employee_Directory as "Seed Employee Directory Data"
+{
+    type = schedule
+    start = "2030-01-01 00:00:00"
+    time zone = "America/New_York"
+
+    on start
+    {
+        actions
+        {
+            on load
+            (
+                emp_count = Employee_Directory[ID != 0].count();
+                if(emp_count == 0)
+                {
+                    insert into Employee_Directory
+                    [
+                        Employee_Name = "Carlos Medina"
+                        Department = "Production"
+                        Requester_ID = "EMP-3011"
+                        Reporting_Manager = "Jason Miller"
+                        Department_Head = "Henrik Larsson"
+                    ];
+                    insert into Employee_Directory
+                    [
+                        Employee_Name = "Wei Zhang"
+                        Department = "Maintenance & Utilities"
+                        Requester_ID = "EMP-3024"
+                        Reporting_Manager = "Fatima Al-Sayed"
+                        Department_Head = "Aisha Bello"
+                    ];
+                    insert into Employee_Directory
+                    [
+                        Employee_Name = "Amara Okafor"
+                        Department = "Quality Assurance"
+                        Requester_ID = "EMP-3037"
+                        Reporting_Manager = "Marco Rossi"
+                        Department_Head = "Takeshi Yamamoto"
+                    ];
+                    insert into Employee_Directory
+                    [
+                        Employee_Name = "Elena Petrova"
+                        Department = "Procurement & Stores"
+                        Requester_ID = "EMP-3042"
+                        Reporting_Manager = "Grace Kim"
+                        Department_Head = "Isabella Fischer"
+                    ];
+                    insert into Employee_Directory
+                    [
+                        Employee_Name = "Daniel Cohen"
+                        Department = "IT & Systems"
+                        Requester_ID = "EMP-3055"
+                        Reporting_Manager = "Liam O'Connor"
+                        Department_Head = "Noah Bergstrom"
+                    ];
+                    insert into Employee_Directory
+                    [
+                        Employee_Name = "Priya Nair"
+                        Department = "HR & Admin"
+                        Requester_ID = "EMP-3068"
+                        Reporting_Manager = "Sofia Martins"
+                        Department_Head = "Chidi Eze"
+                    ];
+                }
+            )
+        }
+    }
+}

@@ -1,0 +1,124 @@
+<link href='https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap' rel='stylesheet'>
+<style>
+  .ri-content-area {
+    margin-left: 220px;
+    background: #F8FAFC;
+    min-height: 100vh;
+    padding-top: 56px;
+    box-sizing: border-box;
+    font-family: 'Lato', sans-serif;
+  }
+  .ri-content-inner {
+    padding: 32px;
+  }
+  .ri-page-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+    font-family: 'Lato', sans-serif;
+    margin: 0 0 4px 0;
+  }
+  .ri-page-subtitle {
+    font-size: 13px;
+    color: #6B7280;
+    margin: 0 0 24px 0;
+    font-family: 'Lato', sans-serif;
+  }
+  .ri-form-card {
+    background: #FFFFFF;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    padding: 32px;
+    max-width: 900px;
+  }
+  .ri-info-strip {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: #F8FAFC;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 20px;
+  }
+  .ri-info-strip i {
+    font-size: 14px;
+    color: #6B7280;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+  .ri-info-strip-text {
+    font-size: 12px;
+    color: #6B7280;
+    font-style: italic;
+    font-family: 'Lato', sans-serif;
+    line-height: 1.5;
+  }
+  .ri-form-embed {
+    width: 100%;
+  }
+  .ri-tier-legend {
+    margin-top: 20px;
+    border-top: 1px solid #F3F4F6;
+    padding-top: 16px;
+  }
+  .ri-tier-legend-label {
+    font-size: 12px;
+    color: #6B7280;
+    font-family: 'Lato', sans-serif;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .ri-tier-badges {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .ri-tier-badge {
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
+    display: inline-block;
+  }
+  .ri-tier-badge-auto {
+    background: #DCFCE7;
+    color: #16AD78;
+  }
+  .ri-tier-badge-two {
+    background: #FEF9C3;
+    color: #D97706;
+  }
+  .ri-tier-badge-three {
+    background: #EFF6FF;
+    color: #2563EB;
+  }
+</style>
+
+<div class="ri-content-area">
+  <div class="ri-content-inner">
+    <h1 class="ri-page-title">New Spend Request</h1>
+    <p class="ri-page-subtitle">Atlas Precision Manufacturing Inc. &middot; Plant 3, Ohio, USA</p>
+
+    <div class="ri-form-card">
+      <div class="ri-info-strip">
+        <i class="zc-li-outline ui-1-info-circle"></i>
+        <span class="ri-info-strip-text">Requester ID, Reporting Manager, and Department Head are auto-resolved when your name and department match our employee records.</span>
+      </div>
+
+      <div class="ri-form-embed">
+        <div zc-component="form" zc-linkname="Spend_Request" zc-height="auto"></div>
+      </div>
+
+      <div class="ri-tier-legend">
+        <span class="ri-tier-legend-label">Approval Tier Thresholds</span>
+        <div class="ri-tier-badges">
+          <span class="ri-tier-badge ri-tier-badge-auto">Auto &mdash; Up to $1,000</span>
+          <span class="ri-tier-badge ri-tier-badge-two">2-Person &mdash; $1,001 &ndash; $50,000</span>
+          <span class="ri-tier-badge ri-tier-badge-three">3-Person &mdash; $50,001+</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

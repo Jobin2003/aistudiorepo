@@ -1,0 +1,17 @@
+customize
+{
+    layout
+    {
+        theme = "theme_6"
+    }
+
+    font = "lato"
+
+    color options
+    {
+        name = "Cobalt Blue"
+        brand color = "#2563EB"
+        type = "custom"
+        dark mode color = "#1D4ED8"
+    }
+}

@@ -1,0 +1,78 @@
+report Approval_Actions
+{
+    quickview
+    (
+        layout
+        (
+            type = -1
+            datablock1
+            (
+                layout type = -1
+                fields
+                (
+                    Request_ID_Input
+                    Approver_Name
+                    Approver_Stage
+                    Decision
+                )
+            )
+        )
+        menu
+        (
+            header
+            (
+                Edit
+                Duplicate
+                Delete
+            )
+            record
+            (
+                Edit
+                Duplicate
+                Delete
+            )
+        )
+        action
+        (
+            on click
+            (
+                View Record
+            )
+            on right click
+            (
+                Edit
+                Delete
+                Duplicate
+                View Record
+            )
+        )
+    )
+    detailview
+    (
+        layout
+        (
+            type = 1
+            datablock1
+            (
+                layout type = -2
+                fields
+                (
+                    Request_ID_Input
+                    Approver_Name
+                    Approver_Stage
+                    Decision
+                    Comments
+                )
+            )
+        )
+        menu
+        (
+            header
+            (
+                Edit
+                Duplicate
+                Delete
+            )
+        )
+    )
+}

@@ -1,0 +1,35 @@
+<page linkname="Dashboard" parameters="string load" displayname="Dashboard"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='db_nav_sidebar' elementName='Nav_Sidebar'>
+          <![CDATA[htmlpage db_nav_sidebar()
+             content
+             <%{%>
+                 <file name:Nav_Sidebar.dshtml/>
+             <%}%>
+         ]]>
+        </dsp>
+        <dsp id='db_header_bar' elementName='Header_Bar'>
+          <![CDATA[htmlpage db_header_bar()
+             content
+             <%{%>
+                 <file name:Header_Bar.dshtml/>
+             <%}%>
+         ]]>
+        </dsp>
+        <dsp id='db_dashboard_content' elementName='Dashboard_Content'>
+          <![CDATA[htmlpage db_dashboard_content()
+             content
+             <%{%>
+                 <file name:Dashboard_Content.dshtml/>
+             <%}%>
+         ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

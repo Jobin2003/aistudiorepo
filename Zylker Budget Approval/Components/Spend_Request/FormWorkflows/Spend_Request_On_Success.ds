@@ -1,0 +1,74 @@
+Spend_Request_On_Success as "Set Request ID and Route on Submit"
+{
+    type = form
+    form = Spend_Request
+    record event = on add
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                /* Skip auto-generation if Request_ID is already set (e.g. seeded records) */
+                if(input.Request_ID == null || input.Request_ID == "")
+                {
+                    current_year = zoho.currentdate.getYear();
+                    rec_id = input.ID;
+                    id_str = "" + rec_id;
+                    padded_id = id_str;
+                    if(id_str.length() == 1) { padded_id = "000" + id_str; }
+                    else if(id_str.length() == 2) { padded_id = "00" + id_str; }
+                    else if(id_str.length() == 3) { padded_id = "0" + id_str; }
+                    req_id = "BRQ-" + current_year + "-" + padded_id;
+                    sub_date = zoho.currentdate;
+
+                    cost_val = input.Estimated_Cost;
+                    if(cost_val <= 1000)
+                    {
+                        new_status = "Auto_Approved";
+                        sla_date = zoho.currentdate;
+                    }
+                    else
+                    {
+                        new_status = "Pending_RM";
+                        sla_date = zoho.currentdate.addDay(60);
+                    }
+
+                    update Spend_Request[ID == input.ID]
+                    [
+                        Request_ID = req_id
+                        Submitted_Date = sub_date
+                        Status = new_status
+                        SLA_Due_Date = sla_date
+                    ];
+
+                    if(cost_val <= 1000)
+                    {
+                        insert into Approval_Log
+                        [
+                            Request_ID_Ref = req_id
+                            Stage = "System"
+                            Approver_Name = "System"
+                            Decision = "Auto-Approved"
+                            Decision_Timestamp = zoho.currenttime
+                            Comments = "Auto-approved based on amount threshold (up to $1,000)"
+                        ];
+                    }
+                    else
+                    {
+                        insert into Approval_Log
+                        [
+                            Request_ID_Ref = req_id
+                            Stage = "System"
+                            Approver_Name = input.Requester_Name
+                            Decision = "Submitted"
+                            Decision_Timestamp = zoho.currenttime
+                            Comments = "Request submitted by " + input.Requester_Name + " from " + input.Department
+                        ];
+                    }
+                }
+            )
+        }
+    }
+}

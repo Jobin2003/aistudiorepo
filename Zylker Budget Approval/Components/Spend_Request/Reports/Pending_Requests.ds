@@ -1,0 +1,19 @@
+list Pending_Requests
+{
+    displayName = "Pending Requests"
+    show all rows from Spend_Request [Status == "Pending_RM" || Status == "Pending_Dept_Head" || Status == "Pending_Finance"]
+    (
+        Request_ID
+        Requester_Name
+        Department
+        Estimated_Cost
+        Approval_Tier
+        Status
+        SLA_Due_Date
+        Priority
+        Item_Description
+        Submitted_Date
+    )
+    filters ( Status  Department )
+    sort by ( SLA_Due_Date ascending )
+}

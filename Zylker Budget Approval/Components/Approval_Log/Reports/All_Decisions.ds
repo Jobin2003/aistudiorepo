@@ -1,0 +1,14 @@
+default list All_Decisions
+{
+    displayName = "All Decisions"
+    show all rows from Approval_Log
+    (
+        Request_ID_Ref
+        Stage
+        Approver_Name
+        Decision
+        Decision_Timestamp
+        Comments
+    )
+    sort by ( Decision_Timestamp descending )
+}

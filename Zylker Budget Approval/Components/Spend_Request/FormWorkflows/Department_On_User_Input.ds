@@ -1,0 +1,29 @@
+Department_On_User_Input as "Filter Items and Resolve Manager on Department Change"
+{
+    type = form
+    form = Spend_Request
+    record event = on add or edit
+
+    on user input of Department
+    {
+        actions
+        {
+            custom deluge script
+            (
+                // Clear dependent fields
+                input.Item_Description = "";
+                input.Estimated_Cost = 0;
+
+                // Resolve employee details
+                emp_records = Employee_Directory[Employee_Name == input.Requester_Name && Department == input.Department];
+                for each emp in emp_records
+                {
+                    input.Requester_ID = emp.Requester_ID;
+                    input.Reporting_Manager_Name = emp.Reporting_Manager;
+                    input.Department_Head_Name = emp.Department_Head;
+                    break;
+                }
+            )
+        }
+    }
+}
