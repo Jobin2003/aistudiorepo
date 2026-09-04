@@ -4,30 +4,26 @@
   <layout>
     <row>
       <column width='100%'>
-        <dsp id='ri_nav_sidebar' elementName='Nav_Sidebar'>
-          <![CDATA[htmlpage ri_nav_sidebar()
-             content
-             <%{%>
-                 <file name:Nav_Sidebar.dshtml/>
-             <%}%>
-         ]]>
-        </dsp>
-        <dsp id='ri_header_bar' elementName='Header_Bar'>
-          <![CDATA[htmlpage ri_header_bar()
-             content
-             <%{%>
-                 <file name:Header_Bar.dshtml/>
-             <%}%>
-         ]]>
-        </dsp>
-        <dsp id='ri_form_card' elementName='Form_Card'>
-          <![CDATA[htmlpage ri_form_card()
+        <dsp id='ri_form_info' elementName='Form_Card'>
+          <![CDATA[htmlpage ri_form_info()
              content
              <%{%>
                  <file name:Form_Card.dshtml/>
              <%}%>
          ]]>
         </dsp>
+        <form elementName='Spend_Request_Form'
+              appLinkName='thisapp'
+              linkName='Spend_Request'
+              heightType='auto'
+              zc_Header='false'
+              urlType='page'
+              urlAppLinkName='thisapp'
+              zc_NextUrl='#Page:Approvals'
+              zc_OpenUrlIn='same window'
+              zc_SuccMsg='Your spend request has been submitted successfully.'
+              zc_SubmitVal='Submit Request'
+              zc_ResetVal='Clear' />
       </column>
     </row>
   </layout>

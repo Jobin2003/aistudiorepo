@@ -1,35 +1,24 @@
-<link href='https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap' rel='stylesheet'>
+<link href='https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&display=swap' rel='stylesheet'>
 <style>
-  .ap-page-wrap {
-    margin-left: 220px;
-    padding-top: 56px;
+  * { box-sizing: border-box; }
+  .ap-wrap {
+    padding: 24px 28px 40px 28px;
     background: #F8FAFC;
     min-height: 100vh;
     font-family: 'Lato', sans-serif;
-    box-sizing: border-box;
   }
-  .ap-title-row {
-    padding: 24px 28px 0;
-  }
-  .ap-title-row h1 {
-    font-size: 22px;
-    font-weight: 700;
-    color: #111827;
-    margin: 0;
-  }
-  .ap-title-row p {
-    font-size: 13px;
-    color: #6B7280;
-    margin: 4px 0 0;
-  }
+  .ap-page-title { font-size: 22px; font-weight: 700; color: #111827; margin: 0 0 4px 0; }
+  .ap-page-sub   { font-size: 13px; color: #6B7280; margin: 0 0 20px 0; }
+
+  /* TABS */
   .ap-tabs-row {
-    padding: 0 28px;
-    margin-top: 20px;
     border-bottom: 1px solid #E5E7EB;
     display: flex;
-    gap: 32px;
+    gap: 28px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
   }
-  .ap-tab-link {
+  .ap-tab {
     font-size: 14px;
     color: #6B7280;
     text-decoration: none;
@@ -37,20 +26,15 @@
     display: inline-block;
     border-bottom: 3px solid transparent;
     white-space: nowrap;
+    font-family: 'Lato', sans-serif;
   }
-  .ap-tab-link.active {
-    font-weight: 700;
-    color: #2563EB;
-    border-bottom: 3px solid #2563EB;
-  }
-  .ap-split-panel {
-    padding: 20px 28px;
-    display: flex;
-    gap: 20px;
-    align-items: flex-start;
-  }
-  /* ---- QUEUE TABLE ---- */
-  .ap-queue-container {
+  .ap-tab.active { font-weight: 700; color: #2563EB; border-bottom-color: #2563EB; }
+
+  /* SPLIT LAYOUT */
+  .ap-split { display: flex; gap: 20px; align-items: flex-start; }
+
+  /* QUEUE */
+  .ap-queue {
     flex: 1;
     min-width: 0;
     background: #FFFFFF;
@@ -58,494 +42,267 @@
     box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     overflow: hidden;
   }
-  .ap-queue-header {
+  .ap-q-head {
     background: #F9FAFB;
-    padding: 12px 16px;
+    padding: 11px 16px;
     display: grid;
-    grid-template-columns: 40px 1fr 140px 100px 90px 120px 120px;
-    gap: 12px;
-    font-size: 12px;
+    grid-template-columns: 44px 1fr 130px 100px 85px 105px 105px;
+    gap: 8px;
+    font-size: 11px;
     font-weight: 700;
     color: #6B7280;
     border-bottom: 1px solid #E5E7EB;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    box-sizing: border-box;
   }
-  .ap-queue-row {
+  .ap-q-row {
     display: grid;
-    grid-template-columns: 40px 1fr 140px 100px 90px 120px 120px;
-    gap: 12px;
-    padding: 14px 16px;
+    grid-template-columns: 44px 1fr 130px 100px 85px 105px 105px;
+    gap: 8px;
+    padding: 13px 16px;
     border-bottom: 1px solid #F3F4F6;
     text-decoration: none;
     color: inherit;
-    box-sizing: border-box;
     align-items: center;
   }
-  .ap-queue-row.selected {
-    background: #EFF6FF;
-  }
-  .ap-queue-row.unselected {
-    background: #FFFFFF;
-  }
-  .ap-badge-circle {
-    width: 36px;
-    height: 36px;
-    background: #2563EB;
-    color: #FFFFFF;
-    font-size: 13px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .ap-q-row.sel  { background: #EFF6FF; }
+  .ap-q-row.norm { background: #FFFFFF; }
+  .ap-avatar {
+    width: 36px; height: 36px;
+    background: #2563EB; color: #FFFFFF;
+    font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
     border-radius: 50%;
     flex-shrink: 0;
+    font-family: 'Lato', sans-serif;
   }
-  .ap-req-name {
-    font-size: 14px;
-    font-weight: 700;
-    color: #111827;
-    display: block;
-  }
-  .ap-req-id {
-    font-size: 12px;
-    color: #9CA3AF;
-    display: block;
-    margin-top: 1px;
-  }
-  .ap-dept-cell {
-    font-size: 13px;
-    color: #374151;
-    align-self: center;
-  }
-  .ap-amount-cell {
-    font-size: 14px;
-    font-weight: 700;
-    color: #111827;
-    align-self: center;
-  }
-  .ap-tier-pill {
-    border-radius: 20px;
-    padding: 3px 10px;
-    font-size: 12px;
-    font-weight: 700;
-    display: inline-block;
-    white-space: nowrap;
-  }
-  .ap-tier-auto { background: #DCFCE7; color: #16AD78; }
-  .ap-tier-2p   { background: #FEF9C3; color: #D97706; }
-  .ap-tier-3p   { background: #EFF6FF; color: #2563EB; }
-  .ap-status-pill {
-    border-radius: 20px;
-    padding: 3px 10px;
-    font-size: 12px;
-    font-weight: 700;
-    display: inline-block;
-    white-space: nowrap;
-  }
-  .ap-status-pending  { background: #FEF9C3; color: #D97706; }
-  .ap-status-approved { background: #DCFCE7; color: #16AD78; }
-  .ap-status-rejected { background: #FEE2E2; color: #EF4444; }
-  .ap-sla-normal  { font-size: 13px; color: #374151; }
-  .ap-sla-overdue { font-size: 13px; color: #EF4444; font-weight: 700; }
-  /* ---- DETAIL PANEL ---- */
-  .ap-detail-panel {
-    width: 440px;
+  .ap-name-line  { font-size: 14px; font-weight: 700; color: #111827; display: block; }
+  .ap-id-line    { font-size: 12px; color: #9CA3AF; display: block; margin-top: 1px; }
+  .ap-dept-cell  { font-size: 13px; color: #374151; }
+  .ap-amt-cell   { font-size: 14px; font-weight: 700; color: #111827; }
+  .ap-pill       { border-radius: 20px; padding: 3px 10px; font-size: 12px; font-weight: 700; display: inline-block; white-space: nowrap; }
+  .tier-auto     { background: #DCFCE7; color: #16AD78; }
+  .tier-2p       { background: #FEF9C3; color: #D97706; }
+  .tier-3p       { background: #EFF6FF; color: #2563EB; }
+  .st-pending    { background: #FEF9C3; color: #D97706; }
+  .st-approved   { background: #DCFCE7; color: #16AD78; }
+  .st-rejected   { background: #FEE2E2; color: #EF4444; }
+  .st-hold       { background: #FEF3C7; color: #92400E; }
+  .sla-ok        { font-size: 13px; color: #374151; }
+  .sla-over      { font-size: 12px; color: #EF4444; font-weight: 700; }
+  .ap-empty      { padding: 32px 16px; text-align: center; font-size: 14px; color: #9CA3AF; }
+
+  /* DETAIL PANEL */
+  .ap-detail {
+    width: 430px;
     flex-shrink: 0;
     background: #FFFFFF;
     border-radius: 10px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     overflow: hidden;
   }
-  .ap-detail-header {
-    background: #F9FAFB;
-    border-bottom: 1px solid #E5E7EB;
-    padding: 16px 20px;
-  }
-  .ap-detail-req-id {
-    font-size: 15px;
-    font-weight: 700;
-    color: #111827;
-    display: block;
-  }
-  .ap-detail-desc {
-    font-size: 13px;
-    color: #6B7280;
-    display: block;
-    margin-top: 3px;
-  }
-  /* Stepper */
-  .ap-stepper {
-    padding: 20px;
-    border-bottom: 1px solid #F3F4F6;
-    display: flex;
-    align-items: center;
-  }
-  .ap-step-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-  }
+  .ap-d-header { background: #F9FAFB; border-bottom: 1px solid #E5E7EB; padding: 16px 20px; }
+  .ap-d-req-id { font-size: 15px; font-weight: 700; color: #111827; display: block; }
+  .ap-d-desc   { font-size: 13px; color: #6B7280; display: block; margin-top: 4px; }
+
+  /* STEPPER */
+  .ap-stepper { padding: 18px 20px; border-bottom: 1px solid #F3F4F6; display: flex; align-items: center; }
+  .ap-step-col { display: flex; flex-direction: column; align-items: center; gap: 5px; }
   .ap-step-circle {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 700;
-    box-sizing: border-box;
+    width: 34px; height: 34px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    font-family: 'Lato', sans-serif;
   }
-  .ap-step-circle.completed {
-    background: #2563EB;
-    color: #FFFFFF;
-    border: none;
-  }
-  .ap-step-circle.active {
-    background: #FFFFFF;
-    color: #2563EB;
-    border: 2px solid #2563EB;
-  }
-  .ap-step-circle.pending {
-    background: #FFFFFF;
-    color: #9CA3AF;
-    border: 2px solid #D1D5DB;
-  }
-  .ap-step-label {
-    font-size: 11px;
-    text-align: center;
-    white-space: nowrap;
-  }
-  .ap-step-label.completed { font-weight: 700; color: #2563EB; }
-  .ap-step-label.active    { font-weight: 700; color: #2563EB; }
-  .ap-step-label.pending   { color: #9CA3AF; }
-  .ap-step-connector {
-    flex: 1;
-    height: 2px;
-    margin-bottom: 18px;
-  }
-  .ap-step-connector.done    { background: #2563EB; }
-  .ap-step-connector.pending { background: #E5E7EB; }
-  /* Stat cards */
-  .ap-stat-cards {
-    display: flex;
-    gap: 12px;
-    padding: 16px 20px;
-    border-bottom: 1px solid #F3F4F6;
-  }
-  .ap-stat-card {
-    flex: 1;
-    border-radius: 8px;
-    padding: 14px 16px;
-  }
-  .ap-stat-card-value {
-    display: block;
-    font-weight: 700;
-    color: #111827;
-  }
-  .ap-stat-card-label {
-    display: block;
-    font-size: 11px;
-    color: #6B7280;
-    margin-top: 4px;
-  }
-  /* Request details grid */
-  .ap-req-details {
-    padding: 16px 20px;
+  .sc-done    { background: #2563EB; color: #FFFFFF; }
+  .sc-active  { background: #FFFFFF; color: #2563EB; border: 2px solid #2563EB; }
+  .sc-pending { background: #FFFFFF; color: #9CA3AF; border: 2px solid #D1D5DB; }
+  .ap-step-lbl { font-size: 11px; text-align: center; white-space: nowrap; }
+  .sl-done    { font-weight: 700; color: #2563EB; }
+  .sl-active  { font-weight: 700; color: #2563EB; }
+  .sl-pending { color: #9CA3AF; }
+  .ap-connector { flex: 1; height: 2px; margin-bottom: 18px; }
+  .conn-done    { background: #2563EB; }
+  .conn-pending { background: #E5E7EB; }
+
+  /* STAT CARDS */
+  .ap-stats { display: flex; gap: 10px; padding: 14px 20px; border-bottom: 1px solid #F3F4F6; }
+  .ap-stat-card { flex: 1; border-radius: 8px; padding: 12px 14px; }
+  .ap-stat-val { display: block; font-weight: 700; color: #111827; font-size: 15px; }
+  .ap-stat-lbl { display: block; font-size: 11px; color: #6B7280; margin-top: 4px; }
+
+  /* REQUEST DETAILS */
+  .ap-req-grid {
+    padding: 14px 20px;
     border-bottom: 1px solid #F3F4F6;
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
   }
-  .ap-req-field {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
+  .ap-field { display: flex; flex-direction: column; gap: 3px; }
+  .ap-field.span2 { grid-column: 1 / -1; }
+  .ap-flbl { font-size: 11px; color: #6B7280; text-transform: uppercase; letter-spacing: 0.5px; }
+  .ap-fval { font-size: 13px; font-weight: 700; color: #111827; }
+
+  /* COST BREAKDOWN */
+  .ap-breakdown { padding: 14px 20px; border-bottom: 1px solid #F3F4F6; }
+  .ap-sec-title { font-size: 13px; font-weight: 700; color: #374151; margin: 0 0 10px 0; display: block; }
+  .ap-breakdown-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .ap-breakdown-table th {
+    background: #F9FAFB; font-size: 11px; font-weight: 700; color: #6B7280;
+    text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 10px; text-align: left;
   }
-  .ap-req-field.full-width {
-    grid-column: 1 / -1;
-  }
-  .ap-field-label {
-    font-size: 11px;
-    color: #6B7280;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .ap-field-value {
-    font-size: 13px;
-    font-weight: 700;
-    color: #111827;
-  }
-  /* Cost breakdown */
-  .ap-cost-section {
-    padding: 16px 20px;
-    border-bottom: 1px solid #F3F4F6;
-  }
-  .ap-section-label {
-    font-size: 13px;
-    font-weight: 700;
-    color: #374151;
-    margin-bottom: 12px;
-    display: block;
-  }
-  .ap-cost-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  .ap-cost-table th {
-    background: #F9FAFB;
-    font-size: 11px;
-    font-weight: 700;
-    color: #6B7280;
-    padding: 8px 12px;
-    text-transform: uppercase;
-    text-align: left;
-  }
-  .ap-cost-table th.right { text-align: right; }
-  .ap-cost-table td {
-    font-size: 13px;
-    color: #374151;
-    padding: 8px 12px;
-    border-bottom: 1px solid #F3F4F6;
-  }
-  .ap-cost-table td.right { text-align: right; }
-  .ap-cost-table tr.total-row td {
-    background: #F9FAFB;
-    font-size: 13px;
-    font-weight: 700;
-    color: #111827;
-    border-top: 2px solid #E5E7EB;
-    border-bottom: none;
-  }
-  /* Activity log */
-  .ap-log-section {
-    padding: 16px 20px;
-    border-bottom: 1px solid #F3F4F6;
-  }
-  .ap-log-entry {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 14px;
-  }
-  .ap-log-left {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex-shrink: 0;
-  }
-  .ap-log-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .ap-log-line {
-    width: 2px;
-    flex: 1;
-    min-height: 20px;
-    margin-top: 3px;
-  }
-  .ap-log-right {
-    flex: 1;
-    padding-bottom: 4px;
-  }
-  .ap-log-time {
-    font-size: 11px;
-    color: #9CA3AF;
-    display: block;
-  }
-  .ap-log-desc {
-    font-size: 13px;
-    color: #374151;
-    display: block;
-    margin-top: 2px;
-  }
-  .ap-log-comment {
-    font-size: 12px;
-    font-style: italic;
-    color: #9CA3AF;
-    display: block;
-    margin-top: 2px;
-  }
-  /* Action bar */
-  .ap-action-bar {
-    padding: 16px 20px;
-    background: #FFFFFF;
-    border-top: 1px solid #E5E7EB;
-    display: flex;
-    gap: 10px;
-  }
-  .ap-action-btn {
-    flex: 1;
-    height: 40px;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 700;
+  .ap-breakdown-table th.right { text-align: right; }
+  .ap-breakdown-table td { padding: 8px 10px; border-bottom: 1px solid #F3F4F6; color: #374151; }
+  .ap-breakdown-table td.right { text-align: right; }
+  .ap-breakdown-total td { background: #F9FAFB; font-weight: 700; color: #111827; border-top: 2px solid #E5E7EB; }
+
+  /* ACTIVITY LOG */
+  .ap-log { padding: 14px 20px; border-bottom: 1px solid #F3F4F6; }
+  .ap-log-entry { display: flex; gap: 12px; margin-bottom: 12px; }
+  .ap-log-left  { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+  .ap-log-dot   { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .ap-log-line  { width: 2px; flex: 1; min-height: 18px; margin-top: 3px; }
+  .ap-log-right { flex: 1; }
+  .ap-log-time  { font-size: 11px; color: #9CA3AF; display: block; }
+  .ap-log-desc  { font-size: 13px; color: #374151; display: block; margin-top: 2px; font-weight: 600; }
+  .ap-log-comment { font-size: 12px; font-style: italic; color: #9CA3AF; display: block; margin-top: 2px; }
+
+  /* ACTION BAR */
+  .ap-actions { padding: 14px 20px; background: #FFFFFF; border-top: 1px solid #E5E7EB; display: flex; gap: 10px; }
+  .ap-btn {
+    flex: 1; height: 40px; border-radius: 6px;
+    font-size: 14px; font-weight: 700;
     font-family: 'Lato', sans-serif;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     text-decoration: none;
   }
-  .ap-action-approve { background: #16AD78; color: #FFFFFF; }
-  .ap-action-hold    { background: #F59E0B; color: #FFFFFF; }
-  .ap-action-reject  { background: #EF4444; color: #FFFFFF; }
+  .btn-approve { background: #16AD78; color: #FFFFFF; }
+  .btn-hold    { background: #F59E0B; color: #FFFFFF; }
+  .btn-reject  { background: #EF4444; color: #FFFFFF; }
+  .ap-no-action { padding: 12px 20px; font-size: 13px; color: #9CA3AF; text-align: center; font-style: italic; }
 </style>
 
 <%
-  /* ---- Resolve active tab and selected ID from page variables ---- */
+  /* ---- Tab + selected ID ---- */
   cur_tab = input.active_tab;
-  if(cur_tab == null || cur_tab == "")
+  if(cur_tab == null || cur_tab == "") { cur_tab = "all"; }
+  cur_sel = input.selected_id;
+  if(cur_sel == null || cur_sel == "") { cur_sel = "BRQ-2026-0303"; }
+
+  /* ---- Live tab counts ---- */
+  all_cnt = Spend_Request[Status != "Auto_Approved" && Status != "Submitted"].count();
+  rm_cnt  = Spend_Request[Status == "Pending_RM"].count();
+  dh_cnt  = Spend_Request[Status == "Pending_Dept_Head"].count();
+  fin_cnt = Spend_Request[Status == "Pending_Finance"].count();
+
+  /* ---- Parse detail record ---- */
+  d_req_id = cur_sel;
+  d_desc = ""; d_dept = ""; d_requester = "";
+  d_priority = ""; d_submitted = ""; d_amount = "";
+  d_tier = ""; d_sla = ""; d_status = "";
+
+  det_str = input.detail_json;
+  if(det_str != null && det_str != "" && det_str != "[]")
   {
-    cur_tab = "all";
-  }
-  cur_selected = input.selected_id;
-  if(cur_selected == null || cur_selected == "")
-  {
-    cur_selected = "BRQ-2026-0303";
-  }
-
-  /* ---- Parse queue JSON ---- */
-  queue_json_str = input.queue_json;
-  all_count = 0;
-  rm_count = 0;
-  dh_count = 0;
-  fin_count = 0;
-
-  /* Count all non-auto records for tab badges */
-  all_count = Spend_Request[Status != "Auto_Approved"].count();
-  rm_count = Spend_Request[Status == "Pending_RM"].count();
-  dh_count = Spend_Request[Status == "Pending_Dept_Head"].count();
-  fin_count = Spend_Request[Status == "Pending_Finance"].count();
-
-  /* ---- Parse detail JSON ---- */
-  detail_json_str = input.detail_json;
-  log_json_str = input.log_json;
-
-  /* Detail fields with defaults for BRQ-2026-0303 */
-  d_req_id = cur_selected;
-  d_desc = "";
-  d_dept = "";
-  d_requester = "";
-  d_priority = "";
-  d_submitted = "";
-  d_amount = "";
-  d_tier = "";
-  d_sla = "";
-  d_status = "";
-
-  if(detail_json_str != null && detail_json_str != "" && detail_json_str != "[]")
-  {
-    detail_list = detail_json_str.toList();
-    if(detail_list.size() > 0)
+    det_list = det_str.toList();
+    if(det_list.size() > 0)
     {
-      detail_map = detail_list.get(0).toMap();
-      d_req_id    = detail_map.get("Request_ID");
-      d_desc      = detail_map.get("Item_Description");
-      d_dept      = detail_map.get("Department");
-      d_requester = detail_map.get("Requester_Name");
-      d_priority  = detail_map.get("Priority");
-      d_submitted = detail_map.get("Submitted_Date");
-      d_amount    = detail_map.get("Estimated_Cost");
-      d_tier      = detail_map.get("Approval_Tier");
-      d_sla       = detail_map.get("SLA_Due_Date");
-      d_status    = detail_map.get("Status");
+      det_map  = det_list.get(0).toMap();
+      d_req_id    = det_map.get("Request_ID");
+      d_desc      = det_map.get("Item_Description");
+      d_dept      = det_map.get("Department");
+      d_requester = det_map.get("Requester_Name");
+      d_priority  = det_map.get("Priority");
+      d_submitted = det_map.get("Submitted_Date");
+      d_amount    = det_map.get("Estimated_Cost");
+      d_tier      = det_map.get("Approval_Tier");
+      d_sla       = det_map.get("SLA_Due_Date");
+      d_status    = det_map.get("Status");
     }
   }
 
-  /* Fallback defaults for BRQ-2026-0303 when DB is empty */
-  if(d_req_id == null || d_req_id == "")   { d_req_id    = "BRQ-2026-0303"; }
-  if(d_desc == null || d_desc == "")       { d_desc      = "CNC lathe machine - Unit 2"; }
-  if(d_dept == null || d_dept == "")       { d_dept      = "Production"; }
-  if(d_requester == null || d_requester == "") { d_requester = "Carlos Medina"; }
-  if(d_priority == null || d_priority == "")  { d_priority  = "High"; }
-  if(d_submitted == null || d_submitted == "") { d_submitted = "25 Aug 2026"; }
-  if(d_amount == null || d_amount == "")   { d_amount    = "128,000"; }
-  if(d_tier == null || d_tier == "")       { d_tier      = "3-Person"; }
-  if(d_sla == null || d_sla == "")         { d_sla       = "20 Nov 2026"; }
-  if(d_status == null || d_status == "")   { d_status    = "Pending_Dept_Head"; }
+  /* ---- Safe defaults (only if genuinely null/empty) ---- */
+  if(d_req_id == null || d_req_id == "")       { d_req_id    = cur_sel; }
+  if(d_desc == null || d_desc == "")           { d_desc      = "-"; }
+  if(d_dept == null || d_dept == "")           { d_dept      = "-"; }
+  if(d_requester == null || d_requester == "") { d_requester = "-"; }
+  if(d_priority == null || d_priority == "")   { d_priority  = "-"; }
+  if(d_submitted == null || d_submitted == "") { d_submitted = "-"; }
+  if(d_amount == null || d_amount == "")       { d_amount    = "0"; }
+  if(d_tier == null || d_tier == "")           { d_tier      = "-"; }
+  if(d_sla == null || d_sla == "")             { d_sla       = "-"; }
+  if(d_status == null || d_status == "")       { d_status    = "Pending_RM"; }
 
-  /* Determine stepper state from status */
-  step_rm = "pending";
-  step_dh = "pending";
-  step_fin = "pending";
+  /* ---- Stage label for Approval_Action links ---- */
+  d_stage_lbl = "Reporting Manager";
+  if(d_status == "Pending_Dept_Head") { d_stage_lbl = "Department Head"; }
+  if(d_status == "Pending_Finance")   { d_stage_lbl = "Finance Controller"; }
+
+  /* ---- Stepper state ---- */
+  s_rm  = "pending"; s_dh = "pending"; s_fin = "pending";
+  c1 = "pending"; c2 = "pending";
   if(d_status == "Pending_RM")
   {
-    step_rm = "active";
+    s_rm = "active";
   }
   else if(d_status == "Pending_Dept_Head")
   {
-    step_rm = "completed";
-    step_dh = "active";
+    s_rm = "done"; c1 = "done"; s_dh = "active";
   }
   else if(d_status == "Pending_Finance")
   {
-    step_rm = "completed";
-    step_dh = "completed";
-    step_fin = "active";
+    s_rm = "done"; c1 = "done"; s_dh = "done"; c2 = "done"; s_fin = "active";
   }
   else if(d_status == "Approved")
   {
-    step_rm = "completed";
-    step_dh = "completed";
-    step_fin = "completed";
+    s_rm = "done"; c1 = "done"; s_dh = "done"; c2 = "done"; s_fin = "done";
   }
 
-  /* Connector states */
-  conn1 = "pending";
-  conn2 = "pending";
-  if(step_rm == "completed") { conn1 = "done"; }
-  if(step_dh == "completed") { conn2 = "done"; }
+  /* ---- Action bar visibility ---- */
+  show_actions = true;
+  if(d_status == "Approved" || d_status == "Rejected" || d_status == "On_Hold" || d_status == "Auto_Approved")
+  {
+    show_actions = false;
+  }
 
-  /* SLA card color */
-  sla_card_bg = "#F0FDF4";
-  sla_val_color = "#16AD78";
-
-  /* Action bar links */
-  approve_href = "#Page:Approval_Action?Request_ID_Input=" + d_req_id + "&Approver_Stage=" + d_status + "&Decision=Approved";
-  hold_href    = "#Page:Approval_Action?Request_ID_Input=" + d_req_id + "&Approver_Stage=" + d_status + "&Decision=On_Hold";
-  reject_href  = "#Page:Approval_Action?Request_ID_Input=" + d_req_id + "&Approver_Stage=" + d_status + "&Decision=Rejected";
+  /* ---- Tier pill class ---- */
+  d_tier_cls = "ap-pill tier-3p";
+  if(d_tier == "Auto")     { d_tier_cls = "ap-pill tier-auto"; }
+  if(d_tier == "2-Person") { d_tier_cls = "ap-pill tier-2p"; }
 %>
 
-<div class="ap-page-wrap">
+<div class="ap-wrap">
 
-  <!-- PAGE TITLE ROW -->
-  <div class="ap-title-row">
-    <h1>Approvals</h1>
-    <p>Review and act on pending spend requests</p>
-  </div>
+  <h1 class="ap-page-title">Approvals</h1>
+  <p class="ap-page-sub">Review and act on all spend requests. Click a row to view details and take action.</p>
 
-  <!-- STAGE TABS ROW -->
+  <!-- TABS -->
   <div class="ap-tabs-row">
-    <a class="ap-tab-link<% if(cur_tab == "all") { %> active<% } %>"
-       href="#Page:Approvals?active_tab=all&selected_id=<%= cur_selected %>">
-      All (<%= all_count %>)
+    <a class="ap-tab<% if(cur_tab == "all") { %> active<% } %>"
+       href="#Page:Approvals?active_tab=all&selected_id=<%= cur_sel %>">
+      All (<%= all_cnt %>)
     </a>
-    <a class="ap-tab-link<% if(cur_tab == "rm") { %> active<% } %>"
-       href="#Page:Approvals?active_tab=rm&selected_id=<%= cur_selected %>">
-      Reporting Manager (<%= rm_count %>)
+    <a class="ap-tab<% if(cur_tab == "rm") { %> active<% } %>"
+       href="#Page:Approvals?active_tab=rm&selected_id=<%= cur_sel %>">
+      Reporting Manager (<%= rm_cnt %>)
     </a>
-    <a class="ap-tab-link<% if(cur_tab == "dept_head") { %> active<% } %>"
-       href="#Page:Approvals?active_tab=dept_head&selected_id=<%= cur_selected %>">
-      Department Head (<%= dh_count %>)
+    <a class="ap-tab<% if(cur_tab == "dept_head") { %> active<% } %>"
+       href="#Page:Approvals?active_tab=dept_head&selected_id=<%= cur_sel %>">
+      Department Head (<%= dh_cnt %>)
     </a>
-    <a class="ap-tab-link<% if(cur_tab == "finance") { %> active<% } %>"
-       href="#Page:Approvals?active_tab=finance&selected_id=<%= cur_selected %>">
-      Finance (<%= fin_count %>)
+    <a class="ap-tab<% if(cur_tab == "finance") { %> active<% } %>"
+       href="#Page:Approvals?active_tab=finance&selected_id=<%= cur_sel %>">
+      Finance (<%= fin_cnt %>)
     </a>
   </div>
 
   <!-- SPLIT PANEL -->
-  <div class="ap-split-panel">
+  <div class="ap-split">
 
-    <!-- LEFT: APPROVAL QUEUE TABLE -->
-    <div class="ap-queue-container">
-      <div class="ap-queue-header">
+    <!-- LEFT: QUEUE TABLE -->
+    <div class="ap-queue">
+      <div class="ap-q-head">
         <div></div>
         <div>Requester</div>
         <div>Department</div>
@@ -556,410 +313,294 @@
       </div>
 
       <%
-        /* Render queue rows from queue_json */
-        q_json = input.queue_json;
-        if(q_json != null && q_json != "" && q_json != "[]")
+        q_str = input.queue_json;
+        q_has = false;
+        if(q_str != null && q_str != "" && q_str != "[]")
         {
-          q_list = q_json.toList();
-          for each q_item in q_list
+          q_list = q_str.toList();
+          if(q_list.size() > 0)
           {
-            q_map = q_item.toMap();
-            q_id      = q_map.get("Request_ID");
-            q_name    = q_map.get("Requester_Name");
-            q_dept    = q_map.get("Department");
-            q_amount  = q_map.get("Estimated_Cost");
-            q_tier    = q_map.get("Approval_Tier");
-            q_status  = q_map.get("Status");
-            q_sla     = q_map.get("SLA_Due_Date");
-
-            /* Initials */
-            /* Initials */
-            q_initials = "";
-            if(q_name != null && q_name.length() > 0)
+            q_has = true;
+            for each q_item in q_list
             {
-              first_letter = q_name.subString(0,1);
-              space_idx = q_name.indexOf(" ");
-              if(space_idx > 0 && (space_idx + 1) < q_name.length())
+              q_map    = q_item.toMap();
+              q_id     = q_map.get("Request_ID");
+              q_name   = q_map.get("Requester_Name");
+              q_dept   = q_map.get("Department");
+              q_amt    = q_map.get("Estimated_Cost");
+              q_tier   = q_map.get("Approval_Tier");
+              q_stat   = q_map.get("Status");
+              q_sla    = q_map.get("SLA_Due_Date");
+
+              if(q_id == null || q_id == "")     { q_id   = ""; }
+              if(q_name == null || q_name == "") { q_name = "Unknown"; }
+              if(q_dept == null || q_dept == "") { q_dept = "-"; }
+              if(q_amt == null || q_amt == "")   { q_amt  = "0"; }
+              if(q_tier == null || q_tier == "") { q_tier = "-"; }
+              if(q_stat == null || q_stat == "") { q_stat = ""; }
+              if(q_sla == null || q_sla == "")   { q_sla  = "-"; }
+
+              /* Initials */
+              q_init = "?";
+              if(q_name.length() > 0)
               {
-                second_letter = q_name.subString(space_idx + 1, space_idx + 2);
-                q_initials = first_letter + second_letter;
+                fl = q_name.subString(0, 1);
+                sp = q_name.indexOf(" ");
+                if(sp > 0)
+                {
+                  sl = q_name.subString(sp + 1, sp + 2);
+                  q_init = fl + sl;
+                }
+                else
+                {
+                  q_init = fl;
+                }
               }
-              else
-              {
-                q_initials = first_letter;
-              }
-            }
 
-            /* Row selected state */
-            row_class = "ap-queue-row unselected";
-            if(q_id == cur_selected) { row_class = "ap-queue-row selected"; }
+              /* Row class */
+              q_row_cls = "ap-q-row norm";
+              if(q_id == cur_sel) { q_row_cls = "ap-q-row sel"; }
 
-            /* Tier pill class */
-            tier_class = "ap-tier-pill ap-tier-3p";
-            if(q_tier == "Auto")     { tier_class = "ap-tier-pill ap-tier-auto"; }
-            if(q_tier == "2-Person") { tier_class = "ap-tier-pill ap-tier-2p"; }
+              /* Tier pill */
+              q_tier_cls = "ap-pill tier-3p";
+              if(q_tier == "Auto")     { q_tier_cls = "ap-pill tier-auto"; }
+              if(q_tier == "2-Person") { q_tier_cls = "ap-pill tier-2p"; }
 
-            /* Status pill class and label */
-            status_class = "ap-status-pill ap-status-pending";
-            status_label = "Pending";
-            if(q_status == "Approved") { status_class = "ap-status-pill ap-status-approved"; status_label = "Approved"; }
-            if(q_status == "Rejected") { status_class = "ap-status-pill ap-status-rejected"; status_label = "Rejected"; }
-
-            /* SLA class */
-            sla_class = "ap-sla-normal";
-            sla_suffix = "";
+              /* Status pill */
+              q_stat_cls = "ap-pill st-pending";
+              q_stat_lbl = "Pending";
+              if(q_stat == "Approved" || q_stat == "Auto_Approved") { q_stat_cls = "ap-pill st-approved"; q_stat_lbl = "Approved"; }
+              if(q_stat == "Rejected")    { q_stat_cls = "ap-pill st-rejected"; q_stat_lbl = "Rejected"; }
+              if(q_stat == "On_Hold")     { q_stat_cls = "ap-pill st-hold"; q_stat_lbl = "On Hold"; }
+              if(q_stat == "Submitted")   { q_stat_cls = "ap-pill st-pending"; q_stat_lbl = "Submitted"; }
       %>
-      <a class="<%= row_class %>"
+      <a class="<%= q_row_cls %>"
          href="#Page:Approvals?active_tab=<%= cur_tab %>&selected_id=<%= q_id %>">
+        <div><div class="ap-avatar"><%= q_init %></div></div>
         <div>
-          <div class="ap-badge-circle"><%= q_initials %></div>
-        </div>
-        <div>
-          <span class="ap-req-name"><%= q_name %></span>
-          <span class="ap-req-id"><%= q_id %></span>
+          <span class="ap-name-line"><%= q_name %></span>
+          <span class="ap-id-line"><%= q_id %></span>
         </div>
         <div class="ap-dept-cell"><%= q_dept %></div>
-        <div class="ap-amount-cell">$<%= q_amount %></div>
-        <div><span class="<%= tier_class %>"><%= q_tier %></span></div>
-        <div><span class="<%= status_class %>"><%= status_label %></span></div>
-        <div class="<%= sla_class %>"><%= q_sla %><%= sla_suffix %></div>
+        <div class="ap-amt-cell">$<%= q_amt %></div>
+        <div><span class="<%= q_tier_cls %>"><%= q_tier %></span></div>
+        <div><span class="<%= q_stat_cls %>"><%= q_stat_lbl %></span></div>
+        <div class="sla-ok"><%= q_sla %></div>
       </a>
       <%
+            }
           }
         }
-        else
+        if(q_has == false)
         {
-          /* Fallback static rows when DB is empty - BRD reference data */
       %>
-      <a class="ap-queue-row unselected" href="#Page:Approvals?active_tab=<%= cur_tab %>&selected_id=BRQ-2026-0311">
-        <div><div class="ap-badge-circle">EP</div></div>
-        <div><span class="ap-req-name">Elena Petrova</span><span class="ap-req-id">BRQ-2026-0311</span></div>
-        <div class="ap-dept-cell">Procurement &amp; Stores</div>
-        <div class="ap-amount-cell">$22,000</div>
-        <div><span class="ap-tier-pill ap-tier-2p">2-Person</span></div>
-        <div><span class="ap-status-pill ap-status-pending">Pending</span></div>
-        <div class="ap-sla-normal">15 Nov 2026</div>
-      </a>
-      <a class="ap-queue-row unselected" href="#Page:Approvals?active_tab=<%= cur_tab %>&selected_id=BRQ-2026-0309">
-        <div><div class="ap-badge-circle">AO</div></div>
-        <div><span class="ap-req-name">Amara Okafor</span><span class="ap-req-id">BRQ-2026-0309</span></div>
-        <div class="ap-dept-cell">Quality Assurance</div>
-        <div class="ap-amount-cell">$142,000</div>
-        <div><span class="ap-tier-pill ap-tier-3p">3-Person</span></div>
-        <div><span class="ap-status-pill ap-status-pending">Pending</span></div>
-        <div class="ap-sla-overdue">05 Sep 2026 (Overdue)</div>
-      </a>
-      <a class="ap-queue-row selected" href="#Page:Approvals?active_tab=<%= cur_tab %>&selected_id=BRQ-2026-0303">
-        <div><div class="ap-badge-circle">CM</div></div>
-        <div><span class="ap-req-name">Carlos Medina</span><span class="ap-req-id">BRQ-2026-0303</span></div>
-        <div class="ap-dept-cell">Production</div>
-        <div class="ap-amount-cell">$128,000</div>
-        <div><span class="ap-tier-pill ap-tier-3p">3-Person</span></div>
-        <div><span class="ap-status-pill ap-status-pending">Pending</span></div>
-        <div class="ap-sla-normal">20 Nov 2026</div>
-      </a>
-      <a class="ap-queue-row unselected" href="#Page:Approvals?active_tab=<%= cur_tab %>&selected_id=BRQ-2026-0306">
-        <div><div class="ap-badge-circle">WZ</div></div>
-        <div><span class="ap-req-name">Wei Zhang</span><span class="ap-req-id">BRQ-2026-0306</span></div>
-        <div class="ap-dept-cell">Maintenance &amp; Utilities</div>
-        <div class="ap-amount-cell">$94,000</div>
-        <div><span class="ap-tier-pill ap-tier-3p">3-Person</span></div>
-        <div><span class="ap-status-pill ap-status-pending">Pending</span></div>
-        <div class="ap-sla-overdue">10 Sep 2026 (Overdue)</div>
-      </a>
-      <a class="ap-queue-row unselected" href="#Page:Approvals?active_tab=<%= cur_tab %>&selected_id=BRQ-2026-0302">
-        <div><div class="ap-badge-circle">CM</div></div>
-        <div><span class="ap-req-name">Carlos Medina</span><span class="ap-req-id">BRQ-2026-0302</span></div>
-        <div class="ap-dept-cell">Production</div>
-        <div class="ap-amount-cell">$18,500</div>
-        <div><span class="ap-tier-pill ap-tier-2p">2-Person</span></div>
-        <div><span class="ap-status-pill ap-status-pending">Pending</span></div>
-        <div class="ap-sla-normal">10 Dec 2026</div>
-      </a>
-      <a class="ap-queue-row unselected" href="#Page:Approvals?active_tab=<%= cur_tab %>&selected_id=BRQ-2026-0315">
-        <div><div class="ap-badge-circle">DC</div></div>
-        <div><span class="ap-req-name">Daniel Cohen</span><span class="ap-req-id">BRQ-2026-0315</span></div>
-        <div class="ap-dept-cell">IT &amp; Systems</div>
-        <div class="ap-amount-cell">$115,000</div>
-        <div><span class="ap-tier-pill ap-tier-3p">3-Person</span></div>
-        <div><span class="ap-status-pill ap-status-pending">Pending</span></div>
-        <div class="ap-sla-normal">25 Nov 2026</div>
-      </a>
+      <div class="ap-empty">No requests found. Load sample data from the Dashboard page to populate records.</div>
       <%
         }
       %>
     </div>
-    <!-- END QUEUE TABLE -->
+    <!-- END QUEUE -->
 
     <!-- RIGHT: DETAIL PANEL -->
-    <div class="ap-detail-panel">
+    <div class="ap-detail">
 
-      <!-- DETAIL HEADER -->
-      <div class="ap-detail-header">
-        <span class="ap-detail-req-id"><%= d_req_id %></span>
-        <span class="ap-detail-desc"><%= d_desc %></span>
+      <!-- HEADER -->
+      <div class="ap-d-header">
+        <span class="ap-d-req-id"><%= d_req_id %></span>
+        <span class="ap-d-desc"><%= d_desc %></span>
       </div>
 
-      <!-- STAGE STEPPER -->
+      <!-- STEPPER -->
       <div class="ap-stepper">
         <%
-          /* 2-Person tier: RM -> Finance (skip Dept Head) */
           if(d_tier == "2-Person")
           {
-            /* For 2-Person, Dept Head step is skipped; connector between RM and Finance */
-            conn_2p = "pending";
-            if(step_rm == "completed") { conn_2p = "done"; }
+            conn_2p = "conn-pending";
+            if(s_rm == "done") { conn_2p = "conn-done"; }
         %>
-        <div class="ap-step-wrap">
-          <div class="ap-step-circle <%= step_rm %>">
-            <% if(step_rm == "completed") { %>
-              <i class="zc-li-outline ui-1-check-simple" style="font-size:14px;"></i>
-            <% } else { %>
-              1
-            <% } %>
+        <div class="ap-step-col">
+          <div class="ap-step-circle sc-<%= s_rm %>">
+            <% if(s_rm == "done") { %>
+              <i class="zc-li-outline ui-1-check-simple" style="font-size:13px;"></i>
+            <% } else { %>1<% } %>
           </div>
-          <span class="ap-step-label <%= step_rm %>">RM</span>
+          <span class="ap-step-lbl sl-<%= s_rm %>">RM</span>
         </div>
-        <div class="ap-step-connector <%= conn_2p %>"></div>
-        <div class="ap-step-wrap">
-          <div class="ap-step-circle <%= step_fin %>">
-            <% if(step_fin == "completed") { %>
-              <i class="zc-li-outline ui-1-check-simple" style="font-size:14px;"></i>
-            <% } else { %>
-              2
-            <% } %>
+        <div class="ap-connector <%= conn_2p %>"></div>
+        <div class="ap-step-col">
+          <div class="ap-step-circle sc-<%= s_fin %>">
+            <% if(s_fin == "done") { %>
+              <i class="zc-li-outline ui-1-check-simple" style="font-size:13px;"></i>
+            <% } else { %>2<% } %>
           </div>
-          <span class="ap-step-label <%= step_fin %>">Finance</span>
+          <span class="ap-step-lbl sl-<%= s_fin %>">Finance</span>
         </div>
         <%
           }
           else
           {
-            /* 3-Person: RM -> Dept Head -> Finance */
         %>
-        <div class="ap-step-wrap">
-          <div class="ap-step-circle <%= step_rm %>">
-            <% if(step_rm == "completed") { %>
-              <i class="zc-li-outline ui-1-check-simple" style="font-size:14px;"></i>
-            <% } else { %>
-              1
-            <% } %>
+        <div class="ap-step-col">
+          <div class="ap-step-circle sc-<%= s_rm %>">
+            <% if(s_rm == "done") { %>
+              <i class="zc-li-outline ui-1-check-simple" style="font-size:13px;"></i>
+            <% } else { %>1<% } %>
           </div>
-          <span class="ap-step-label <%= step_rm %>">RM</span>
+          <span class="ap-step-lbl sl-<%= s_rm %>">RM</span>
         </div>
-        <div class="ap-step-connector <%= conn1 %>"></div>
-        <div class="ap-step-wrap">
-          <div class="ap-step-circle <%= step_dh %>">
-            <% if(step_dh == "completed") { %>
-              <i class="zc-li-outline ui-1-check-simple" style="font-size:14px;"></i>
-            <% } else { %>
-              2
-            <% } %>
+        <div class="ap-connector conn-<%= c1 %>"></div>
+        <div class="ap-step-col">
+          <div class="ap-step-circle sc-<%= s_dh %>">
+            <% if(s_dh == "done") { %>
+              <i class="zc-li-outline ui-1-check-simple" style="font-size:13px;"></i>
+            <% } else { %>2<% } %>
           </div>
-          <span class="ap-step-label <%= step_dh %>">Dept Head</span>
+          <span class="ap-step-lbl sl-<%= s_dh %>">Dept Head</span>
         </div>
-        <div class="ap-step-connector <%= conn2 %>"></div>
-        <div class="ap-step-wrap">
-          <div class="ap-step-circle <%= step_fin %>">
-            <% if(step_fin == "completed") { %>
-              <i class="zc-li-outline ui-1-check-simple" style="font-size:14px;"></i>
-            <% } else { %>
-              3
-            <% } %>
+        <div class="ap-connector conn-<%= c2 %>"></div>
+        <div class="ap-step-col">
+          <div class="ap-step-circle sc-<%= s_fin %>">
+            <% if(s_fin == "done") { %>
+              <i class="zc-li-outline ui-1-check-simple" style="font-size:13px;"></i>
+            <% } else { %>3<% } %>
           </div>
-          <span class="ap-step-label <%= step_fin %>">Finance</span>
+          <span class="ap-step-lbl sl-<%= s_fin %>">Finance</span>
         </div>
         <%
           }
         %>
       </div>
 
-      <!-- FINANCIAL STAT CARDS -->
-      <div class="ap-stat-cards">
+      <!-- STAT CARDS -->
+      <div class="ap-stats">
         <div class="ap-stat-card" style="background:#EFF6FF;">
-          <span class="ap-stat-card-value" style="font-size:20px;">$<%= d_amount %></span>
-          <span class="ap-stat-card-label">Request Value</span>
+          <span class="ap-stat-val" style="font-size:17px;">$<%= d_amount %></span>
+          <span class="ap-stat-lbl">Request Value</span>
         </div>
         <div class="ap-stat-card" style="background:#FFF8E7;">
-          <span class="ap-stat-card-value" style="font-size:16px;color:#D97706;"><%= d_tier %></span>
-          <span class="ap-stat-card-label">Approval Tier</span>
+          <span class="ap-stat-val" style="color:#D97706;font-size:13px;"><%= d_tier %></span>
+          <span class="ap-stat-lbl">Approval Tier</span>
         </div>
-        <div class="ap-stat-card" style="background:<%= sla_card_bg %>;">
-          <span class="ap-stat-card-value" style="font-size:14px;color:<%= sla_val_color %>;"><%= d_sla %></span>
-          <span class="ap-stat-card-label">SLA Due Date</span>
+        <div class="ap-stat-card" style="background:#F0FDF4;">
+          <span class="ap-stat-val" style="color:#16AD78;font-size:12px;"><%= d_sla %></span>
+          <span class="ap-stat-lbl">SLA Due Date</span>
         </div>
       </div>
 
       <!-- REQUEST DETAILS -->
-      <div class="ap-req-details">
-        <div class="ap-req-field">
-          <span class="ap-field-label">Department</span>
-          <span class="ap-field-value"><%= d_dept %></span>
+      <div class="ap-req-grid">
+        <div class="ap-field">
+          <span class="ap-flbl">Department</span>
+          <span class="ap-fval"><%= d_dept %></span>
         </div>
-        <div class="ap-req-field">
-          <span class="ap-field-label">Requester</span>
-          <span class="ap-field-value"><%= d_requester %></span>
+        <div class="ap-field">
+          <span class="ap-flbl">Requester</span>
+          <span class="ap-fval"><%= d_requester %></span>
         </div>
-        <div class="ap-req-field">
-          <span class="ap-field-label">Priority</span>
-          <span class="ap-field-value"><%= d_priority %></span>
+        <div class="ap-field">
+          <span class="ap-flbl">Priority</span>
+          <span class="ap-fval"><%= d_priority %></span>
         </div>
-        <div class="ap-req-field">
-          <span class="ap-field-label">Submitted Date</span>
-          <span class="ap-field-value"><%= d_submitted %></span>
+        <div class="ap-field">
+          <span class="ap-flbl">Submitted Date</span>
+          <span class="ap-fval"><%= d_submitted %></span>
         </div>
-        <div class="ap-req-field full-width">
-          <span class="ap-field-label">Item / Description</span>
-          <span class="ap-field-value"><%= d_desc %></span>
+        <div class="ap-field span2">
+          <span class="ap-flbl">Item / Description</span>
+          <span class="ap-fval"><%= d_desc %></span>
         </div>
-      </div>
-
-      <!-- COST BREAKDOWN TABLE -->
-      <div class="ap-cost-section">
-        <span class="ap-section-label">Cost Breakdown</span>
-        <%
-          /* Render cost breakdown based on selected request */
-          if(d_req_id == "BRQ-2026-0302")
-          {
-        %>
-        <table class="ap-cost-table">
-          <thead>
-            <tr>
-              <th>Line Item</th>
-              <th class="right">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>Sensor units (Qty 4)</td><td class="right">$14,000</td></tr>
-            <tr><td>Installation &amp; calibration</td><td class="right">$3,000</td></tr>
-            <tr><td>Contingency</td><td class="right">$1,500</td></tr>
-            <tr class="total-row"><td>Total</td><td class="right">$18,500</td></tr>
-          </tbody>
-        </table>
-        <%
-          }
-          else
-          {
-            /* Default: BRQ-2026-0303 breakdown (also used as generic fallback) */
-        %>
-        <table class="ap-cost-table">
-          <thead>
-            <tr>
-              <th>Line Item</th>
-              <th class="right">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>CNC lathe machine unit</td><td class="right">$112,000</td></tr>
-            <tr><td>Installation &amp; calibration</td><td class="right">$9,500</td></tr>
-            <tr><td>Contingency</td><td class="right">$6,500</td></tr>
-            <tr class="total-row"><td>Total</td><td class="right">$128,000</td></tr>
-          </tbody>
-        </table>
-        <%
-          }
-        %>
       </div>
 
       <!-- ACTIVITY LOG -->
-      <div class="ap-log-section">
-        <span class="ap-section-label">Activity Log</span>
+      <div class="ap-log">
+        <span class="ap-sec-title">Activity Log</span>
         <%
           log_str = input.log_json;
+          log_found = false;
           if(log_str != null && log_str != "" && log_str != "[]")
           {
             log_list = log_str.toList();
-            for each log_item in log_list
+            if(log_list.size() > 0)
             {
-              log_map = log_item.toMap();
-              log_time     = log_map.get("Timestamp");
-              log_desc     = log_map.get("Description");
-              log_comment  = log_map.get("Comments");
-              log_decision = log_map.get("Decision");
+              log_found = true;
+              for each log_item in log_list
+              {
+                lm          = log_item.toMap();
+                l_time      = lm.get("Decision_Timestamp");
+                l_stage     = lm.get("Stage");
+                l_approver  = lm.get("Approver_Name");
+                l_decision  = lm.get("Decision");
+                l_comment   = lm.get("Comments");
 
-              /* Dot color by decision */
-              dot_color  = "#9CA3AF";
-              line_color = "#E5E7EB";
-              if(log_decision == "Approved")      { dot_color = "#16AD78"; line_color = "#DCFCE7"; }
-              if(log_decision == "On_Hold")        { dot_color = "#F59E0B"; line_color = "#FEF9C3"; }
-              if(log_decision == "Rejected")       { dot_color = "#EF4444"; line_color = "#FEE2E2"; }
-              if(log_decision == "Auto_Approved")  { dot_color = "#2563EB"; line_color = "#EFF6FF"; }
+                if(l_time == null || l_time == "")         { l_time     = ""; }
+                if(l_stage == null || l_stage == "")       { l_stage    = ""; }
+                if(l_approver == null || l_approver == "") { l_approver = ""; }
+                if(l_decision == null || l_decision == "") { l_decision = ""; }
+                if(l_comment == null)                      { l_comment  = ""; }
+
+                l_dot  = "#9CA3AF";
+                l_line = "#E5E7EB";
+                if(l_decision == "Approved")      { l_dot = "#16AD78"; l_line = "#DCFCE7"; }
+                if(l_decision == "Auto-Approved")  { l_dot = "#2563EB"; l_line = "#BFDBFE"; }
+                if(l_decision == "On_Hold")        { l_dot = "#F59E0B"; l_line = "#FEF9C3"; }
+                if(l_decision == "On Hold")        { l_dot = "#F59E0B"; l_line = "#FEF9C3"; }
+                if(l_decision == "Rejected")       { l_dot = "#EF4444"; l_line = "#FEE2E2"; }
+
+                l_desc = l_stage;
+                if(l_approver != "") { l_desc = l_stage + " - " + l_approver; }
         %>
         <div class="ap-log-entry">
           <div class="ap-log-left">
-            <div class="ap-log-dot" style="background:<%= dot_color %>;"></div>
-            <div class="ap-log-line" style="background:<%= line_color %>;"></div>
+            <div class="ap-log-dot" style="background:<%= l_dot %>;"></div>
+            <div class="ap-log-line" style="background:<%= l_line %>;"></div>
           </div>
           <div class="ap-log-right">
-            <span class="ap-log-time"><%= log_time %></span>
-            <span class="ap-log-desc"><%= log_desc %></span>
-            <% if(log_comment != null && log_comment != "") { %>
-            <span class="ap-log-comment"><%= log_comment %></span>
+            <span class="ap-log-time"><%= l_time %></span>
+            <span class="ap-log-desc"><%= l_decision %> - <%= l_desc %></span>
+            <% if(l_comment != "") { %>
+            <span class="ap-log-comment"><%= l_comment %></span>
             <% } %>
           </div>
         </div>
         <%
+              }
             }
           }
-          else
+          if(log_found == false)
           {
-            /* Fallback static log for BRQ-2026-0303 */
         %>
-        <div class="ap-log-entry">
-          <div class="ap-log-left">
-            <div class="ap-log-dot" style="background:#9CA3AF;"></div>
-            <div class="ap-log-line" style="background:#E5E7EB;"></div>
-          </div>
-          <div class="ap-log-right">
-            <span class="ap-log-time">25 Aug 2026, 10:05 AM</span>
-            <span class="ap-log-desc">Submitted by Carlos Medina (Production)</span>
-          </div>
-        </div>
-        <div class="ap-log-entry">
-          <div class="ap-log-left">
-            <div class="ap-log-dot" style="background:#16AD78;"></div>
-            <div class="ap-log-line" style="background:#DCFCE7;"></div>
-          </div>
-          <div class="ap-log-right">
-            <span class="ap-log-time">28 Aug 2026, 09:30 AM</span>
-            <span class="ap-log-desc">Approved by Jason Miller (Reporting Manager) - routed to Department Head</span>
-          </div>
-        </div>
-        <div class="ap-log-entry">
-          <div class="ap-log-left">
-            <div class="ap-log-dot" style="background:#F59E0B;"></div>
-            <div class="ap-log-line" style="background:#FEF9C3;"></div>
-          </div>
-          <div class="ap-log-right">
-            <span class="ap-log-time">Awaiting</span>
-            <span class="ap-log-desc">Department Head Henrik Larsson (SLA due 20 Nov 2026)</span>
-          </div>
-        </div>
+        <div style="font-size:13px;color:#9CA3AF;font-style:italic;">No activity log entries for this request yet.</div>
         <%
           }
         %>
       </div>
 
       <!-- ACTION BAR -->
-      <div class="ap-action-bar">
-        <a class="ap-action-btn ap-action-approve"
-           href="#Page:Approval_Action?Request_ID_Input=<%= d_req_id %>&Approver_Stage=<%= d_status %>&Decision=Approved">
+      <% if(show_actions) { %>
+      <div class="ap-actions">
+        <a class="ap-btn btn-approve"
+           href="#Page:Approval_Action?Request_ID_Input=<%= d_req_id %>&Approver_Stage=<%= d_stage_lbl %>&Decision=Approved">
           Approve
         </a>
-        <a class="ap-action-btn ap-action-hold"
-           href="#Page:Approval_Action?Request_ID_Input=<%= d_req_id %>&Approver_Stage=<%= d_status %>&Decision=On_Hold">
+        <a class="ap-btn btn-hold"
+           href="#Page:Approval_Action?Request_ID_Input=<%= d_req_id %>&Approver_Stage=<%= d_stage_lbl %>&Decision=On_Hold">
           Hold
         </a>
-        <a class="ap-action-btn ap-action-reject"
-           href="#Page:Approval_Action?Request_ID_Input=<%= d_req_id %>&Approver_Stage=<%= d_status %>&Decision=Rejected">
+        <a class="ap-btn btn-reject"
+           href="#Page:Approval_Action?Request_ID_Input=<%= d_req_id %>&Approver_Stage=<%= d_stage_lbl %>&Decision=Rejected">
           Reject
         </a>
       </div>
+      <% } else { %>
+      <div class="ap-no-action">
+        This request has been <%= d_status %>. No further actions available.
+      </div>
+      <% } %>
 
     </div>
     <!-- END DETAIL PANEL -->
 
   </div>
-  <!-- END SPLIT PANEL -->
+  <!-- END SPLIT -->
 
 </div>

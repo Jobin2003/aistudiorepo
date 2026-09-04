@@ -1,124 +1,99 @@
-<link href='https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap' rel='stylesheet'>
+<link href='https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&display=swap' rel='stylesheet'>
 <style>
-  .ri-content-area {
-    margin-left: 220px;
+  .ri-wrap {
+    padding: 24px 28px 16px 28px;
     background: #F8FAFC;
-    min-height: 100vh;
-    padding-top: 56px;
-    box-sizing: border-box;
     font-family: 'Lato', sans-serif;
-  }
-  .ri-content-inner {
-    padding: 32px;
+    box-sizing: border-box;
   }
   .ri-page-title {
     font-size: 22px;
     font-weight: 700;
     color: #111827;
-    font-family: 'Lato', sans-serif;
     margin: 0 0 4px 0;
+    line-height: 1.3;
   }
-  .ri-page-subtitle {
+  .ri-page-sub {
     font-size: 13px;
     color: #6B7280;
-    margin: 0 0 24px 0;
-    font-family: 'Lato', sans-serif;
+    margin: 0 0 20px 0;
   }
-  .ri-form-card {
+  .ri-context-card {
     background: #FFFFFF;
-    border-radius: 12px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-    padding: 32px;
-    max-width: 900px;
+    border-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    padding: 20px 24px;
+    max-width: 920px;
+    margin-bottom: 4px;
   }
   .ri-info-strip {
     display: flex;
     align-items: flex-start;
-    gap: 8px;
-    background: #F8FAFC;
-    border-radius: 6px;
-    padding: 10px 14px;
+    gap: 10px;
+    background: #EFF6FF;
+    border: 1px solid #BFDBFE;
+    border-radius: 8px;
+    padding: 12px 16px;
     margin-bottom: 20px;
   }
-  .ri-info-strip i {
-    font-size: 14px;
-    color: #6B7280;
-    margin-top: 1px;
-    flex-shrink: 0;
-  }
-  .ri-info-strip-text {
-    font-size: 12px;
-    color: #6B7280;
+  .ri-info-text {
+    font-size: 13px;
+    color: #1D4ED8;
     font-style: italic;
-    font-family: 'Lato', sans-serif;
     line-height: 1.5;
+    margin: 0;
+    font-family: 'Lato', sans-serif;
   }
-  .ri-form-embed {
-    width: 100%;
+  .ri-divider {
+    border: none;
+    border-top: 1px solid #E5E7EB;
+    margin: 0 0 16px 0;
   }
-  .ri-tier-legend {
-    margin-top: 20px;
-    border-top: 1px solid #F3F4F6;
-    padding-top: 16px;
-  }
-  .ri-tier-legend-label {
-    font-size: 12px;
+  .ri-tier-lbl {
+    font-size: 11px;
     color: #6B7280;
-    font-family: 'Lato', sans-serif;
-    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
     display: block;
-  }
-  .ri-tier-badges {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-  .ri-tier-badge {
-    border-radius: 20px;
-    padding: 4px 12px;
-    font-size: 12px;
+    margin-bottom: 10px;
     font-family: 'Lato', sans-serif;
-    font-weight: 400;
+  }
+  .ri-tier-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .ri-badge {
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 700;
     display: inline-block;
+    font-family: 'Lato', sans-serif;
+    line-height: 1.4;
   }
-  .ri-tier-badge-auto {
-    background: #DCFCE7;
-    color: #16AD78;
-  }
-  .ri-tier-badge-two {
-    background: #FEF9C3;
-    color: #D97706;
-  }
-  .ri-tier-badge-three {
-    background: #EFF6FF;
-    color: #2563EB;
-  }
+  .ri-auto  { background: #DCFCE7; color: #16AD78; }
+  .ri-two   { background: #FEF9C3; color: #D97706; }
+  .ri-three { background: #EFF6FF; color: #2563EB; }
 </style>
 
-<div class="ri-content-area">
-  <div class="ri-content-inner">
-    <h1 class="ri-page-title">New Spend Request</h1>
-    <p class="ri-page-subtitle">Atlas Precision Manufacturing Inc. &middot; Plant 3, Ohio, USA</p>
+<div class="ri-wrap">
+  <h1 class="ri-page-title">New Spend Request</h1>
+  <p class="ri-page-sub">Atlas Precision Manufacturing Inc. &middot; Plant 3, Ohio, USA</p>
 
-    <div class="ri-form-card">
-      <div class="ri-info-strip">
-        <i class="zc-li-outline ui-1-info-circle"></i>
-        <span class="ri-info-strip-text">Requester ID, Reporting Manager, and Department Head are auto-resolved when your name and department match our employee records.</span>
-      </div>
-
-      <div class="ri-form-embed">
-        <div zc-component="form" zc-linkname="Spend_Request" zc-height="auto"></div>
-      </div>
-
-      <div class="ri-tier-legend">
-        <span class="ri-tier-legend-label">Approval Tier Thresholds</span>
-        <div class="ri-tier-badges">
-          <span class="ri-tier-badge ri-tier-badge-auto">Auto &mdash; Up to $1,000</span>
-          <span class="ri-tier-badge ri-tier-badge-two">2-Person &mdash; $1,001 &ndash; $50,000</span>
-          <span class="ri-tier-badge ri-tier-badge-three">3-Person &mdash; $50,001+</span>
-        </div>
-      </div>
+  <div class="ri-context-card">
+    <div class="ri-info-strip">
+      <i class="zc-li-outline ui-1-info-circle" style="font-size:16px;color:#2563EB;flex-shrink:0;margin-top:2px;"></i>
+      <p class="ri-info-text">Requester ID, Reporting Manager, and Department Head auto-resolve when your name and department match the Employee Directory. Item cost auto-fills from the Request Catalog when you select an item. The Approval Tier is calculated automatically from the cost entered.</p>
+    </div>
+    <hr class="ri-divider">
+    <span class="ri-tier-lbl">Approval Tier Thresholds</span>
+    <div class="ri-tier-row">
+      <span class="ri-badge ri-auto">Auto - Up to $1,000</span>
+      <span class="ri-badge ri-two">2-Person - $1,001 to $50,000</span>
+      <span class="ri-badge ri-three">3-Person - $50,001 and above</span>
     </div>
   </div>
 </div>

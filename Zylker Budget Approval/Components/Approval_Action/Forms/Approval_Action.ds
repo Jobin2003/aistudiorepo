@@ -39,7 +39,7 @@ form Approval_Action
     (
         type = picklist
         displayname = "Decision"
-        values = {"Approved", "On Hold", "Rejected"}
+        values = {"Approved", "On_Hold", "Rejected"}
         row = 1
         column = 2
         width = medium

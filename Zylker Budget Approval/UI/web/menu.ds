@@ -2,7 +2,7 @@ menu
 {
     space Budget_Approval
     {
-        displayname = "Zylker Budget Approval"
+        displayname = "Zylker Budget Approval - 2"
         icon = "business-briefcase-25"
 
         section Modules

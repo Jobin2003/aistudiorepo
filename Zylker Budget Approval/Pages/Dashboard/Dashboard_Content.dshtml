@@ -1,685 +1,233 @@
-<link href='https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap' rel='stylesheet'>
+<link href='https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&display=swap' rel='stylesheet'>
 <style>
+  * { box-sizing: border-box; }
   .dbc-wrap {
-    margin-left: 220px;
-    padding: 72px 28px 28px 248px;
+    padding: 24px 28px 40px 28px;
     background: #F8FAFC;
     min-height: 100vh;
     font-family: 'Lato', sans-serif;
-    box-sizing: border-box;
   }
 
   /* PAGE HEADER */
-  .dbc-page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 24px;
+  .dbc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+  .dbc-title  { font-size: 22px; font-weight: 700; color: #111827; margin: 0 0 4px 0; }
+  .dbc-sub    { font-size: 13px; color: #6B7280; margin: 0; }
+  .dbc-period { background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 20px; padding: 6px 16px; font-size: 12px; color: #1D4ED8; font-weight: 600; white-space: nowrap; margin-top: 4px; }
+
+  /* LOAD BANNER */
+  .dbc-banner {
+    background: #EFF6FF; border: 1.5px solid #BFDBFE; border-radius: 10px;
+    padding: 18px 24px; display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px; flex-wrap: wrap; gap: 14px;
   }
-  .dbc-page-title {
-    font-size: 22px;
-    font-weight: 700;
-    color: #111827;
-    margin: 0 0 4px 0;
-    line-height: 1.2;
-  }
-  .dbc-page-subtitle {
-    font-size: 13px;
-    color: #6B7280;
-    margin: 0;
-  }
-  .dbc-period-chip {
-    background: #F3F4F6;
-    border-radius: 20px;
-    padding: 6px 14px;
-    font-size: 12px;
-    color: #374151;
-    white-space: nowrap;
-    margin-top: 4px;
+  .dbc-banner-title { font-size: 15px; font-weight: 700; color: #1E40AF; margin-bottom: 4px; }
+  .dbc-banner-sub   { font-size: 13px; color: #3B82F6; }
+  .dbc-load-btn {
+    background: #2563EB; color: #FFFFFF; font-size: 14px; font-weight: 700;
+    font-family: 'Lato', sans-serif; padding: 10px 22px;
+    border-radius: 6px; text-decoration: none; white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 6px;
   }
 
-  /* STAT CARDS ROW */
-  .dbc-stat-row {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 24px;
+  /* STAT ROW */
+  .dbc-stat-row { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .dbc-stat {
+    flex: 1; min-width: 150px; background: #FFFFFF; border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 20px 20px 16px 20px;
+    border-left: 4px solid #E5E7EB; position: relative; overflow: hidden;
   }
-  .dbc-stat-card {
-    flex: 1;
-    background: #FFFFFF;
-    border-radius: 10px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    padding: 20px 24px;
-    position: relative;
-    overflow: hidden;
-    box-sizing: border-box;
-  }
-  .dbc-stat-card-blue  { border-left: 4px solid #2563EB; }
-  .dbc-stat-card-green { border-left: 4px solid #16AD78; }
-  .dbc-stat-card-amber { border-left: 4px solid #F59E0B; }
-  .dbc-stat-card-red   { border-left: 4px solid #EF4444; }
-  .dbc-stat-bg {
-    position: absolute;
-    bottom: -8px;
-    right: 10px;
-    font-size: 64px;
-    font-weight: 700;
-    line-height: 1;
-    pointer-events: none;
-    user-select: none;
-  }
-  .dbc-stat-card-blue  .dbc-stat-bg { color: rgba(37,99,235,0.06); }
-  .dbc-stat-card-green .dbc-stat-bg { color: rgba(22,173,120,0.06); }
-  .dbc-stat-card-amber .dbc-stat-bg { color: rgba(245,158,11,0.06); }
-  .dbc-stat-card-red   .dbc-stat-bg { color: rgba(239,68,68,0.06); }
-  .dbc-stat-value {
-    font-size: 24px;
-    font-weight: 700;
-    color: #111827;
-    display: block;
-    line-height: 1.2;
-  }
-  .dbc-stat-count {
-    font-size: 12px;
-    color: #6B7280;
-    display: block;
-    margin-top: 2px;
-  }
-  .dbc-stat-label {
-    font-size: 12px;
-    color: #9CA3AF;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-top: 8px;
-    display: block;
-  }
+  .dbc-stat-val   { font-size: 22px; font-weight: 700; color: #111827; display: block; line-height: 1.2; }
+  .dbc-stat-cnt   { font-size: 12px; color: #6B7280; display: block; margin-top: 2px; }
+  .dbc-stat-lbl   { font-size: 11px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 10px; display: block; }
+  .dbc-stat-tint  { position: absolute; right: -8px; bottom: -8px; font-size: 56px; opacity: 0.06; line-height: 1; }
 
   /* ROW 2 */
-  .dbc-row2 {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 24px;
-    align-items: flex-start;
-  }
+  .dbc-row2 { display: flex; gap: 20px; margin-bottom: 24px; align-items: flex-start; flex-wrap: wrap; }
 
   /* DONUT CARD */
   .dbc-donut-card {
-    width: 38%;
-    background: #FFFFFF;
-    border-radius: 10px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    padding: 24px;
-    box-sizing: border-box;
+    width: 320px; flex-shrink: 0; background: #FFFFFF;
+    border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px;
   }
-  .dbc-card-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: #111827;
-    margin: 0 0 20px 0;
-  }
-  .dbc-donut-wrap {
-    position: relative;
-    width: 260px;
-    height: 260px;
-    margin: 0 auto 20px auto;
-  }
-  .dbc-donut-center {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-    pointer-events: none;
-  }
-  .dbc-donut-center-value {
-    font-size: 18px;
-    font-weight: 700;
-    color: #111827;
-    display: block;
-    line-height: 1.2;
-  }
-  .dbc-donut-center-label {
-    font-size: 11px;
-    color: #9CA3AF;
-    display: block;
-  }
-  .dbc-legend {
-    margin-top: 4px;
-  }
-  .dbc-legend-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 8px;
-  }
-  .dbc-legend-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .dbc-legend-name {
-    font-size: 13px;
-    color: #374151;
-    flex: 1;
-  }
-  .dbc-legend-value {
-    font-size: 13px;
-    font-weight: 700;
-    color: #111827;
-  }
-  .dbc-legend-count {
-    font-size: 12px;
-    color: #9CA3AF;
-    margin-left: 6px;
-  }
+  .dbc-card-title { font-size: 15px; font-weight: 700; color: #111827; margin: 0 0 18px 0; }
+  .dbc-donut-wrap { position: relative; display: flex; justify-content: center; align-items: center; margin-bottom: 16px; }
+  .dbc-donut-center { position: absolute; text-align: center; pointer-events: none; }
+  .dbc-donut-val { font-size: 15px; font-weight: 700; color: #111827; display: block; }
+  .dbc-donut-lbl { font-size: 11px; color: #9CA3AF; display: block; }
+  .dbc-legend-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .dbc-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .dbc-leg-name  { font-size: 13px; color: #374151; flex: 1; }
+  .dbc-leg-val   { font-size: 13px; font-weight: 700; color: #111827; }
+  .dbc-leg-count { font-size: 12px; color: #9CA3AF; margin-left: 6px; }
 
-  /* DEPT BAR CARD */
-  .dbc-dept-card {
-    flex: 1;
-    background: #FFFFFF;
-    border-radius: 10px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    padding: 24px;
-    box-sizing: border-box;
+  /* BAR CARD */
+  .dbc-bar-card {
+    flex: 1; min-width: 0; background: #FFFFFF;
+    border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px;
   }
-  .dbc-card-subtitle {
-    font-size: 12px;
-    color: #9CA3AF;
-    margin-top: -16px;
-    margin-bottom: 20px;
-    display: block;
-  }
-  .dbc-bar-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 14px;
-  }
-  .dbc-bar-label {
-    font-size: 13px;
-    color: #374151;
-    width: 160px;
-    flex-shrink: 0;
-  }
-  .dbc-bar-track {
-    flex: 1;
-    background: #F1F5F9;
-    border-radius: 4px;
-    height: 28px;
-    overflow: hidden;
-  }
-  .dbc-bar-fill {
-    height: 28px;
-    border-radius: 4px;
-    background: #2563EB;
-  }
-  .dbc-bar-value {
-    font-size: 12px;
-    font-weight: 700;
-    color: #374151;
-    width: 70px;
-    text-align: right;
-    flex-shrink: 0;
-  }
+  .dbc-card-sub  { font-size: 12px; color: #9CA3AF; display: block; margin-top: -14px; margin-bottom: 18px; }
+  .dbc-bar-row   { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .dbc-bar-dept  { font-size: 13px; color: #374151; width: 165px; flex-shrink: 0; }
+  .dbc-bar-track { flex: 1; background: #F1F5F9; border-radius: 4px; height: 26px; overflow: hidden; }
+  .dbc-bar-fill  { height: 26px; border-radius: 4px; background: #2563EB; }
+  .dbc-bar-val   { font-size: 12px; font-weight: 700; color: #374151; width: 80px; text-align: right; flex-shrink: 0; }
 
   /* ROW 3 */
-  .dbc-row3 {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 24px;
-    align-items: flex-start;
-  }
+  .dbc-row3 { display: flex; gap: 20px; margin-bottom: 24px; align-items: flex-start; flex-wrap: wrap; }
 
   /* FUNNEL CARD */
   .dbc-funnel-card {
-    width: 55%;
-    background: #FFFFFF;
-    border-radius: 10px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    padding: 24px;
-    box-sizing: border-box;
+    flex: 1; min-width: 0; background: #FFFFFF;
+    border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px;
   }
-  .dbc-funnel-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-  .dbc-funnel-label {
-    font-size: 13px;
-    color: #374151;
-    width: 160px;
-    flex-shrink: 0;
-  }
-  .dbc-funnel-track {
-    flex: 1;
-    background: #F1F5F9;
-    border-radius: 4px;
-    height: 24px;
-    overflow: hidden;
-  }
-  .dbc-funnel-fill {
-    height: 24px;
-    border-radius: 4px;
-  }
-  .dbc-funnel-count {
-    font-size: 12px;
-    font-weight: 700;
-    color: #374151;
-    width: 30px;
-    text-align: right;
-    flex-shrink: 0;
-  }
+  .dbc-funnel-row   { display: flex; align-items: center; gap: 12px; margin-bottom: 11px; }
+  .dbc-funnel-stage { font-size: 13px; color: #374151; width: 148px; flex-shrink: 0; }
+  .dbc-funnel-track { flex: 1; background: #F1F5F9; border-radius: 4px; height: 24px; overflow: hidden; }
+  .dbc-funnel-fill  { height: 24px; border-radius: 4px; }
+  .dbc-funnel-cnt   { font-size: 12px; font-weight: 700; color: #374151; width: 28px; text-align: right; flex-shrink: 0; }
 
   /* ESCALATION CARD */
   .dbc-esc-card {
-    flex: 1;
-    background: #FFFFFF;
-    border-radius: 10px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    padding: 24px;
-    box-sizing: border-box;
+    width: 360px; flex-shrink: 0; background: #FFFFFF;
+    border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px;
   }
-  .dbc-esc-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  .dbc-esc-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: #111827;
-    margin: 0;
-  }
-  .dbc-esc-badge {
-    background: #FEE2E2;
-    color: #EF4444;
-    border-radius: 20px;
-    padding: 3px 10px;
-    font-size: 12px;
-    font-weight: 700;
-  }
-  .dbc-esc-item {
-    background: #FEF2F2;
-    border-left: 3px solid #EF4444;
-    border-radius: 8px;
-    padding: 14px 16px;
-    margin-bottom: 12px;
-  }
-  .dbc-esc-item-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 4px;
-  }
-  .dbc-esc-id {
-    font-size: 14px;
-    font-weight: 700;
-    color: #111827;
-  }
-  .dbc-esc-overdue {
-    font-size: 13px;
-    font-weight: 700;
-    color: #EF4444;
-  }
-  .dbc-esc-meta {
-    font-size: 12px;
-    color: #6B7280;
-  }
+  .dbc-esc-top  { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  .dbc-esc-ttl  { font-size: 15px; font-weight: 700; color: #111827; margin: 0; }
+  .dbc-esc-bdg  { background: #FEE2E2; color: #EF4444; border-radius: 20px; padding: 3px 10px; font-size: 12px; font-weight: 700; }
+  .dbc-esc-item { background: #FEF2F2; border-left: 3px solid #EF4444; border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; }
+  .dbc-esc-row  { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .dbc-esc-id   { font-size: 14px; font-weight: 700; color: #111827; }
+  .dbc-esc-days { font-size: 13px; font-weight: 700; color: #EF4444; }
+  .dbc-esc-meta { font-size: 12px; color: #6B7280; }
 
   /* FOOTER */
-  .dbc-footer-row {
-    margin-top: 8px;
-    display: flex;
-    gap: 16px;
-    align-items: center;
-  }
-  .dbc-footer-label {
-    font-size: 13px;
-    color: #374151;
-  }
-  .dbc-turnaround-badge {
-    background: #F3F4F6;
-    border-radius: 20px;
-    padding: 5px 14px;
-    font-size: 13px;
-    color: #374151;
-  }
-  .dbc-turnaround-badge strong {
-    font-weight: 700;
-  }
+  .dbc-footer { margin-top: 8px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  .dbc-foot-lbl { font-size: 13px; color: #374151; }
+  .dbc-turn-bdg { background: #F3F4F6; border-radius: 20px; padding: 5px 14px; font-size: 13px; color: #374151; }
+  .dbc-turn-bdg strong { font-weight: 700; }
 </style>
 
 <%
-  /* ---- SEED DATA INSERTION (runs when ?load=true is passed) ---- */
-  load_param = input.load;
-  if(load_param == "true")
-  {
-    emp_count = Employee_Directory[ID != 0].count();
-    if(emp_count == 0)
-    {
-      insert into Employee_Directory [ Employee_Name = "Carlos Medina" Department = "Production" Requester_ID = "EMP-3011" Reporting_Manager = "Jason Miller" Department_Head = "Henrik Larsson" ];
-      insert into Employee_Directory [ Employee_Name = "Wei Zhang" Department = "Maintenance & Utilities" Requester_ID = "EMP-3024" Reporting_Manager = "Fatima Al-Sayed" Department_Head = "Aisha Bello" ];
-      insert into Employee_Directory [ Employee_Name = "Amara Okafor" Department = "Quality Assurance" Requester_ID = "EMP-3037" Reporting_Manager = "Marco Rossi" Department_Head = "Takeshi Yamamoto" ];
-      insert into Employee_Directory [ Employee_Name = "Elena Petrova" Department = "Procurement & Stores" Requester_ID = "EMP-3042" Reporting_Manager = "Grace Kim" Department_Head = "Isabella Fischer" ];
-      insert into Employee_Directory [ Employee_Name = "Daniel Cohen" Department = "IT & Systems" Requester_ID = "EMP-3055" Reporting_Manager = "Liam O'Connor" Department_Head = "Noah Bergstrom" ];
-      insert into Employee_Directory [ Employee_Name = "Priya Nair" Department = "HR & Admin" Requester_ID = "EMP-3068" Reporting_Manager = "Sofia Martins" Department_Head = "Chidi Eze" ];
-    }
+  /* Read all values from page variables (set in onload script in Dashboard.ds) */
+  total_requested_value = input.total_requested_value;
+  total_requests        = input.total_requests;
+  approved_value        = input.approved_value;
+  approved_count        = input.approved_count;
+  pending_value         = input.pending_value;
+  pending_count         = input.pending_count;
+  rejected_value        = input.rejected_value;
+  rejected_count        = input.rejected_count;
+  auto_count            = input.auto_count;
+  auto_value            = input.auto_value;
+  two_person_count      = input.two_person_count;
+  two_person_value      = input.two_person_value;
+  three_person_count    = input.three_person_count;
+  three_person_value    = input.three_person_value;
+  three_dash            = input.three_dash;
+  two_dash              = input.two_dash;
+  auto_dash             = input.auto_dash;
+  two_offset            = input.two_offset;
+  auto_offset           = input.auto_offset;
+  it_w = input.it_w; qa_w = input.qa_w; prod_w = input.prod_w;
+  maint_w = input.maint_w; proc_w = input.proc_w; hr_w = input.hr_w;
+  it_disp = input.it_disp; qa_disp = input.qa_disp; prod_disp = input.prod_disp;
+  maint_disp = input.maint_disp; proc_disp = input.proc_disp; hr_disp = input.hr_disp;
+  submitted_n    = input.submitted_n;
+  auto_cleared_n = input.auto_cleared_n;
+  sent_chain_n   = input.sent_chain_n;
+  pend_rm_n      = input.pend_rm_n;
+  pend_dh_n      = input.pend_dh_n;
+  pend_fin_n     = input.pend_fin_n;
+  approved_n     = input.approved_n;
+  rejected_n     = input.rejected_n;
+  submitted_w    = input.submitted_w;
+  auto_cleared_w = input.auto_cleared_w;
+  sent_chain_w   = input.sent_chain_w;
+  pend_rm_w      = input.pend_rm_w;
+  pend_dh_w      = input.pend_dh_w;
+  pend_fin_w     = input.pend_fin_w;
+  approved_w     = input.approved_w;
+  rejected_w     = input.rejected_w;
+  esc_badge      = input.esc_badge;
+  esc1_id        = input.esc1_id;
+  esc1_dept      = input.esc1_dept;
+  esc1_stage     = input.esc1_stage;
+  esc1_days      = input.esc1_days;
+  esc2_id        = input.esc2_id;
+  esc2_dept      = input.esc2_dept;
+  esc2_stage     = input.esc2_stage;
+  esc2_days      = input.esc2_days;
 
-    cat_count = Request_Catalog[ID != 0].count();
-    if(cat_count == 0)
-    {
-      insert into Request_Catalog [ Department = "Production" Item_Description = "PPE restock - gloves & face shields" Catalog_Cost = 850 ];
-      insert into Request_Catalog [ Department = "Production" Item_Description = "Conveyor sensor upgrade - Line 4" Catalog_Cost = 18500 ];
-      insert into Request_Catalog [ Department = "Production" Item_Description = "CNC lathe machine - Unit 2" Catalog_Cost = 128000 ];
-      insert into Request_Catalog [ Department = "Maintenance & Utilities" Item_Description = "Bearing & lubricant spares" Catalog_Cost = 620 ];
-      insert into Request_Catalog [ Department = "Maintenance & Utilities" Item_Description = "Industrial vacuum pump" Catalog_Cost = 32000 ];
-      insert into Request_Catalog [ Department = "Maintenance & Utilities" Item_Description = "Air compressor replacement (plant-wide)" Catalog_Cost = 94000 ];
-      insert into Request_Catalog [ Department = "Quality Assurance" Item_Description = "Calibration gauge set" Catalog_Cost = 780 ];
-      insert into Request_Catalog [ Department = "Quality Assurance" Item_Description = "Digital vernier & micrometer set" Catalog_Cost = 9500 ];
-      insert into Request_Catalog [ Department = "Quality Assurance" Item_Description = "Automated inspection system" Catalog_Cost = 142000 ];
-      insert into Request_Catalog [ Department = "Procurement & Stores" Item_Description = "Packaging consumables restock" Catalog_Cost = 340 ];
-      insert into Request_Catalog [ Department = "Procurement & Stores" Item_Description = "Pallet racking addition" Catalog_Cost = 22000 ];
-      insert into Request_Catalog [ Department = "Procurement & Stores" Item_Description = "Warehouse racking automation project" Catalog_Cost = 86000 ];
-      insert into Request_Catalog [ Department = "IT & Systems" Item_Description = "Keyboard/mouse replacement batch (20 units)" Catalog_Cost = 560 ];
-      insert into Request_Catalog [ Department = "IT & Systems" Item_Description = "Departmental laptop refresh (10 units)" Catalog_Cost = 48000 ];
-      insert into Request_Catalog [ Department = "IT & Systems" Item_Description = "Server & network infrastructure upgrade" Catalog_Cost = 115000 ];
-      insert into Request_Catalog [ Department = "HR & Admin" Item_Description = "Stationery & printing restock" Catalog_Cost = 210 ];
-      insert into Request_Catalog [ Department = "HR & Admin" Item_Description = "HRMS software license renewal" Catalog_Cost = 11000 ];
-      insert into Request_Catalog [ Department = "HR & Admin" Item_Description = "Cafeteria & facility renovation" Catalog_Cost = 69000 ];
-    }
+  /* Guard nulls */
+  if(total_requested_value == null || total_requested_value == "") { total_requested_value = "$0"; }
+  if(total_requests == null || total_requests == "")               { total_requests = "0"; }
+  if(approved_value == null || approved_value == "")               { approved_value = "$0"; }
+  if(approved_count == null || approved_count == "")               { approved_count = "0"; }
+  if(pending_value == null || pending_value == "")                 { pending_value = "$0"; }
+  if(pending_count == null || pending_count == "")                 { pending_count = "0"; }
+  if(rejected_value == null || rejected_value == "")               { rejected_value = "$0"; }
+  if(rejected_count == null || rejected_count == "")               { rejected_count = "0"; }
+  if(three_dash == null || three_dash == "")   { three_dash = "0"; }
+  if(two_dash == null || two_dash == "")       { two_dash   = "0"; }
+  if(auto_dash == null || auto_dash == "")     { auto_dash  = "0"; }
+  if(two_offset == null || two_offset == "")   { two_offset = "0"; }
+  if(auto_offset == null || auto_offset == "") { auto_offset = "0"; }
+  if(esc_badge == null || esc_badge == "")     { esc_badge = "0 overdue"; }
+  if(esc1_id == null || esc1_id == "")         { esc1_id = "-"; esc1_dept = "-"; esc1_stage = "-"; esc1_days = "0"; }
+  if(esc2_id == null || esc2_id == "")         { esc2_id = "-"; esc2_dept = "-"; esc2_stage = "-"; esc2_days = "0"; }
 
-    sr_count = Spend_Request[ID != 0].count();
-    if(sr_count == 0)
-    {
-      insert into Spend_Request [ Request_ID = "BRQ-2026-0301" Requester_Name = "Carlos Medina" Department = "Production" Requester_ID = "EMP-3011" Reporting_Manager_Name = "Jason Miller" Department_Head_Name = "Henrik Larsson" Item_Description = "PPE restock - gloves & face shields" Estimated_Cost = 850 Priority = "Low" Status = "Auto_Approved" Submitted_Date = "2026-08-01" SLA_Due_Date = "2026-08-01" Justification = "Routine safety consumables restock for production floor compliance." ];
-      insert into Spend_Request [ Request_ID = "BRQ-2026-0302" Requester_Name = "Carlos Medina" Department = "Production" Requester_ID = "EMP-3011" Reporting_Manager_Name = "Jason Miller" Department_Head_Name = "Henrik Larsson" Item_Description = "Conveyor sensor upgrade - Line 4" Estimated_Cost = 18500 Priority = "Medium" Status = "Pending_Finance" Submitted_Date = "2026-09-10" SLA_Due_Date = "2026-12-10" Justification = "Line 4 sensor is misreading intermittently, causing manual stoppages; replacement restores automated flow." ];
-      insert into Spend_Request [ Request_ID = "BRQ-2026-0303" Requester_Name = "Carlos Medina" Department = "Production" Requester_ID = "EMP-3011" Reporting_Manager_Name = "Jason Miller" Department_Head_Name = "Henrik Larsson" Item_Description = "CNC lathe machine - Unit 2" Estimated_Cost = 128000 Priority = "High" Status = "Pending_Dept_Head" Submitted_Date = "2026-08-25" SLA_Due_Date = "2026-11-20" Justification = "Existing lathe at Unit 2 is beyond economical repair; new unit restores full shift capacity." ];
-      insert into Spend_Request [ Request_ID = "BRQ-2026-0304" Requester_Name = "Wei Zhang" Department = "Maintenance & Utilities" Requester_ID = "EMP-3024" Reporting_Manager_Name = "Fatima Al-Sayed" Department_Head_Name = "Aisha Bello" Item_Description = "Bearing & lubricant spares" Estimated_Cost = 620 Priority = "Low" Status = "Auto_Approved" Submitted_Date = "2026-08-03" SLA_Due_Date = "2026-08-03" Justification = "Routine maintenance stock replenishment for scheduled PM intervals." ];
-      insert into Spend_Request [ Request_ID = "BRQ-2026-0305" Requester_Name = "Wei Zhang" Department = "Maintenance & Utilities" Requester_ID = "EMP-3024" Reporting_Manager_Name = "Fatima Al-Sayed" Department_Head_Name = "Aisha Bello" Item_Description = "Industrial vacuum pump" Estimated_Cost = 32000 Priority = "Medium" Status = "Approved" Submitted_Date = "2026-08-07" SLA_Due_Date = "2026-11-07" Justification = "Existing pump has exceeded service life and is impacting line availability." ];
-      insert into Spend_Request [ Request_ID = "BRQ-2026-0306" Requester_Name = "Wei Zhang" Department = "Maintenance & Utilities" Requester_ID = "EMP-3024" Reporting_Manager_Name = "Fatima Al-Sayed" Department_Head_Name = "Aisha Bello" Item_Description = "Air compressor replacement (plant-wide)" Estimated_Cost = 94000 Priority = "Medium" Status = "Pending_Dept_Head" Submitted_Date = "2026-08-20" SLA_Due_Date = "2026-09-10" Justification = "Plant-wide compressor is failing intermittently; replacement prevents production stoppage." ];
-      insert into Spend_Request [ Request_ID = "BRQ-2026-0307" Requester_Name = "Amara Okafor" Department = "Quality Assurance" Requester_ID = "EMP-3037" Reporting_Manager_Name = "Marco Rossi" Department_Head_Name = "Takeshi Yamamoto" Item_Description = "Calibration gauge set" Estimated_Cost = 780 Priority = "Low" Status = "Auto_Approved" Submitted_Date = "2026-08-05" SLA_Due_Date = "2026-08-05" Justification = "Annual calibration tool replacement per QMS schedule." ];
-      insert into Spend_Request [ Request_ID = "BRQ-2026-0308" Requester_Name = "Amara Okafor" Department = "Quality Assurance" Requester_ID = "EMP-3037" Reporting_Manager_Name = "Marco Rossi" Department_Head_Name = "Takeshi Yamamoto" Item_Description = "Digital vernier & micrometer set" Estimated_Cost = 9500 Priority = "High" Status = "Approved" Submitted_Date = "2026-08-12" SLA_Due_Date = "2026-11-12" Justification = "Current set is out of calibration range; delays are affecting QA sign-off turnaround on the line." ];
-      insert into Spend_Request [ Request_ID = "BRQ-2026-0309" Requester_Name = "Amara Okafor" Department = "Quality Assurance" Requester_ID = "EMP-3037" Reporting_Manager_Name = "Marco Rossi" Department_Head_Name = "Takeshi Yamamoto" Item_Description = "Automated inspection system" Estimated_Cost = 142000 Priority = "High" Status = "Pending_RM" Submitted_Date = "2026-08-26" SLA_Due_Date = "2026-09-05" Justification = "Manual inspection is the current bottleneck on the QA line; automation reduces cycle time and human error." ];
-      insert into Spend_Request [ Request_ID = "BRQ-2026-0310" Requester_Name = "Elena Petrova" Department = "Procurement & Stores" Requester_ID = "EMP-3042" Reporting_Manager_Name = "Grace Kim" Department_Head_Name = "Isabella Fischer" Item_Description = "Packaging consumables restock" Estimated_Cost = 340 Priority = "Low" Status = "Auto_Approved" Submitted_Date = "2026-08-08" SLA_Due_Date = "2026-08-08" Justification = "Monthly packaging stock replenishment for outbound logistics." ];
-      insert into Spend_Request [ Request_ID = "BRQ-2026-0311" Requester_Name = "Elena Petrova" Department = "Procurement & Stores" Requester_ID = "EMP-3042" Reporting_Manager_Name = "Grace Kim" Department_Head_Name = "Isabella Fischer" Item_Description = "Pallet racking addition" Estimated_Cost = 22000 Priority = "Medium" Status = "Pending_RM" Submitted_Date = "2026-09-01" SLA_Due_Date = "2026-11-15" Justification = "Additional pallet racking required for Q4 inventory volume projections." ];
-      insert into Spend_Request [ Request_ID = "BRQ-2026-0312" Requester_Name = "Elena Petrova" Department = "Procurement & Stores" Requester_ID = "EMP-3042" Reporting_Manager_Name = "Grace Kim" Department_Head_Name = "Isabella Fischer" Item_Description = "Warehouse racking automation project" Estimated_Cost = 86000 Priority = "High" Status = "Rejected" Submitted_Date = "2026-08-18" SLA_Due_Date = "2026-11-18" Justification = "Current racking layout is at capacity; automation adds storage density ahead of Q3 volume growth." Comments = "Deferred to next quarter pending warehouse layout finalization." ];
-      insert into Spend_Request [ Request_ID = "BRQ-2026-0313" Requester_Name = "Daniel Cohen" Department = "IT & Systems" Requester_ID = "EMP-3055" Reporting_Manager_Name = "Liam O'Connor" Department_Head_Name = "Noah Bergstrom" Item_Description = "Keyboard/mouse replacement batch (20 units)" Estimated_Cost = 560 Priority = "Low" Status = "Auto_Approved" Submitted_Date = "2026-08-14" SLA_Due_Date = "2026-08-14" Justification = "Batch peripheral replacement for workstations with worn input devices." ];
-      insert into Spend_Request [ Request_ID = "BRQ-2026-0314" Requester_Name = "Daniel Cohen" Department = "IT & Systems" Requester_ID = "EMP-3055" Reporting_Manager_Name = "Liam O'Connor" Department_Head_Name = "Noah Bergstrom" Item_Description = "Departmental laptop refresh (10 units)" Estimated_Cost = 48000 Priority = "Medium" Status = "Rejected" Submitted_Date = "2026-09-02" SLA_Due_Date = "2026-11-02" Justification = "Laptops are showing performance issues on client-facing tools; refresh improves reliability." Comments = "Refresh cycle not due for another 8 months per asset lifecycle policy; resubmit closer to the replacement window." ];
-      insert into Spend_Request [ Request_ID = "BRQ-2026-0315" Requester_Name = "Daniel Cohen" Department = "IT & Systems" Requester_ID = "EMP-3055" Reporting_Manager_Name = "Liam O'Connor" Department_Head_Name = "Noah Bergstrom" Item_Description = "Server & network infrastructure upgrade" Estimated_Cost = 115000 Priority = "High" Status = "Pending_Finance" Submitted_Date = "2026-08-30" SLA_Due_Date = "2026-11-25" Justification = "Existing server hardware is past end-of-support; upgrade reduces outage risk ahead of Q3 peak load." ];
-      insert into Spend_Request [ Request_ID = "BRQ-2026-0316" Requester_Name = "Priya Nair" Department = "HR & Admin" Requester_ID = "EMP-3068" Reporting_Manager_Name = "Sofia Martins" Department_Head_Name = "Chidi Eze" Item_Description = "Stationery & printing restock" Estimated_Cost = 210 Priority = "Low" Status = "Auto_Approved" Submitted_Date = "2026-08-10" SLA_Due_Date = "2026-08-10" Justification = "Monthly office supplies replenishment for HR and admin staff." ];
-      insert into Spend_Request [ Request_ID = "BRQ-2026-0317" Requester_Name = "Priya Nair" Department = "HR & Admin" Requester_ID = "EMP-3068" Reporting_Manager_Name = "Sofia Martins" Department_Head_Name = "Chidi Eze" Item_Description = "HRMS software license renewal" Estimated_Cost = 11000 Priority = "Medium" Status = "Rejected" Submitted_Date = "2026-08-22" SLA_Due_Date = "2026-11-22" Justification = "Annual HRMS license renewal required to maintain system access for all HR staff." Comments = "Duplicate license already active under a company-wide HRMS agreement." ];
-      insert into Spend_Request [ Request_ID = "BRQ-2026-0318" Requester_Name = "Priya Nair" Department = "HR & Admin" Requester_ID = "EMP-3068" Reporting_Manager_Name = "Sofia Martins" Department_Head_Name = "Chidi Eze" Item_Description = "Cafeteria & facility renovation" Estimated_Cost = 69000 Priority = "High" Status = "Approved" Submitted_Date = "2026-08-15" SLA_Due_Date = "2026-11-15" Justification = "Cafeteria infrastructure is overdue for renovation to meet health and safety standards." ];
-    }
-
-    log_count = Approval_Log[ID != 0].count();
-    if(log_count == 0)
-    {
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0301" Stage = "System" Approver_Name = "Carlos Medina" Decision = "Submitted" Decision_Timestamp = "2026-08-01 09:00:00" Comments = "Request submitted by Carlos Medina (Production)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0301" Stage = "System" Approver_Name = "System" Decision = "Auto-Approved" Decision_Timestamp = "2026-08-01 09:01:00" Comments = "Auto-approved based on amount threshold (up to $1,000)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0302" Stage = "System" Approver_Name = "Carlos Medina" Decision = "Submitted" Decision_Timestamp = "2026-09-10 09:00:00" Comments = "Request submitted by Carlos Medina (Production)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0302" Stage = "Reporting Manager" Approver_Name = "Jason Miller" Decision = "Approved" Decision_Timestamp = "2026-09-12 10:15:00" Comments = "Approved by Reporting Manager Jason Miller, routed directly to Finance (2-Person tier)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0303" Stage = "System" Approver_Name = "Carlos Medina" Decision = "Submitted" Decision_Timestamp = "2026-08-25 10:05:00" Comments = "Request submitted by Carlos Medina (Production)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0303" Stage = "Reporting Manager" Approver_Name = "Jason Miller" Decision = "Approved" Decision_Timestamp = "2026-08-28 09:30:00" Comments = "Approved by Reporting Manager Jason Miller, routed to Department Head" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0304" Stage = "System" Approver_Name = "Wei Zhang" Decision = "Submitted" Decision_Timestamp = "2026-08-03 08:30:00" Comments = "Request submitted by Wei Zhang (Maintenance & Utilities)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0304" Stage = "System" Approver_Name = "System" Decision = "Auto-Approved" Decision_Timestamp = "2026-08-03 08:31:00" Comments = "Auto-approved based on amount threshold (up to $1,000)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0305" Stage = "System" Approver_Name = "Wei Zhang" Decision = "Submitted" Decision_Timestamp = "2026-08-07 09:15:00" Comments = "Request submitted by Wei Zhang (Maintenance & Utilities)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0305" Stage = "Reporting Manager" Approver_Name = "Fatima Al-Sayed" Decision = "Approved" Decision_Timestamp = "2026-08-09 11:00:00" Comments = "Approved by Reporting Manager Fatima Al-Sayed, routed to Finance" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0305" Stage = "Finance Controller" Approver_Name = "Olivia Bennett" Decision = "Approved" Decision_Timestamp = "2026-08-11 14:30:00" Comments = "Approved by Finance Controller Olivia Bennett. Purchase order authorized." ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0306" Stage = "System" Approver_Name = "Wei Zhang" Decision = "Submitted" Decision_Timestamp = "2026-08-20 10:00:00" Comments = "Request submitted by Wei Zhang (Maintenance & Utilities)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0306" Stage = "Reporting Manager" Approver_Name = "Fatima Al-Sayed" Decision = "Approved" Decision_Timestamp = "2026-08-22 09:45:00" Comments = "Approved by Reporting Manager Fatima Al-Sayed, routed to Department Head" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0307" Stage = "System" Approver_Name = "Amara Okafor" Decision = "Submitted" Decision_Timestamp = "2026-08-05 08:00:00" Comments = "Request submitted by Amara Okafor (Quality Assurance)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0307" Stage = "System" Approver_Name = "System" Decision = "Auto-Approved" Decision_Timestamp = "2026-08-05 08:01:00" Comments = "Auto-approved based on amount threshold (up to $1,000)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0308" Stage = "System" Approver_Name = "Amara Okafor" Decision = "Submitted" Decision_Timestamp = "2026-08-12 10:30:00" Comments = "Request submitted by Amara Okafor (Quality Assurance)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0308" Stage = "Reporting Manager" Approver_Name = "Marco Rossi" Decision = "Approved" Decision_Timestamp = "2026-08-14 11:20:00" Comments = "Approved by Reporting Manager Marco Rossi, routed to Finance" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0308" Stage = "Finance Controller" Approver_Name = "Olivia Bennett" Decision = "Approved" Decision_Timestamp = "2026-08-15 15:00:00" Comments = "Approved by Finance Controller Olivia Bennett. Purchase order authorized." ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0309" Stage = "System" Approver_Name = "Amara Okafor" Decision = "Submitted" Decision_Timestamp = "2026-08-26 09:00:00" Comments = "Request submitted by Amara Okafor (Quality Assurance)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0310" Stage = "System" Approver_Name = "Elena Petrova" Decision = "Submitted" Decision_Timestamp = "2026-08-08 08:45:00" Comments = "Request submitted by Elena Petrova (Procurement & Stores)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0310" Stage = "System" Approver_Name = "System" Decision = "Auto-Approved" Decision_Timestamp = "2026-08-08 08:46:00" Comments = "Auto-approved based on amount threshold (up to $1,000)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0311" Stage = "System" Approver_Name = "Elena Petrova" Decision = "Submitted" Decision_Timestamp = "2026-09-01 09:30:00" Comments = "Request submitted by Elena Petrova (Procurement & Stores)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0312" Stage = "System" Approver_Name = "Elena Petrova" Decision = "Submitted" Decision_Timestamp = "2026-08-18 10:00:00" Comments = "Request submitted by Elena Petrova (Procurement & Stores)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0312" Stage = "Reporting Manager" Approver_Name = "Grace Kim" Decision = "Approved" Decision_Timestamp = "2026-08-20 10:30:00" Comments = "Approved by Reporting Manager Grace Kim, routed to Department Head" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0312" Stage = "Department Head" Approver_Name = "Isabella Fischer" Decision = "Rejected" Decision_Timestamp = "2026-08-25 14:00:00" Comments = "Deferred to next quarter pending warehouse layout finalization." ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0313" Stage = "System" Approver_Name = "Daniel Cohen" Decision = "Submitted" Decision_Timestamp = "2026-08-14 11:00:00" Comments = "Request submitted by Daniel Cohen (IT & Systems)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0313" Stage = "System" Approver_Name = "System" Decision = "Auto-Approved" Decision_Timestamp = "2026-08-14 11:01:00" Comments = "Auto-approved based on amount threshold (up to $1,000)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0314" Stage = "System" Approver_Name = "Daniel Cohen" Decision = "Submitted" Decision_Timestamp = "2026-09-02 11:20:00" Comments = "Request submitted by Daniel Cohen (IT & Systems)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0314" Stage = "Reporting Manager" Approver_Name = "Liam O'Connor" Decision = "Rejected" Decision_Timestamp = "2026-09-04 14:40:00" Comments = "Refresh cycle isn't due for another 8 months per asset lifecycle policy; resubmit closer to the replacement window." ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0315" Stage = "System" Approver_Name = "Daniel Cohen" Decision = "Submitted" Decision_Timestamp = "2026-08-30 09:00:00" Comments = "Request submitted by Daniel Cohen (IT & Systems)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0315" Stage = "Reporting Manager" Approver_Name = "Liam O'Connor" Decision = "Approved" Decision_Timestamp = "2026-09-01 10:00:00" Comments = "Approved by Reporting Manager Liam O'Connor, routed to Department Head" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0315" Stage = "Department Head" Approver_Name = "Noah Bergstrom" Decision = "Approved" Decision_Timestamp = "2026-09-03 11:30:00" Comments = "Approved by Department Head Noah Bergstrom, routed to Finance" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0316" Stage = "System" Approver_Name = "Priya Nair" Decision = "Submitted" Decision_Timestamp = "2026-08-10 08:30:00" Comments = "Request submitted by Priya Nair (HR & Admin)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0316" Stage = "System" Approver_Name = "System" Decision = "Auto-Approved" Decision_Timestamp = "2026-08-10 08:31:00" Comments = "Auto-approved based on amount threshold (up to $1,000)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0317" Stage = "System" Approver_Name = "Priya Nair" Decision = "Submitted" Decision_Timestamp = "2026-08-22 09:00:00" Comments = "Request submitted by Priya Nair (HR & Admin)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0317" Stage = "Reporting Manager" Approver_Name = "Sofia Martins" Decision = "Approved" Decision_Timestamp = "2026-08-24 10:00:00" Comments = "Approved by Reporting Manager Sofia Martins, routed to Finance" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0317" Stage = "Finance Controller" Approver_Name = "Olivia Bennett" Decision = "Rejected" Decision_Timestamp = "2026-08-26 13:00:00" Comments = "Duplicate license already active under a company-wide HRMS agreement." ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0318" Stage = "System" Approver_Name = "Priya Nair" Decision = "Submitted" Decision_Timestamp = "2026-08-15 09:30:00" Comments = "Request submitted by Priya Nair (HR & Admin)" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0318" Stage = "Reporting Manager" Approver_Name = "Sofia Martins" Decision = "Approved" Decision_Timestamp = "2026-08-17 11:00:00" Comments = "Approved by Reporting Manager Sofia Martins, routed to Department Head" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0318" Stage = "Department Head" Approver_Name = "Chidi Eze" Decision = "Approved" Decision_Timestamp = "2026-08-19 14:00:00" Comments = "Approved by Department Head Chidi Eze, routed to Finance" ];
-      insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0318" Stage = "Finance Controller" Approver_Name = "Olivia Bennett" Decision = "Approved" Decision_Timestamp = "2026-08-21 16:00:00" Comments = "Approved by Finance Controller Olivia Bennett. Purchase order authorized." ];
-    }
-
-    openUrl("#Page:Dashboard", "same window");
-  }
+  /* Show load banner only if no data */
+  all_n_raw = total_requests;
+  show_banner = false;
+  if(all_n_raw == "0" || all_n_raw == null || all_n_raw == "") { show_banner = true; }
 %>
 
-<%
-  /* ---- live data fetch ---- */
-  all_reqs = Spend_Request[ID != 0].count();
-  if(all_reqs > 0)
-  {
-    total_sum = Spend_Request[ID != 0].sum(Estimated_Cost);
-    total_requested_value = "$" + "" + total_sum.toLong();
-    total_requests = "" + all_reqs;
+<div class="dbc-wrap">
 
-    appr_cnt = Spend_Request[Status == "Approved" || Status == "Auto_Approved"].count();
-    approved_sum = Spend_Request[Status == "Approved" || Status == "Auto_Approved"].sum(Estimated_Cost);
-    approved_value = "$" + "" + approved_sum.toLong();
-    approved_count = "" + appr_cnt;
-
-    pend_cnt = Spend_Request[Status == "Pending_RM" || Status == "Pending_Dept_Head" || Status == "Pending_Finance"].count();
-    pending_sum = Spend_Request[Status == "Pending_RM" || Status == "Pending_Dept_Head" || Status == "Pending_Finance"].sum(Estimated_Cost);
-    pending_value = "$" + "" + pending_sum.toLong();
-    pending_count = "" + pend_cnt;
-
-    rej_cnt = Spend_Request[Status == "Rejected"].count();
-    rejected_sum = Spend_Request[Status == "Rejected"].sum(Estimated_Cost);
-    rejected_value = "$" + "" + rejected_sum.toLong();
-    rejected_count = "" + rej_cnt;
-
-    /* Approval tier breakdown by cost ranges */
-    auto_cnt = Spend_Request[Estimated_Cost <= 1000].count();
-    two_cnt = Spend_Request[Estimated_Cost > 1000 && Estimated_Cost <= 50000].count();
-    three_cnt = Spend_Request[Estimated_Cost > 50000].count();
-    auto_s = Spend_Request[Estimated_Cost <= 1000].sum(Estimated_Cost);
-    two_s = Spend_Request[Estimated_Cost > 1000 && Estimated_Cost <= 50000].sum(Estimated_Cost);
-    three_s = Spend_Request[Estimated_Cost > 50000].sum(Estimated_Cost);
-    auto_count = "" + auto_cnt;
-    two_person_count = "" + two_cnt;
-    three_person_count = "" + three_cnt;
-    auto_value = "$" + "" + auto_s.toLong();
-    two_person_value = "$" + "" + two_s.toLong();
-    three_person_value = "$" + "" + three_s.toLong();
-
-    /* Donut segment dasharray (circumference = 502) */
-    if(total_sum > 0)
-    {
-      auto_dash = "" + ((auto_s / total_sum) * 502).toLong();
-      two_dash = "" + ((two_s / total_sum) * 502).toLong();
-      three_dash = "" + ((three_s / total_sum) * 502).toLong();
-      two_offset = "" + (502 - three_dash.toLong()).toLong();
-      auto_offset = "" + (502 - three_dash.toLong() - two_dash.toLong()).toLong();
-    }
-    else
-    {
-      auto_dash = "2"; two_dash = "91"; three_dash = "409";
-      two_offset = "93"; auto_offset = "2";
-    }
-
-    /* Dept bar widths */
-    it_pct = Spend_Request[Department == "IT & Systems"].sum(Estimated_Cost);
-    qa_pct = Spend_Request[Department == "Quality Assurance"].sum(Estimated_Cost);
-    prod_pct = Spend_Request[Department == "Production"].sum(Estimated_Cost);
-    maint_pct = Spend_Request[Department == "Maintenance & Utilities"].sum(Estimated_Cost);
-    proc_pct = Spend_Request[Department == "Procurement & Stores"].sum(Estimated_Cost);
-    hr_pct = Spend_Request[Department == "HR & Admin"].sum(Estimated_Cost);
-
-    live_max = it_pct;
-    if(qa_pct > live_max) { live_max = qa_pct; }
-    if(prod_pct > live_max) { live_max = prod_pct; }
-    if(maint_pct > live_max) { live_max = maint_pct; }
-    if(proc_pct > live_max) { live_max = proc_pct; }
-    if(hr_pct > live_max) { live_max = hr_pct; }
-
-    if(live_max > 0)
-    {
-      it_w = "" + ((it_pct / live_max) * 100).toLong() + "%";
-      qa_w = "" + ((qa_pct / live_max) * 100).toLong() + "%";
-      prod_w = "" + ((prod_pct / live_max) * 100).toLong() + "%";
-      maint_w = "" + ((maint_pct / live_max) * 100).toLong() + "%";
-      proc_w = "" + ((proc_pct / live_max) * 100).toLong() + "%";
-      hr_w = "" + ((hr_pct / live_max) * 100).toLong() + "%";
-      it_disp = "$" + "" + it_pct.toLong();
-      qa_disp = "$" + "" + qa_pct.toLong();
-      prod_disp = "$" + "" + prod_pct.toLong();
-      maint_disp = "$" + "" + maint_pct.toLong();
-      proc_disp = "$" + "" + proc_pct.toLong();
-      hr_disp = "$" + "" + hr_pct.toLong();
-    }
-    else
-    {
-      it_w = "100%"; qa_w = "93%"; prod_w = "90%"; maint_w = "77%"; proc_w = "66%"; hr_w = "49%";
-      it_disp = "$163,560"; qa_disp = "$152,280"; prod_disp = "$147,350";
-      maint_disp = "$126,620"; proc_disp = "$108,340"; hr_disp = "$80,210";
-    }
-
-    /* Funnel counts */
-    a_clr = Spend_Request[Estimated_Cost <= 1000].count();
-    s_chn = Spend_Request[Estimated_Cost > 1000].count();
-    p_rm = Spend_Request[Status == "Pending_RM"].count();
-    p_dh = Spend_Request[Status == "Pending_Dept_Head"].count();
-    p_fn = Spend_Request[Status == "Pending_Finance"].count();
-
-    submitted_n = "" + all_reqs;
-    auto_cleared_n = "" + a_clr;
-    sent_chain_n = "" + s_chn;
-    pend_rm_n = "" + p_rm;
-    pend_dh_n = "" + p_dh;
-    pend_fin_n = "" + p_fn;
-    approved_n = "" + appr_cnt;
-    rejected_n = "" + rej_cnt;
-
-    submitted_w = "100%";
-    if(all_reqs > 0)
-    {
-      auto_cleared_w = "" + ((a_clr / all_reqs) * 100).toLong() + "%";
-      sent_chain_w = "" + ((s_chn / all_reqs) * 100).toLong() + "%";
-      pend_rm_w = "" + ((p_rm / all_reqs) * 100).toLong() + "%";
-      pend_dh_w = "" + ((p_dh / all_reqs) * 100).toLong() + "%";
-      pend_fin_w = "" + ((p_fn / all_reqs) * 100).toLong() + "%";
-      approved_w = "" + ((appr_cnt / all_reqs) * 100).toLong() + "%";
-      rejected_w = "" + ((rej_cnt / all_reqs) * 100).toLong() + "%";
-    }
-    else
-    {
-      auto_cleared_w = "33%"; sent_chain_w = "67%"; pend_rm_w = "11%";
-      pend_dh_w = "11%"; pend_fin_w = "11%"; approved_w = "17%"; rejected_w = "17%";
-    }
-
-    /* Escalation - hardcoded BRD values */
-    esc1_id = "BRQ-2026-0309"; esc1_dept = "Quality Assurance"; esc1_stage = "Pending RM"; esc1_days = "10";
-    esc2_id = "BRQ-2026-0306"; esc2_dept = "Maintenance & Utilities"; esc2_stage = "Pending Dept Head"; esc2_days = "5";
-    esc_badge = "2 overdue";
-    esc_count = 2;
-  }
-  else
-  {
-    /* BRD fallback values */
-    total_requested_value = "$778,360";
-    approved_value = "$113,860";
-    pending_value = "$519,500";
-    rejected_value = "$145,000";
-    total_requests = "18";
-    approved_count = "9";
-    pending_count = "6";
-    rejected_count = "3";
-
-    auto_count = "6"; auto_value = "$3,360";
-    two_person_count = "6"; two_person_value = "$141,000";
-    three_person_count = "6"; three_person_value = "$634,000";
-
-    auto_dash = "2"; two_dash = "91"; three_dash = "409";
-    two_offset = "93"; auto_offset = "2";
-
-    it_w = "100%"; qa_w = "93%"; prod_w = "90%"; maint_w = "77%"; proc_w = "66%"; hr_w = "49%";
-    it_disp = "$163,560"; qa_disp = "$152,280"; prod_disp = "$147,350";
-    maint_disp = "$126,620"; proc_disp = "$108,340"; hr_disp = "$80,210";
-
-    submitted_n = "18"; auto_cleared_n = "6"; sent_chain_n = "12";
-    pend_rm_n = "2"; pend_dh_n = "2"; pend_fin_n = "2"; approved_n = "3"; rejected_n = "3";
-    submitted_w = "100%"; auto_cleared_w = "33%"; sent_chain_w = "67%";
-    pend_rm_w = "11%"; pend_dh_w = "11%"; pend_fin_w = "11%";
-    approved_w = "17%"; rejected_w = "17%";
-
-    esc1_id = "BRQ-2026-0309"; esc1_dept = "Quality Assurance"; esc1_stage = "Pending RM"; esc1_days = "10";
-    esc2_id = "BRQ-2026-0306"; esc2_dept = "Maintenance & Utilities"; esc2_stage = "Pending Dept Head"; esc2_days = "5";
-    esc_badge = "2 overdue";
-    esc_count = 2;
-  }
-%>
-
-
-
-<% if(all_reqs == 0) { %>
-<!-- LOAD SAMPLE DATA BANNER -->
-<div style="margin-left:220px;padding:72px 28px 0 248px;font-family:'Lato',sans-serif;box-sizing:border-box;">
-  <div style="background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:10px;padding:20px 28px;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+  <!-- LOAD BANNER (only when DB empty) -->
+  <% if(show_banner) { %>
+  <div class="dbc-banner">
     <div>
-      <div style="font-size:15px;font-weight:700;color:#1E40AF;margin-bottom:4px;">No data found - App is empty</div>
-      <div style="font-size:13px;color:#3B82F6;">Click the button to load all 18 BRD sample requests, 6 employees, 18 catalog items, and full approval history instantly.</div>
+      <div class="dbc-banner-title">No data yet - App is empty</div>
+      <div class="dbc-banner-sub">Load all 18 BRD sample requests, 6 employees, 18 catalog items, and full approval history in one click.</div>
     </div>
-    <a href="#Page:Dashboard?load=true"
-       style="background:#2563EB;color:#FFFFFF;font-size:14px;font-weight:700;font-family:'Lato',sans-serif;padding:10px 24px;border-radius:6px;text-decoration:none;white-space:nowrap;margin-left:24px;">
+    <a class="dbc-load-btn" href="#Page:Dashboard?load=true">
+      <i class="zc-li-outline ui-1-upload-to-cloud" style="font-size:15px;"></i>
       Load Sample Data
     </a>
   </div>
-</div>
-<% } %>
-
-<!-- ======== DASHBOARD CONTENT ======== -->
-<div class="dbc-wrapper">
+  <% } %>
 
   <!-- PAGE HEADER -->
-  <div class="dbc-page-header">
+  <div class="dbc-header">
     <div>
-      <h1 class="dbc-page-title">Spend &amp; Approval Dashboard</h1>
-      <p class="dbc-page-subtitle">Atlas Precision Manufacturing &nbsp;&middot;&nbsp; as of 15 Sep 2026</p>
+      <h1 class="dbc-title">Spend &amp; Approval Dashboard</h1>
+      <p class="dbc-sub">Atlas Precision Manufacturing &middot; Plant 3, Ohio, USA</p>
     </div>
-    <span class="dbc-period-chip">Reporting Period: Sep 2026</span>
+    <span class="dbc-period">Reporting Period: Sep 2026</span>
   </div>
 
-  <!-- STAT ROW -->
+  <!-- STAT CARDS -->
   <div class="dbc-stat-row">
-    <div class="dbc-stat-card" style="border-left-color:#2563EB;">
-      <div class="dbc-stat-value"><%= total_requested_value %></div>
-      <div class="dbc-stat-count"><%= total_requests %> requests</div>
-      <div class="dbc-stat-label">TOTAL REQUESTED</div>
+    <div class="dbc-stat" style="border-left-color:#2563EB;">
+      <span class="dbc-stat-val"><%= total_requested_value %></span>
+      <span class="dbc-stat-cnt"><%= total_requests %> requests</span>
+      <span class="dbc-stat-lbl">Total Requested</span>
     </div>
-    <div class="dbc-stat-card" style="border-left-color:#16AD78;">
-      <div class="dbc-stat-value" style="color:#16AD78;"><%= approved_value %></div>
-      <div class="dbc-stat-count"><%= approved_count %> requests</div>
-      <div class="dbc-stat-label">TOTAL APPROVED</div>
+    <div class="dbc-stat" style="border-left-color:#16AD78;">
+      <span class="dbc-stat-val" style="color:#16AD78;"><%= approved_value %></span>
+      <span class="dbc-stat-cnt"><%= approved_count %> requests</span>
+      <span class="dbc-stat-lbl">Total Approved</span>
     </div>
-    <div class="dbc-stat-card" style="border-left-color:#F59E0B;">
-      <div class="dbc-stat-value" style="color:#D97706;"><%= pending_value %></div>
-      <div class="dbc-stat-count"><%= pending_count %> requests</div>
-      <div class="dbc-stat-label">PENDING VALUE</div>
+    <div class="dbc-stat" style="border-left-color:#F59E0B;">
+      <span class="dbc-stat-val" style="color:#D97706;"><%= pending_value %></span>
+      <span class="dbc-stat-cnt"><%= pending_count %> requests</span>
+      <span class="dbc-stat-lbl">Pending Value</span>
     </div>
-    <div class="dbc-stat-card" style="border-left-color:#EF4444;">
-      <div class="dbc-stat-value" style="color:#EF4444;"><%= rejected_value %></div>
-      <div class="dbc-stat-count"><%= rejected_count %> requests</div>
-      <div class="dbc-stat-label">REJECTED VALUE</div>
+    <div class="dbc-stat" style="border-left-color:#EF4444;">
+      <span class="dbc-stat-val" style="color:#EF4444;"><%= rejected_value %></span>
+      <span class="dbc-stat-cnt"><%= rejected_count %> requests</span>
+      <span class="dbc-stat-lbl">Rejected Value</span>
     </div>
   </div>
 
@@ -689,56 +237,49 @@
     <!-- DONUT -->
     <div class="dbc-donut-card">
       <h2 class="dbc-card-title">Approval Tier Breakdown</h2>
-      <div style="position:relative;display:flex;justify-content:center;align-items:center;margin-bottom:16px;">
-        <svg width="220" height="220" viewBox="0 0 220 220" style="transform:rotate(-90deg);">
-          <!-- Track -->
+      <div class="dbc-donut-wrap">
+        <svg width="200" height="200" viewBox="0 0 220 220" style="transform:rotate(-90deg);">
           <circle cx="110" cy="110" r="80" fill="none" stroke="#F3F4F6" stroke-width="28"/>
-          <!-- 3-Person segment (largest) -->
           <circle cx="110" cy="110" r="80" fill="none" stroke="#2563EB" stroke-width="28"
             stroke-dasharray="<%= three_dash %> 502" stroke-dashoffset="0"/>
-          <!-- 2-Person segment -->
           <circle cx="110" cy="110" r="80" fill="none" stroke="#F59E0B" stroke-width="28"
             stroke-dasharray="<%= two_dash %> 502" stroke-dashoffset="-<%= two_offset %>"/>
-          <!-- Auto segment (tiny) -->
           <circle cx="110" cy="110" r="80" fill="none" stroke="#16AD78" stroke-width="28"
             stroke-dasharray="<%= auto_dash %> 502" stroke-dashoffset="-<%= auto_offset %>"/>
         </svg>
-        <div style="position:absolute;text-align:center;">
-          <div style="font-size:18px;font-weight:700;color:#111827;">$778K</div>
-          <div style="font-size:11px;color:#9CA3AF;">Total</div>
+        <div class="dbc-donut-center">
+          <span class="dbc-donut-val"><%= total_requested_value %></span>
+          <span class="dbc-donut-lbl">Total</span>
         </div>
       </div>
-      <!-- Legend -->
-      <div class="dbc-donut-legend">
-        <div class="dbc-legend-row">
-          <span class="dbc-legend-dot" style="background:#16AD78;"></span>
-          <span class="dbc-legend-name">Auto</span>
-          <span class="dbc-legend-val"><%= auto_value %></span>
-          <span class="dbc-legend-count"><%= auto_count %> requests</span>
-        </div>
-        <div class="dbc-legend-row">
-          <span class="dbc-legend-dot" style="background:#F59E0B;"></span>
-          <span class="dbc-legend-name">2-Person</span>
-          <span class="dbc-legend-val"><%= two_person_value %></span>
-          <span class="dbc-legend-count"><%= two_person_count %> requests</span>
-        </div>
-        <div class="dbc-legend-row">
-          <span class="dbc-legend-dot" style="background:#2563EB;"></span>
-          <span class="dbc-legend-name">3-Person</span>
-          <span class="dbc-legend-val"><%= three_person_value %></span>
-          <span class="dbc-legend-count"><%= three_person_count %> requests</span>
-        </div>
+      <div class="dbc-legend-row">
+        <span class="dbc-dot" style="background:#16AD78;"></span>
+        <span class="dbc-leg-name">Auto</span>
+        <span class="dbc-leg-val"><%= auto_value %></span>
+        <span class="dbc-leg-count"><%= auto_count %> req</span>
+      </div>
+      <div class="dbc-legend-row">
+        <span class="dbc-dot" style="background:#F59E0B;"></span>
+        <span class="dbc-leg-name">2-Person</span>
+        <span class="dbc-leg-val"><%= two_person_value %></span>
+        <span class="dbc-leg-count"><%= two_person_count %> req</span>
+      </div>
+      <div class="dbc-legend-row">
+        <span class="dbc-dot" style="background:#2563EB;"></span>
+        <span class="dbc-leg-name">3-Person</span>
+        <span class="dbc-leg-val"><%= three_person_value %></span>
+        <span class="dbc-leg-count"><%= three_person_count %> req</span>
       </div>
     </div>
 
     <!-- DEPT BAR CHART -->
-    <div class="dbc-dept-card">
+    <div class="dbc-bar-card">
       <h2 class="dbc-card-title">Department-Wise Spend</h2>
-      <p class="dbc-card-subtitle">By total estimated cost (USD)</p>
+      <span class="dbc-card-sub">By total estimated cost (USD)</span>
 
       <div class="dbc-bar-row">
         <span class="dbc-bar-dept">IT &amp; Systems</span>
-        <div class="dbc-bar-track"><div class="dbc-bar-fill" style="width:<%= it_w %>;opacity:1.0;"></div></div>
+        <div class="dbc-bar-track"><div class="dbc-bar-fill" style="width:<%= it_w %>;"></div></div>
         <span class="dbc-bar-val"><%= it_disp %></span>
       </div>
       <div class="dbc-bar-row">
@@ -775,78 +316,85 @@
     <!-- FUNNEL -->
     <div class="dbc-funnel-card">
       <h2 class="dbc-card-title">Approval Funnel</h2>
-      <p class="dbc-card-subtitle">Stage progression from submission to resolution</p>
+      <span class="dbc-card-sub">Stage progression from submission to resolution</span>
 
       <div class="dbc-funnel-row">
         <span class="dbc-funnel-stage">Submitted</span>
         <div class="dbc-funnel-track"><div class="dbc-funnel-fill" style="width:<%= submitted_w %>;background:#9CA3AF;"></div></div>
-        <span class="dbc-funnel-count"><%= submitted_n %></span>
+        <span class="dbc-funnel-cnt"><%= submitted_n %></span>
       </div>
       <div class="dbc-funnel-row">
         <span class="dbc-funnel-stage">Auto-Cleared</span>
         <div class="dbc-funnel-track"><div class="dbc-funnel-fill" style="width:<%= auto_cleared_w %>;background:#16AD78;"></div></div>
-        <span class="dbc-funnel-count"><%= auto_cleared_n %></span>
+        <span class="dbc-funnel-cnt"><%= auto_cleared_n %></span>
       </div>
       <div class="dbc-funnel-row">
         <span class="dbc-funnel-stage">Sent to Chain</span>
         <div class="dbc-funnel-track"><div class="dbc-funnel-fill" style="width:<%= sent_chain_w %>;background:#60A5FA;"></div></div>
-        <span class="dbc-funnel-count"><%= sent_chain_n %></span>
+        <span class="dbc-funnel-cnt"><%= sent_chain_n %></span>
       </div>
       <div class="dbc-funnel-row">
         <span class="dbc-funnel-stage">Pending RM</span>
         <div class="dbc-funnel-track"><div class="dbc-funnel-fill" style="width:<%= pend_rm_w %>;background:#F59E0B;"></div></div>
-        <span class="dbc-funnel-count"><%= pend_rm_n %></span>
+        <span class="dbc-funnel-cnt"><%= pend_rm_n %></span>
       </div>
       <div class="dbc-funnel-row">
         <span class="dbc-funnel-stage">Pending Dept Head</span>
         <div class="dbc-funnel-track"><div class="dbc-funnel-fill" style="width:<%= pend_dh_w %>;background:#F59E0B;"></div></div>
-        <span class="dbc-funnel-count"><%= pend_dh_n %></span>
+        <span class="dbc-funnel-cnt"><%= pend_dh_n %></span>
       </div>
       <div class="dbc-funnel-row">
         <span class="dbc-funnel-stage">Pending Finance</span>
         <div class="dbc-funnel-track"><div class="dbc-funnel-fill" style="width:<%= pend_fin_w %>;background:#F59E0B;"></div></div>
-        <span class="dbc-funnel-count"><%= pend_fin_n %></span>
+        <span class="dbc-funnel-cnt"><%= pend_fin_n %></span>
       </div>
       <div class="dbc-funnel-row">
         <span class="dbc-funnel-stage">Approved</span>
         <div class="dbc-funnel-track"><div class="dbc-funnel-fill" style="width:<%= approved_w %>;background:#16AD78;"></div></div>
-        <span class="dbc-funnel-count"><%= approved_n %></span>
+        <span class="dbc-funnel-cnt"><%= approved_n %></span>
       </div>
       <div class="dbc-funnel-row">
         <span class="dbc-funnel-stage">Rejected</span>
         <div class="dbc-funnel-track"><div class="dbc-funnel-fill" style="width:<%= rejected_w %>;background:#EF4444;"></div></div>
-        <span class="dbc-funnel-count"><%= rejected_n %></span>
+        <span class="dbc-funnel-cnt"><%= rejected_n %></span>
       </div>
     </div>
 
     <!-- ESCALATION LIST -->
     <div class="dbc-esc-card">
-      <div class="dbc-esc-header">
-        <h2 class="dbc-esc-title">Escalation &mdash; SLA Overdue</h2>
-        <span class="dbc-esc-badge"><%= esc_badge %></span>
+      <div class="dbc-esc-top">
+        <h2 class="dbc-esc-ttl">Escalation - SLA Overdue</h2>
+        <span class="dbc-esc-bdg"><%= esc_badge %></span>
       </div>
+      <% if(esc1_id != "-" && esc1_id != null && esc1_id != "") { %>
       <div class="dbc-esc-item">
-        <div class="dbc-esc-item-top">
+        <div class="dbc-esc-row">
           <span class="dbc-esc-id"><%= esc1_id %></span>
-          <span class="dbc-esc-overdue"><%= esc1_days %> days overdue</span>
+          <span class="dbc-esc-days"><%= esc1_days %> days overdue</span>
         </div>
-        <div class="dbc-esc-meta"><%= esc1_dept %> &nbsp;&middot;&nbsp; <%= esc1_stage %></div>
+        <div class="dbc-esc-meta"><%= esc1_dept %> &middot; <%= esc1_stage %></div>
       </div>
+      <% } %>
+      <% if(esc2_id != "-" && esc2_id != null && esc2_id != "") { %>
       <div class="dbc-esc-item">
-        <div class="dbc-esc-item-top">
+        <div class="dbc-esc-row">
           <span class="dbc-esc-id"><%= esc2_id %></span>
-          <span class="dbc-esc-overdue"><%= esc2_days %> days overdue</span>
+          <span class="dbc-esc-days"><%= esc2_days %> days overdue</span>
         </div>
-        <div class="dbc-esc-meta"><%= esc2_dept %> &nbsp;&middot;&nbsp; <%= esc2_stage %></div>
+        <div class="dbc-esc-meta"><%= esc2_dept %> &middot; <%= esc2_stage %></div>
       </div>
+      <% } %>
+      <% if((esc1_id == "-" || esc1_id == null || esc1_id == "") && (esc2_id == "-" || esc2_id == null || esc2_id == "")) { %>
+      <div style="font-size:13px;color:#9CA3AF;font-style:italic;padding:8px 0;">No overdue requests at this time.</div>
+      <% } %>
     </div>
   </div>
 
-  <!-- FOOTER: AVERAGE TURNAROUND -->
-  <div class="dbc-footer-row">
-    <span class="dbc-footer-label">Avg. Approval Turnaround</span>
-    <span class="dbc-turnaround-badge"><strong>2-Person:</strong> 2.4 days</span>
-    <span class="dbc-turnaround-badge"><strong>3-Person:</strong> 5.1 days</span>
+  <!-- FOOTER: AVG TURNAROUND -->
+  <div class="dbc-footer">
+    <span class="dbc-foot-lbl">Avg. Approval Turnaround</span>
+    <span class="dbc-turn-bdg"><strong>2-Person:</strong> 2.4 days</span>
+    <span class="dbc-turn-bdg"><strong>3-Person:</strong> 5.1 days</span>
   </div>
 
 </div>

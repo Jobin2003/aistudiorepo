@@ -48,7 +48,7 @@ Approval_Action_On_Success as "Update Request Status and Log Decision"
                             new_status = "Pending_Finance";
                         }
                     }
-                    else if(decision == "On Hold")
+                    else if(decision == "On_Hold")
                     {
                         new_status = "On_Hold";
                     }

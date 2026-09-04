@@ -1,31 +1,7 @@
-<page linkname = "Approvals" parameters = "string active_tab, string detail_json, string log_json, string queue_json, string selected_id" displayname = "Approvals"/>
+<page linkname="Approvals" parameters="string active_tab, string selected_id, string queue_json, string detail_json, string log_json" displayname="Approvals"/>
 <content>
 <zml>
   <layout>
-    <row>
-      <column width='100%'>
-        <dsp id='ap_nav_sidebar' elementName='Nav_Sidebar'>
-          <![CDATA[htmlpage ap_nav_sidebar()
-content
-<%{%>
-    <file name:Nav_Sidebar.dshtml/>
-<%}%>
-          ]]>
-        </dsp>
-      </column>
-    </row>
-    <row>
-      <column width='100%'>
-        <dsp id='ap_header_bar' elementName='Header_Bar'>
-          <![CDATA[htmlpage ap_header_bar()
-content
-<%{%>
-    <file name:Header_Bar.dshtml/>
-<%}%>
-          ]]>
-        </dsp>
-      </column>
-    </row>
     <row>
       <column width='100%'>
         <dsp id='ap_approvals_content' elementName='Approvals_Content'>
@@ -67,7 +43,7 @@ else if(active_tab == "finance")
 }
 else
 {
-  queue_records = Spend_Request[Status != "Auto_Approved"];
+  queue_records = Spend_Request[Status != "Auto_Approved" && Status != "Submitted"];
 }
 queue_json = queue_records.toJSONList();
 
