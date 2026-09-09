@@ -1,0 +1,44 @@
+default list All_Leave_Requests
+{
+    displayName = "All Leave Requests"
+    show all rows from Leave_Requests
+    (
+        Request_Number
+        Employee
+        Leave_Type
+        Start_Date
+        End_Date
+        Requested_Days
+        Reason
+        Supporting_Document
+        Assigned_Manager
+        Status
+        Manager_Comments
+        Manager_Action_Date
+        HR_Comments
+        HR_Processed_By
+        HR_Processed_Date
+        Balance_Before
+        Balance_After
+    )
+    filters
+    (
+        Employee
+        Leave_Type
+        Assigned_Manager
+        Status
+        Start_Date
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Status ascending
+    )
+    sort by
+    (
+        Start_Date descending
+    )
+}

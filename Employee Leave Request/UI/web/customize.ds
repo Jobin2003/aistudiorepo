@@ -1,0 +1,21 @@
+customize
+{
+    layout
+    {
+        theme = "theme_2"
+        variant = "variant_2"
+    }
+    font = "lato"
+    color options
+    {
+        name = "Leave Blue Teal"
+        brand color = "#0F766E"
+        type = "custom"
+        dark mode color = "#115E59"
+    }
+    logo
+    {
+        preference = "app_icon"
+        placement = "left"
+    }
+}

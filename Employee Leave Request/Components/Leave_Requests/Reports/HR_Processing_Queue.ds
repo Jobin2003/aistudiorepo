@@ -1,0 +1,27 @@
+list HR_Processing_Queue
+{
+    displayName = "HR Processing Queue"
+    show all rows from Leave_Requests [Status == "Pending HR"]
+    (
+        Request_Number
+        Employee
+        Leave_Type
+        Start_Date
+        End_Date
+        Requested_Days
+        Assigned_Manager
+        Status
+        Manager_Comments
+        Manager_Action_Date
+    )
+    filters
+    (
+        Employee
+        Leave_Type
+        Start_Date
+    )
+    sort by
+    (
+        Start_Date ascending
+    )
+}

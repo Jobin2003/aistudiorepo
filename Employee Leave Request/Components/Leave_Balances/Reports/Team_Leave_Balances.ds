@@ -1,0 +1,32 @@
+list Team_Leave_Balances
+{
+    displayName = "Team Leave Balances"
+    show all rows from Leave_Balances [Manager_Email == zoho.loginuser]
+    (
+        Employee
+        Leave_Type
+        Balance_Year
+        Opening_Allocation
+        Used_Days
+        Remaining_Days
+    )
+    filters
+    (
+        Employee
+        Leave_Type
+        Balance_Year
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Employee ascending
+    )
+    sort by
+    (
+        Balance_Year descending
+        Leave_Type ascending
+    )
+}

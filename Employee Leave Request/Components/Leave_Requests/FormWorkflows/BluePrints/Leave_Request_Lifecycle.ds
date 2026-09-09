@@ -1,0 +1,180 @@
+Leave_Request_Lifecycle as "Leave Request Lifecycle"
+{
+    type = blueprint
+    form = Leave_Requests
+
+    start
+    {
+        start stage = "Submitted"
+    }
+
+    stages
+    {
+        "Submitted" { }
+        "Pending HR" { }
+        "Completed" { }
+        "Rejected" { }
+    }
+
+    transitions
+    {
+        Approve as "Approve"
+        {
+            type = normal
+            from stage = "Submitted"
+            to stage = "Pending HR"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Manager"}
+                )
+                confirmation before execution
+                (
+                    message = "Approve this request and send it to HR?"
+                    confirm button text = "Approve"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Manager_Action_Date = zoho.currenttime;
+                        employee_record = Employees[ID == input.Employee];
+                        if (employee_record.count() > 0)
+                        {
+                            sendmail
+                            (
+                                from : zoho.adminuserid
+                                to : employee_record.Work_Email
+                                subject : "Leave request approved by manager"
+                                message : "Your leave request has been approved by your manager and is pending HR balance processing."
+                            )
+                        }
+                        insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.loginuser
+                            Action = "Manager Approved"
+                            Leave_Request = input.ID
+                            Previous_Status = "Submitted"
+                            New_Status = "Pending HR"
+                            Details = ifnull(input.Manager_Comments, "Manager approved the request.")
+                        ]
+                    )
+                }
+            }
+        }
+
+        Reject as "Reject"
+        {
+            type = normal
+            from stage = "Submitted"
+            to stage = "Rejected"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"Manager"}
+                )
+                confirmation before execution
+                (
+                    message = "Reject this leave request?"
+                    confirm button text = "Reject"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        Manager_Action_Date = zoho.currenttime;
+                        employee_record = Employees[ID == input.Employee];
+                        if (employee_record.count() > 0)
+                        {
+                            sendmail
+                            (
+                                from : zoho.adminuserid
+                                to : employee_record.Work_Email
+                                subject : "Leave request rejected"
+                                message : "Your leave request was rejected. Manager comments: " + ifnull(input.Manager_Comments, "No comments provided.")
+                            )
+                        }
+                        insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.loginuser
+                            Action = "Manager Rejected"
+                            Leave_Request = input.ID
+                            Previous_Status = "Submitted"
+                            New_Status = "Rejected"
+                            Details = ifnull(input.Manager_Comments, "Manager rejected the request.")
+                        ]
+                    )
+                }
+            }
+        }
+
+        Confirm_Balance_Update as "Confirm Balance Update"
+        {
+            type = normal
+            from stage = "Pending HR"
+            to stage = "Completed"
+            before
+            {
+                transition owner
+                (
+                    permissions = {"HR"}
+                )
+                transition criteria = ( Balance_After is null )
+                confirmation before execution
+                (
+                    message = "Deduct this request from the employee's leave balance and complete it?"
+                    confirm button text = "Confirm"
+                    cancel button text = "Cancel"
+                )
+            }
+            after
+            {
+                actions
+                {
+                    custom deluge script
+                    (
+                        balance_record = Leave_Balances[Employee == input.Employee && Leave_Type == input.Leave_Type && Balance_Year == input.Start_Date.getYear()];
+                        Balance_Before = balance_record.Remaining_Days;
+                        balance_record.Used_Days = balance_record.Used_Days + input.Requested_Days;
+                        Balance_After = Balance_Before - input.Requested_Days;
+                        HR_Processed_By = zoho.loginuser;
+                        HR_Processed_Date = zoho.currenttime;
+                        employee_record = Employees[ID == input.Employee];
+                        if (employee_record.count() > 0)
+                        {
+                            sendmail
+                            (
+                                from : zoho.adminuserid
+                                to : employee_record.Work_Email
+                                subject : "Leave request completed"
+                                message : "Your leave request is fully approved and your leave balance has been updated."
+                            )
+                        }
+                        insert into Audit_Log
+                        [
+                            Event_Time = zoho.currenttime
+                            Actor_Email = zoho.loginuser
+                            Action = "HR Completed"
+                            Leave_Request = input.ID
+                            Previous_Status = "Pending HR"
+                            New_Status = "Completed"
+                            Details = "Balance updated from " + Balance_Before + " to " + Balance_After + ". " + ifnull(input.HR_Comments, "")
+                        ]
+                    )
+                }
+            }
+        }
+    }
+}

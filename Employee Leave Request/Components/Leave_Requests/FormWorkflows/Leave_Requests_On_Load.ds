@@ -1,0 +1,42 @@
+Leave_Requests_On_Load as "Initialize Leave Request"
+{
+    type = form
+    form = Leave_Requests
+    record event = on add or edit
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                disable Requested_Days;
+                disable Assigned_Manager;
+                disable Status;
+                disable Manager_Action_Date;
+                disable HR_Processed_By;
+                disable HR_Processed_Date;
+                disable Balance_Before;
+                disable Balance_After;
+                if (input.ID == null)
+                {
+                    employee_record = Employees[Work_Email == zoho.loginuser && Employment_Status == "Active"];
+                    if (employee_record.count() > 0)
+                    {
+                        input.Employee = employee_record.ID;
+                        input.Assigned_Manager = employee_record.Manager;
+                        disable Employee;
+                    }
+                    input.Status = "Submitted";
+                    hide Manager_Comments;
+                    hide Manager_Action_Date;
+                    hide HR_Comments;
+                    hide HR_Processed_By;
+                    hide HR_Processed_Date;
+                    hide Balance_Before;
+                    hide Balance_After;
+                }
+            )
+        }
+    }
+}

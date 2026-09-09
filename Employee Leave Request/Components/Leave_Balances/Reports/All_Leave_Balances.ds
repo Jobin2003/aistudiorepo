@@ -1,0 +1,33 @@
+default list All_Leave_Balances
+{
+    displayName = "All Leave Balances"
+    show all rows from Leave_Balances
+    (
+        Employee
+        Leave_Type
+        Balance_Year
+        Opening_Allocation
+        Used_Days
+        Remaining_Days
+    )
+    filters
+    (
+        Employee
+        Leave_Type
+        Balance_Year
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Balance_Year descending
+        Employee ascending
+    )
+    sort by
+    (
+        Employee ascending
+        Leave_Type ascending
+    )
+}

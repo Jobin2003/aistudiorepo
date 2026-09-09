@@ -1,0 +1,219 @@
+form Leave_Requests
+{
+    title
+    {
+        displayname = "Leave Requests"
+        on add = "Submit Leave Request"
+        on edit = "Edit Leave Request"
+    }
+    success message = "Leave request submitted successfully."
+    record owner = Added_User
+
+    Request_Details
+    (
+        type = section
+        displayname = "Request Details"
+        row = 1
+        column = 0
+    )
+    Request_Number
+    (
+        type = autonumber
+        displayname = "Request Number"
+        start index = 10001
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Employee
+    (
+        type = picklist
+        displayname = "Employee"
+        values = Employees[Employment_Status == "Active"].ID
+        displayformat = [Employee_Name.first_name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Leave_Type
+    (
+        type = picklist
+        displayname = "Leave Type"
+        values = Leave_Types[Active == true].ID
+        displayformat = [Leave_Type_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Start_Date
+    (
+        type = date
+        displayname = "Start Date"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have End_Date
+    (
+        type = date
+        displayname = "End Date"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Requested_Days
+    (
+        type = decimal
+        displayname = "Requested Days"
+        decimalplace = 2
+        initial value = 0
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Reason
+    (
+        type = textarea
+        displayname = "Reason"
+        height = 100px
+        row = 1
+        column = 2
+        width = medium
+    )
+    Supporting_Document
+    (
+        type = upload file
+        displayname = "Supporting Document"
+        browse = local_drive, google_docs, zoho_docs
+        row = 1
+        column = 1
+        width = medium
+    )
+
+    Approval_Details
+    (
+        type = section
+        displayname = "Approval Details"
+        visibility = true
+        row = 2
+        column = 1
+    )
+    Assigned_Manager
+    (
+        type = picklist
+        displayname = "Assigned Manager"
+        values = Employees.ID
+        displayformat = [Employee_Name.first_name]
+        searchable = true
+        row = 2
+        column = 1
+        width = medium
+    )
+    must have Status
+    (
+        type = picklist
+        displayname = "Status"
+        values = {"Submitted", "Pending HR", "Completed", "Rejected"}
+        initial value = "Submitted"
+        row = 2
+        column = 2
+        width = medium
+    )
+    Manager_Comments
+    (
+        type = textarea
+        displayname = "Manager Comments"
+        height = 80px
+        row = 2
+        column = 1
+        width = medium
+    )
+    Manager_Action_Date
+    (
+        type = datetime
+        displayname = "Manager Action Date"
+        row = 2
+        column = 2
+        width = medium
+    )
+    HR_Comments
+    (
+        type = textarea
+        displayname = "HR Comments"
+        height = 80px
+        row = 2
+        column = 1
+        width = medium
+    )
+    HR_Processed_By
+    (
+        type = email
+        displayname = "HR Processed By"
+        row = 2
+        column = 2
+        width = medium
+    )
+    HR_Processed_Date
+    (
+        type = datetime
+        displayname = "HR Processed Date"
+        row = 2
+        column = 1
+        width = medium
+    )
+    Balance_Before
+    (
+        type = decimal
+        displayname = "Balance Before"
+        decimalplace = 2
+        row = 2
+        column = 2
+        width = medium
+    )
+    Balance_After
+    (
+        type = decimal
+        displayname = "Balance After"
+        decimalplace = 2
+        row = 2
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Submit Request"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Request"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+
+    blueprint components
+    {
+        stages = {"Submitted", "Pending HR", "Completed", "Rejected"}
+    }
+}

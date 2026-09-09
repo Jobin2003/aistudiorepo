@@ -1,0 +1,65 @@
+menu
+{
+    space Leave_Management
+    {
+        displayname = "Leave Management"
+        icon = "business-briefcase-24"
+        section Dashboard_Section
+        {
+            displayname = "Dashboard"
+            icon = "business-chart-bar-33"
+            page Leave_Dashboard { icon = "business-chart-pie-36" }
+        }
+        section My_Leave_Section
+        {
+            displayname = "My Leave"
+            icon = "travel-bag"
+            form Leave_Requests { icon = "files-add" }
+            report My_Leave_Requests { icon = "files-single-content-03" }
+            report My_Leave_Balances { icon = "business-coins" }
+        }
+        section Manager_Review_Section
+        {
+            displayname = "Manager Review"
+            icon = "users-single-body"
+            report Manager_Review_Queue { icon = "files-check" }
+            report Team_Leave_Balances { icon = "users-multiple-19" }
+        }
+        section HR_Administration_Section
+        {
+            displayname = "HR Administration"
+            icon = "business-briefcase-24"
+            form Employees { icon = "users-single-body" }
+            report All_Employees { icon = "users-multiple-11" }
+            form Leave_Types { icon = "files-single-content-03" }
+            report All_Leave_Types { icon = "files-paper" }
+            form Leave_Balances { icon = "business-coins" }
+            report All_Leave_Balances { icon = "business-chart-bar-33" }
+            report All_Leave_Requests { icon = "files-folder-14" }
+            report HR_Processing_Queue { icon = "ui-2-hourglass" }
+            report Leave_Request_Board { icon = "business-board-30" }
+            form Audit_Log { icon = "files-archive-3d-content" }
+            report Leave_Audit_Log { icon = "files-search" }
+        }
+        section Calendar_Section
+        {
+            displayname = "Calendar"
+            icon = "business-agenda"
+            report Approved_Leave_Calendar { icon = "business-agenda" }
+        }
+        section SharedAnalytics_Section
+        {
+            type = shared_user_report_section
+            displayname = "Reports"
+            icon = "business-chart-bar-33"
+        }
+    }
+    preference
+    {
+        icon
+        {
+            style = outline
+            show = {space,section,component}
+        }
+    }
+}

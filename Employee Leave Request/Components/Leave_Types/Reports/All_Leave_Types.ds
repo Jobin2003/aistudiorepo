@@ -1,0 +1,30 @@
+default list All_Leave_Types
+{
+    displayName = "All Leave Types"
+    show all rows from Leave_Types
+    (
+        Leave_Type_Name
+        Description
+        Default_Annual_Allocation
+        Count_Weekends
+        Active
+    )
+    filters
+    (
+        Active
+        Count_Weekends
+    )
+    sort by
+    (
+        Leave_Type_Name ascending
+    )
+    conditional formatting
+    (
+        "Inactive Leave Types"
+        {
+            condition = (Active == false)
+            fields = [Leave_Type_Name, Active]
+            format = "background-color:#F3F4F6;color:#6B7280"
+        }
+    )
+}

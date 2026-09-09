@@ -1,0 +1,8 @@
+forms
+{
+    form Employees { label placement = top }
+    form Leave_Types { label placement = top }
+    form Leave_Balances { label placement = top }
+    form Leave_Requests { label placement = top }
+    form Audit_Log { label placement = top }
+}

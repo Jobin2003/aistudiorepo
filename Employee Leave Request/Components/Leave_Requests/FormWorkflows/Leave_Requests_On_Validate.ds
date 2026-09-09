@@ -1,0 +1,60 @@
+Leave_Requests_On_Validate as "Validate Leave Request"
+{
+    type = form
+    form = Leave_Requests
+    record event = on add or edit
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if (input.End_Date < input.Start_Date)
+                {
+                    alert "End date must be on or after the start date.";
+                    cancel submit;
+                }
+                if (input.Start_Date.getYear() != input.End_Date.getYear())
+                {
+                    alert "A leave request must fall within one balance year.";
+                    cancel submit;
+                }
+                employee_record = Employees[ID == input.Employee && Employment_Status == "Active"];
+                if (employee_record.count() == 0)
+                {
+                    alert "The selected employee is not active.";
+                    cancel submit;
+                }
+                if (employee_record.Manager == null)
+                {
+                    alert "No manager is assigned to this employee.";
+                    cancel submit;
+                }
+                input.Assigned_Manager = employee_record.Manager;
+                leave_type_record = Leave_Types[ID == input.Leave_Type && Active == true];
+                if (leave_type_record.count() == 0)
+                {
+                    alert "The selected leave type is not active.";
+                    cancel submit;
+                }
+                if (ifnull(input.Requested_Days, 0) <= 0)
+                {
+                    alert "The request must include at least one working day.";
+                    cancel submit;
+                }
+                balance_record = Leave_Balances[Employee == input.Employee && Leave_Type == input.Leave_Type && Balance_Year == input.Start_Date.getYear()];
+                if (balance_record.count() == 0)
+                {
+                    alert "No leave balance exists for this employee, leave type, and year.";
+                    cancel submit;
+                }
+                if (balance_record.Remaining_Days < input.Requested_Days)
+                {
+                    alert "The requested days exceed the available leave balance.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

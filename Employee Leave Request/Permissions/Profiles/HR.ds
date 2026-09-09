@@ -1,0 +1,87 @@
+"HR"
+{
+    name = "HR"
+    type = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+    description = "HR manages employees, leave policies, balances, and approved request completion."
+    ModulePermissions
+    {
+        Employees
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Employees={"View","Edit","Delete"}
+            }
+        }
+        Leave_Types
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Leave_Types={"View","Edit","Delete"}
+            }
+        }
+        Leave_Balances
+        {
+            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Leave_Balances={"View","Edit","Delete"}
+                My_Leave_Balances={"View"}
+                Team_Leave_Balances={"View"}
+            }
+        }
+        Leave_Requests
+        {
+            enabled = Viewall,Modifyall,Export,Tab,View,Edit,Search
+            allFieldsVisible = false
+            ReportPermissions
+            {
+                All_Leave_Requests={"View","Edit"}
+                My_Leave_Requests={"View"}
+                Manager_Review_Queue={"View"}
+                HR_Processing_Queue={"View","Edit"}
+                Leave_Request_Board={"View","Edit"}
+                Approved_Leave_Calendar={"View"}
+            }
+            FieldPermissions
+            {
+                Request_Number{visibility:true,readonly:true}
+                Employee{visibility:true,readonly:true}
+                Leave_Type{visibility:true,readonly:true}
+                Start_Date{visibility:true,readonly:true}
+                End_Date{visibility:true,readonly:true}
+                Requested_Days{visibility:true,readonly:true}
+                Reason{visibility:true,readonly:true}
+                Supporting_Document{visibility:true,readonly:true}
+                Assigned_Manager{visibility:true,readonly:true}
+                Status{visibility:true,readonly:true}
+                Manager_Comments{visibility:true,readonly:true}
+                Manager_Action_Date{visibility:true,readonly:true}
+                HR_Comments{visibility:true,readonly:false}
+                HR_Processed_By{visibility:true,readonly:true}
+                HR_Processed_Date{visibility:true,readonly:true}
+                Balance_Before{visibility:true,readonly:true}
+                Balance_After{visibility:true,readonly:true}
+            }
+        }
+        Audit_Log
+        {
+            enabled = Viewall,Export,Tab,View,Search
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                Leave_Audit_Log={"View"}
+            }
+        }
+        Leave_Dashboard
+        {
+            enabled = tab
+        }
+    }
+}
+

@@ -1,0 +1,19 @@
+<page linkname = "Leave_Dashboard" displayname = "Leave Dashboard"/>
+<content>
+<zml>
+  <layout>
+    <row>
+      <column width='100%'>
+        <dsp id='Leave_Dashboard_Snippet' elementName='Leave Dashboard'>
+          <![CDATA[htmlpage Leave_Dashboard_Snippet()
+             content
+             <%{%>
+                 <file name:Dashboard.dshtml/>
+             <%}%>
+         ]]>
+        </dsp>
+      </column>
+    </row>
+  </layout>
+</zml>
+</content>

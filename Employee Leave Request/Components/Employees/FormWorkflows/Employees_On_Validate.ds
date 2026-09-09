@@ -1,0 +1,22 @@
+Employees_On_Validate as "Validate Employee Manager"
+{
+    type = form
+    form = Employees
+    record event = on add or edit
+    description = "Prevents an employee from being assigned as their own manager."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if (input.Manager != null && input.ID != null && input.Manager == input.ID)
+                {
+                    alert "An employee cannot be assigned as their own manager.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

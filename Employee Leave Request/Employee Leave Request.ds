@@ -1,0 +1,2051 @@
+application "Employee-Leave-Request"
+{
+	date format = "dd-MMM-yyyy"
+	time zone = "Asia/Kolkata"
+	time format = "24-hr"
+
+
+
+	forms
+	{
+		form Audit_Log
+		{
+		    title
+		    {
+		        displayname = "Audit Log"
+		        on add = "Add Audit Event"
+		        on edit = "Edit Audit Event"
+		    }
+		
+		    Audit_Details
+		    (
+		        type = section
+		        displayname = "Audit Details"
+		        row = 1
+		        column = 0
+		    )
+		    must have Event_Time
+		    (
+		        type = datetime
+		        displayname = "Event Time"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Actor_Email
+		    (
+		        type = email
+		        displayname = "Actor Email"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Action
+		    (
+		        type = picklist
+		        displayname = "Action"
+		        values = {"Submitted", "Manager Approved", "Manager Rejected", "HR Completed", "Balance Updated"}
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Leave_Request
+		    (
+		        type = picklist
+		        displayname = "Leave Request"
+		        values = Leave_Requests.ID
+		        displayformat = [Request_Number]
+		        searchable = true
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Previous_Status
+		    (
+		        type = text
+		        displayname = "Previous Status"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    New_Status
+		    (
+		        type = text
+		        displayname = "New Status"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Details
+		    (
+		        type = textarea
+		        displayname = "Details"
+		        height = 100px
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Save Audit Event"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update Audit Event"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Employees
+		{
+		    title
+		    {
+		        displayname = "Employees"
+		        on add = "Add Employee"
+		        on edit = "Edit Employee"
+		    }
+		    success message = "Employee saved successfully."
+		
+		    Details
+		    (
+		        type = section
+		        displayname = "Employee Details"
+		        row = 1
+		        column = 0
+		    )
+		    Employee_ID
+		    (
+		        type = autonumber
+		        displayname = "Employee ID"
+		        start index = 1001
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Employee_Name
+		    (
+		        type = name
+		        displayname = "Employee Name"
+		        prefix
+		        (
+		            type = prefix
+		            displayname = "Title"
+		            visibility = false
+		            value = {"Mr.", "Mrs.", "Ms.", "Dr."}
+		        )
+		        first_name
+		        (
+		            type = first_name
+		            displayname = "First Name"
+		        )
+		        last_name
+		        (
+		            type = last_name
+		            displayname = "Last Name"
+		        )
+		        suffix
+		        (
+		            type = suffix
+		            displayname = "Suffix"
+		            visibility = false
+		        )
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have unique Work_Email
+		    (
+		        type = email
+		        displayname = "Work Email"
+		        personal data = true
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Department
+		    (
+		        type = picklist
+		        displayname = "Department"
+		        values = {"Human Resources", "Finance", "Sales", "Marketing", "Operations", "Engineering", "Customer Support", "Other"}
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Job_Title
+		    (
+		        type = text
+		        displayname = "Job Title"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Manager
+		    (
+		        type = picklist
+		        displayname = "Manager"
+		        values = Employees.ID
+		        displayformat = [Employee_Name.first_name]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Employment_Status
+		    (
+		        type = picklist
+		        displayname = "Employment Status"
+		        values = {"Active", "Inactive"}
+		        initial value = "Active"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Hire_Date
+		    (
+		        type = date
+		        displayname = "Hire Date"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Save Employee"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update Employee"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Leave_Balances
+		{
+		    title
+		    {
+		        displayname = "Leave Balances"
+		        on add = "Add Leave Balance"
+		        on edit = "Edit Leave Balance"
+		    }
+		    success message = "Leave balance saved successfully."
+		
+		    Balance_Details
+		    (
+		        type = section
+		        displayname = "Balance Details"
+		        row = 1
+		        column = 0
+		    )
+		    must have Employee
+		    (
+		        type = picklist
+		        displayname = "Employee"
+		        values = Employees.ID
+		        displayformat = [Employee_Name.first_name]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Manager_Email
+		    (
+		        type = email
+		        displayname = "Manager Email"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Leave_Type
+		    (
+		        type = picklist
+		        displayname = "Leave Type"
+		        values = Leave_Types[Active == true].ID
+		        displayformat = [Leave_Type_Name]
+		        searchable = true
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Balance_Year
+		    (
+		        type = number
+		        displayname = "Balance Year"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Opening_Allocation
+		    (
+		        type = decimal
+		        displayname = "Opening Allocation"
+		        decimalplace = 2
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Used_Days
+		    (
+		        type = decimal
+		        displayname = "Used Days"
+		        decimalplace = 2
+		        initial value = 0
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Remaining_Days
+		    (
+		        type = formula
+		        displayname = "Remaining Days"
+		        value = Opening_Allocation - Used_Days
+		        visibility = true
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Save Balance"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update Balance"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+
+		form Leave_Requests
+		{
+		    title
+		    {
+		        displayname = "Leave Requests"
+		        on add = "Submit Leave Request"
+		        on edit = "Edit Leave Request"
+		    }
+		    success message = "Leave request submitted successfully."
+		    record owner = Added_User
+		
+		    Request_Details
+		    (
+		        type = section
+		        displayname = "Request Details"
+		        row = 1
+		        column = 0
+		    )
+		    Request_Number
+		    (
+		        type = autonumber
+		        displayname = "Request Number"
+		        start index = 10001
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Employee
+		    (
+		        type = picklist
+		        displayname = "Employee"
+		        values = Employees[Employment_Status == "Active"].ID
+		        displayformat = [Employee_Name.first_name]
+		        searchable = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Leave_Type
+		    (
+		        type = picklist
+		        displayname = "Leave Type"
+		        values = Leave_Types[Active == true].ID
+		        displayformat = [Leave_Type_Name]
+		        searchable = true
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Start_Date
+		    (
+		        type = date
+		        displayname = "Start Date"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have End_Date
+		    (
+		        type = date
+		        displayname = "End Date"
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Requested_Days
+		    (
+		        type = decimal
+		        displayname = "Requested Days"
+		        decimalplace = 2
+		        initial value = 0
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    must have Reason
+		    (
+		        type = textarea
+		        displayname = "Reason"
+		        height = 100px
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Supporting_Document
+		    (
+		        type = upload file
+		        displayname = "Supporting Document"
+		        browse = local_drive, google_docs, zoho_docs
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		
+		    Approval_Details
+		    (
+		        type = section
+		        displayname = "Approval Details"
+		        visibility = true
+		        row = 2
+		        column = 1
+		    )
+		    Assigned_Manager
+		    (
+		        type = picklist
+		        displayname = "Assigned Manager"
+		        values = Employees.ID
+		        displayformat = [Employee_Name.first_name]
+		        searchable = true
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    must have Status
+		    (
+		        type = picklist
+		        displayname = "Status"
+		        values = {"Submitted", "Pending HR", "Completed", "Rejected"}
+		        initial value = "Submitted"
+		        row = 2
+		        column = 2
+		        width = medium
+		    )
+		    Manager_Comments
+		    (
+		        type = textarea
+		        displayname = "Manager Comments"
+		        height = 80px
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Manager_Action_Date
+		    (
+		        type = datetime
+		        displayname = "Manager Action Date"
+		        row = 2
+		        column = 2
+		        width = medium
+		    )
+		    HR_Comments
+		    (
+		        type = textarea
+		        displayname = "HR Comments"
+		        height = 80px
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    HR_Processed_By
+		    (
+		        type = email
+		        displayname = "HR Processed By"
+		        row = 2
+		        column = 2
+		        width = medium
+		    )
+		    HR_Processed_Date
+		    (
+		        type = datetime
+		        displayname = "HR Processed Date"
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		    Balance_Before
+		    (
+		        type = decimal
+		        displayname = "Balance Before"
+		        decimalplace = 2
+		        row = 2
+		        column = 2
+		        width = medium
+		    )
+		    Balance_After
+		    (
+		        type = decimal
+		        displayname = "Balance After"
+		        decimalplace = 2
+		        row = 2
+		        column = 1
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Submit Request"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update Request"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		
+		    blueprint components
+		    {
+		        stages = {"Submitted", "Pending HR", "Completed", "Rejected"}
+		    }
+		}
+
+		form Leave_Types
+		{
+		    title
+		    {
+		        displayname = "Leave Types"
+		        on add = "Add Leave Type"
+		        on edit = "Edit Leave Type"
+		    }
+		    success message = "Leave type saved successfully."
+		
+		    Details
+		    (
+		        type = section
+		        displayname = "Leave Type Details"
+		        row = 1
+		        column = 0
+		    )
+		    must have unique Leave_Type_Name
+		    (
+		        type = text
+		        displayname = "Leave Type Name"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Description
+		    (
+		        type = textarea
+		        displayname = "Description"
+		        height = 100px
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    must have Default_Annual_Allocation
+		    (
+		        type = decimal
+		        displayname = "Default Annual Allocation"
+		        decimalplace = 2
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		    Count_Weekends
+		    (
+		        type = checkbox
+		        displayname = "Count Weekends"
+		        initial value = false
+		        row = 1
+		        column = 2
+		        width = medium
+		    )
+		    Active
+		    (
+		        type = checkbox
+		        displayname = "Active"
+		        initial value = true
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Submit
+		            (
+		                type = submit
+		                displayname = "Save Leave Type"
+		            )
+		            Reset
+		            (
+		                type = reset
+		                displayname = "Reset"
+		            )
+		        }
+		        on edit
+		        {
+		            Update
+		            (
+		                type = submit
+		                displayname = "Update Leave Type"
+		            )
+		            Cancel
+		            (
+		                type = cancel
+		                displayname = "Cancel"
+		            )
+		        }
+		    }
+		}
+	}
+
+	reports
+	{
+		default list Leave_Audit_Log
+		{
+		    displayName = "Leave Audit Log"
+		    show all rows from Audit_Log
+		    (
+		        Event_Time
+		        Actor_Email
+		        Action
+		        Leave_Request
+		        Previous_Status
+		        New_Status
+		        Details
+		    )
+		    filters
+		    (
+		        Action
+		        Leave_Request
+		        Actor_Email
+		        Event_Time
+		    )
+		    sort by
+		    (
+		        Event_Time descending
+		    )
+		}
+
+		default list All_Employees
+		{
+		    displayName = "All Employees"
+		    show all rows from Employees
+		    (
+		        Employee_ID
+		        Employee_Name
+		        Work_Email
+		        Department
+		        Job_Title
+		        Manager
+		        Employment_Status
+		        Hire_Date
+		        (
+		            displayformat = fulldate
+		        )
+		    )
+		    filters
+		    (
+		        Department
+		        Employment_Status
+		        Manager
+		    )
+		    group by
+		    (
+		        properties
+		        (
+		            display record count = true
+		        )
+		        Department ascending
+		    )
+		    sort by
+		    (
+		        Employee_Name ascending
+		    )
+		    conditional formatting
+		    (
+		        "Inactive Employees"
+		        {
+		            condition = (Employment_Status == "Inactive")
+		            fields = [Employee_Name, Work_Email, Department, Employment_Status]
+		            format = "background-color:#FEE2E2;color:#991B1B"
+		        }
+		    )
+		}
+
+		default list All_Leave_Balances
+		{
+		    displayName = "All Leave Balances"
+		    show all rows from Leave_Balances
+		    (
+		        Employee
+		        Leave_Type
+		        Balance_Year
+		        Opening_Allocation
+		        Used_Days
+		        Remaining_Days
+		    )
+		    filters
+		    (
+		        Employee
+		        Leave_Type
+		        Balance_Year
+		    )
+		    group by
+		    (
+		        properties
+		        (
+		            display record count = true
+		        )
+		        Balance_Year descending
+		        Employee ascending
+		    )
+		    sort by
+		    (
+		        Employee ascending
+		        Leave_Type ascending
+		    )
+		}
+
+		list My_Leave_Balances
+		{
+		    displayName = "My Leave Balances"
+		    show all rows from Leave_Balances [Employee.Work_Email == zoho.loginuser]
+		    (
+		        Employee
+		        Leave_Type
+		        Balance_Year
+		        Opening_Allocation
+		        Used_Days
+		        Remaining_Days
+		    )
+		    filters
+		    (
+		        Leave_Type
+		        Balance_Year
+		    )
+		    sort by
+		    (
+		        Balance_Year descending
+		        Leave_Type ascending
+		    )
+		}
+
+		list Team_Leave_Balances
+		{
+		    displayName = "Team Leave Balances"
+		    show all rows from Leave_Balances [Manager_Email == zoho.loginuser]
+		    (
+		        Employee
+		        Leave_Type
+		        Balance_Year
+		        Opening_Allocation
+		        Used_Days
+		        Remaining_Days
+		    )
+		    filters
+		    (
+		        Employee
+		        Leave_Type
+		        Balance_Year
+		    )
+		    group by
+		    (
+		        properties
+		        (
+		            display record count = true
+		        )
+		        Employee ascending
+		    )
+		    sort by
+		    (
+		        Balance_Year descending
+		        Leave_Type ascending
+		    )
+		}
+
+		default list All_Leave_Requests
+		{
+		    displayName = "All Leave Requests"
+		    show all rows from Leave_Requests
+		    (
+		        Request_Number
+		        Employee
+		        Leave_Type
+		        Start_Date
+		        End_Date
+		        Requested_Days
+		        Reason
+		        Supporting_Document
+		        Assigned_Manager
+		        Status
+		        Manager_Comments
+		        Manager_Action_Date
+		        HR_Comments
+		        HR_Processed_By
+		        HR_Processed_Date
+		        Balance_Before
+		        Balance_After
+		    )
+		    filters
+		    (
+		        Employee
+		        Leave_Type
+		        Assigned_Manager
+		        Status
+		        Start_Date
+		    )
+		    group by
+		    (
+		        properties
+		        (
+		            display record count = true
+		        )
+		        Status ascending
+		    )
+		    sort by
+		    (
+		        Start_Date descending
+		    )
+		}
+
+		calendar Approved_Leave_Calendar
+		{
+		    displayName = "Approved Leave Calendar"
+		    show all rows from Leave_Requests [Status == "Completed"]
+		    (
+		        Employee
+		        Leave_Type
+		        Start_Date
+		        End_Date
+		        Requested_Days
+		        Status
+		    )
+		    filters
+		    (
+		        Employee
+		        Leave_Type
+		        Status
+		    )
+		    group by
+		    (
+		        Leave_Type ascending
+		    )
+		    options
+		    (
+		        display type = month
+		        week start day = monday
+		        display field = Employee
+		        start date = Start_Date
+		        end date = End_Date
+		        default date
+		        (
+		            day = Today
+		            month = Currentmonth
+		            year = Currentyear
+		        )
+		    )
+		}
+
+		list HR_Processing_Queue
+		{
+		    displayName = "HR Processing Queue"
+		    show all rows from Leave_Requests [Status == "Pending HR"]
+		    (
+		        Request_Number
+		        Employee
+		        Leave_Type
+		        Start_Date
+		        End_Date
+		        Requested_Days
+		        Assigned_Manager
+		        Status
+		        Manager_Comments
+		        Manager_Action_Date
+		    )
+		    filters
+		    (
+		        Employee
+		        Leave_Type
+		        Start_Date
+		    )
+		    sort by
+		    (
+		        Start_Date ascending
+		    )
+		}
+
+		kanban Leave_Request_Board
+		{
+		    displayName = "Leave Request Board"
+		    show all rows from Leave_Requests
+		    (
+		        Request_Number
+		        Employee
+		        Leave_Type
+		        Start_Date
+		        End_Date
+		        Requested_Days
+		        Assigned_Manager
+		        Status
+		    )
+		    filters
+		    (
+		        Employee
+		        Leave_Type
+		        Assigned_Manager
+		        Status
+		    )
+		    sort by
+		    (
+		        Start_Date descending
+		    )
+		    options
+		    (
+		        display field = Status
+		        othercolumn = "Other"
+		        filter type = manual
+		        sort order = custom
+		        record count = enable
+		    )
+		}
+
+		list Manager_Review_Queue
+		{
+		    displayName = "Manager Review Queue"
+		    show all rows from Leave_Requests [Assigned_Manager.Work_Email == zoho.loginuser && Status == "Submitted"]
+		    (
+		        Request_Number
+		        Employee
+		        Leave_Type
+		        Start_Date
+		        End_Date
+		        Requested_Days
+		        Reason
+		        Supporting_Document
+		        Assigned_Manager
+		        Status
+		    )
+		    filters
+		    (
+		        Employee
+		        Leave_Type
+		        Start_Date
+		    )
+		    sort by
+		    (
+		        Start_Date ascending
+		    )
+		}
+
+		list My_Leave_Requests
+		{
+		    displayName = "My Leave Requests"
+		    show all rows from Leave_Requests [Employee.Work_Email == zoho.loginuser]
+		    (
+		        Request_Number
+		        Employee
+		        Leave_Type
+		        Start_Date
+		        End_Date
+		        Requested_Days
+		        Status
+		        Manager_Comments
+		        HR_Comments
+		    )
+		    filters
+		    (
+		        Leave_Type
+		        Status
+		        Start_Date
+		    )
+		    sort by
+		    (
+		        Start_Date descending
+		    )
+		}
+
+		default list All_Leave_Types
+		{
+		    displayName = "All Leave Types"
+		    show all rows from Leave_Types
+		    (
+		        Leave_Type_Name
+		        Description
+		        Default_Annual_Allocation
+		        Count_Weekends
+		        Active
+		    )
+		    filters
+		    (
+		        Active
+		        Count_Weekends
+		    )
+		    sort by
+		    (
+		        Leave_Type_Name ascending
+		    )
+		    conditional formatting
+		    (
+		        "Inactive Leave Types"
+		        {
+		            condition = (Active == false)
+		            fields = [Leave_Type_Name, Active]
+		            format = "background-color:#F3F4F6;color:#6B7280"
+		        }
+		    )
+		}
+	}
+
+	pages
+	{
+		page Leave_Dashboard
+		{
+					displayname = "Leave Dashboard"
+					Content="<zml>\n\t<layout>\n\t\t<row>\n\t\t\t<column width='100%'>\n\t\t\t\t<dsp id='Leave_Dashboard_Snippet' elementName='Leave Dashboard'>\n\t\t\t\t\t<![CDATA[htmlpage Leave_Dashboard_Snippet()\n\t\t\t\t\t\t content\n\t\t\t\t\t\t &lt;%{%&gt;\n\t\t\t\t\t\t\t\t &lt;%\nme = Employees[Work_Email == zoho.loginuser];\nisHR = false;\nisManager = false;\nscopeLabel = &quot;My activity&quot;;\nif(me.count() &gt; 0)\n{\n\tisHR = me.Department == &quot;Human Resources&quot;;\n\tisManager = Employees[Manager == me.ID].count() &gt; 0;\n}\nif(isHR)\n{\n\tscopeLabel = &quot;Organization-wide activity&quot;;\n\tscoped = Leave_Requests[ID != 0] sort by Start_Date;\n}\nelse if(isManager)\n{\n\tscopeLabel = &quot;Assigned-team activity&quot;;\n\tscoped = Leave_Requests[Employee.Manager == me.ID] sort by Start_Date;\n}\nelse\n{\n\tscoped = Leave_Requests[Employee == me.ID] sort by Start_Date;\n}\nsubmitted = 0;\npending = 0;\ncompleted = 0;\nrejected = 0;\nfor each request_record in scoped\n{\n\tif(request_record.Status == &quot;Submitted&quot;) { submitted = submitted + 1; }\n\telse if(request_record.Status == &quot;Pending HR&quot;) { pending = pending + 1; }\n\telse if(request_record.Status == &quot;Rejected&quot;) { rejected = rejected + 1; }\n\telse if(request_record.Status == &quot;Completed&quot; &amp;&amp; request_record.Start_Date.getMonth() == zoho.currentdate.getMonth() &amp;&amp; request_record.Start_Date.getYear() == zoho.currentdate.getYear()) { completed = completed + 1; }\n}\ntotal = submitted + pending + completed + rejected;\nif(total == 0) { total = 1; }\na1 = submitted * 100 / total;\na2 = pending * 100 / total;\na3 = completed * 100 / total;\na4 = rejected * 100 / total;\nupcoming = scoped;\nbalances = Leave_Balances[Employee == me.ID &amp;&amp; Balance_Year == zoho.currentdate.getYear()];\n%&gt;\n&lt;style&gt;\n/* zcs-global: page utility subset used by this dashboard */\n:root{--zcs-theme-brand-color:var(--zcs_brand_color);--zcs-white-color:#fff;--zcs-primary-text-color:var(--zcs_primary_text_color);--zcs-secondary-text-color:var(--zcs_secondary_text_color);--zcs-border-color:var(--zcs_tertiary_border_color)}*{box-sizing:border-box}.zcs-flex{display:flex}.zcs-inline-flex{display:inline-flex}.zcs-row{display:flex;flex-wrap:wrap}.zcs-direction-column{flex-direction:column}.zcs-align-items-center{align-items:center}.zcs-justify-space-between{justify-content:space-between}.zcs-justify-center{justify-content:center}.zcs-gap-8{gap:8px}.zcs-gap-12{gap:12px}.zcs-gap-16{gap:16px}.zcs-gap-24{gap:24px}.zcs-w-full{width:100%}.zcs-p-0{padding:0}.zcs-p-16{padding:16px}.zcs-p-20{padding:20px}.zcs-px-10{padding-left:10px;padding-right:10px}.zcs-px-12{padding-left:12px;padding-right:12px}.zcs-px-16{padding-left:16px;padding-right:16px}.zcs-py-2{padding-top:2px;padding-bottom:2px}.zcs-py-8{padding-top:8px;padding-bottom:8px}.zcs-m-0{margin:0}.zcs-font-12{font-size:12px}.zcs-font-14{font-size:14px}.zcs-font-15{font-size:15px}.zcs-font-18{font-size:18px}.zcs-font-24{font-size:24px}.zcs-font-30{font-size:30px}.zcs-font-normal{font-weight:400}.zcs-font-medium{font-weight:500}.zcs-font-semibold{font-weight:600}.zcs-color-primary{color:var(--zcs-primary-text-color)}.zcs-color-secondary{color:var(--zcs-secondary-text-color)}.zcs-rounded-sm{border-radius:4px}.zcs-rounded-md{border-radius:6px}.zcs-rounded-xl{border-radius:12px}.zcs-rounded-full{border-radius:100%}.zcs-card{background:var(--zcs-white-color);border:1px solid var(--zcs-border-color);border-radius:12px}.ld{padding:24px;background:var(--zcs-page-bg-color,#f5f7fa);color:var(--zcs-primary-text-color);font-family:inherit}.ld-header{margin-bottom:20px}.ld-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.ld-kpi{grid-column:span 3;padding:18px}.ld-kpi i{font-size:22px;color:var(--zcs_brand_color)}.ld-main{grid-column:span 8}.ld-side{grid-column:span 4}.ld-card{padding:20px}.ld-value{font-size:30px;font-weight:600;margin-top:10px}.ld-sub{color:var(--zcs-secondary-text-color);font-size:13px}.ld-balance{min-width:145px;padding:14px}.zcs-button{min-height:36px;background:var(--zcs_brand_color);color:var(--zcs_brand_foreground_color);padding:8px 16px;border-radius:6px}.zcs-table-wrapper{border:1px solid var(--zcs-border-color);overflow:auto}.zcs-table-wrapper table{border-collapse:collapse;width:100%}.zcs-table-wrapper th{background:#f9fafe}.zcs-table-wrapper th,.zcs-table-wrapper td{padding:10px 16px;text-align:left;border-top:1px solid var(--zcs-border-color);font-size:14px}.zcs-badge{color:#fff;border-radius:4px;padding:2px 10px}.zcs-badge-green{background:#179e6c}.zcs-badge-yellow{background:#faae13}.zcs-badge-red{background:#fe455d}.zcs-badge-blue{background:#2a6ffc}.zcs-quick-action-item{list-style:none;border:1px solid var(--zcs-border-color);border-radius:8px;padding:10px 12px}.zcs-quick-action-link{color:var(--zcs-primary-text-color)}.zcs-quick-action-item:hover{border-color:var(--zcs_brand_color)}.zcs-donut-chart{width:180px;height:180px;border-radius:50%;background:conic-gradient(#faae13 0 calc(var(--a1)*1%),#2a6ffc 0 calc((var(--a1) + var(--a2))*1%),#179e6c 0 calc((var(--a1) + var(--a2) + var(--a3))*1%),#fe455d 0);position:relative}.zcs-donut-chart:after{content:&quot;&quot;;position:absolute;inset:34px;background:white;border-radius:50%}.donut-label{position:absolute;z-index:1;text-align:center}.legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block}@media(max-width:900px){.ld-kpi{grid-column:span 6}.ld-main,.ld-side{grid-column:span 12}}@media(max-width:560px){.ld{padding:14px}.ld-kpi{grid-column:span 12}}\n&lt;/style&gt;\n&lt;div class=&quot;ld&quot;&gt;\n\t&lt;div class=&quot;ld-header zcs-flex zcs-align-items-center zcs-justify-space-between zcs-gap-16&quot;&gt;\n\t\t&lt;div&gt;&lt;h2 class=&quot;zcs-m-0&quot;&gt;Leave dashboard&lt;/h2&gt;&lt;div class=&quot;ld-sub&quot;&gt;&lt;%=scopeLabel%&gt; for &lt;%=zoho.loginuser%&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t&lt;a class=&quot;zcs-button zcs-inline-flex zcs-align-items-center zcs-gap-8&quot; href=&quot;#Form:Leave_Requests&quot;&gt;&lt;i class=&quot;zc-li-outline ui-1-edit-72&quot;&gt;&lt;/i&gt;&lt;span&gt;Submit request&lt;/span&gt;&lt;/a&gt;\n\t&lt;/div&gt;\n\t&lt;div class=&quot;ld-grid&quot;&gt;\n\t\t&lt;div class=&quot;ld-kpi zcs-card&quot;&gt;&lt;div class=&quot;zcs-flex zcs-justify-space-between&quot;&gt;&lt;span&gt;Submitted&lt;/span&gt;&lt;i class=&quot;zc-li-outline files-2-doc&quot;&gt;&lt;/i&gt;&lt;/div&gt;&lt;div class=&quot;ld-value&quot;&gt;&lt;%=submitted%&gt;&lt;/div&gt;&lt;div class=&quot;ld-sub&quot;&gt;Awaiting manager review&lt;/div&gt;&lt;/div&gt;\n\t\t&lt;div class=&quot;ld-kpi zcs-card&quot;&gt;&lt;div class=&quot;zcs-flex zcs-justify-space-between&quot;&gt;&lt;span&gt;Pending HR&lt;/span&gt;&lt;i class=&quot;zc-li-outline ui-2-time&quot;&gt;&lt;/i&gt;&lt;/div&gt;&lt;div class=&quot;ld-value&quot;&gt;&lt;%=pending%&gt;&lt;/div&gt;&lt;div class=&quot;ld-sub&quot;&gt;Balance confirmation needed&lt;/div&gt;&lt;/div&gt;\n\t\t&lt;div class=&quot;ld-kpi zcs-card&quot;&gt;&lt;div class=&quot;zcs-flex zcs-justify-space-between&quot;&gt;&lt;span&gt;Completed this month&lt;/span&gt;&lt;i class=&quot;zc-li-outline ui-1-check-circle-08&quot;&gt;&lt;/i&gt;&lt;/div&gt;&lt;div class=&quot;ld-value&quot;&gt;&lt;%=completed%&gt;&lt;/div&gt;&lt;div class=&quot;ld-sub&quot;&gt;Approved leave&lt;/div&gt;&lt;/div&gt;\n\t\t&lt;div class=&quot;ld-kpi zcs-card&quot;&gt;&lt;div class=&quot;zcs-flex zcs-justify-space-between&quot;&gt;&lt;span&gt;Rejected&lt;/span&gt;&lt;i class=&quot;zc-li-outline ui-1-circle-remove&quot;&gt;&lt;/i&gt;&lt;/div&gt;&lt;div class=&quot;ld-value&quot;&gt;&lt;%=rejected%&gt;&lt;/div&gt;&lt;div class=&quot;ld-sub&quot;&gt;Closed requests&lt;/div&gt;&lt;/div&gt;\n\t\t&lt;div class=&quot;ld-main zcs-card ld-card&quot;&gt;&lt;h3 class=&quot;zcs-m-0&quot;&gt;Status distribution&lt;/h3&gt;&lt;div class=&quot;zcs-flex zcs-align-items-center zcs-justify-center zcs-gap-24 zcs-p-20&quot;&gt;&lt;div class=&quot;zcs-donut-chart zcs-flex zcs-align-items-center zcs-justify-center&quot; style=&quot;--a1:&lt;%=a1%&gt;;--a2:&lt;%=a2%&gt;;--a3:&lt;%=a3%&gt;;--a4:&lt;%=a4%&gt;&quot;&gt;&lt;div class=&quot;donut-label&quot;&gt;&lt;strong class=&quot;zcs-font-24&quot;&gt;&lt;%=submitted + pending + completed + rejected%&gt;&lt;/strong&gt;&lt;br&gt;&lt;span class=&quot;ld-sub&quot;&gt;requests&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;zcs-flex zcs-direction-column zcs-gap-12&quot;&gt;&lt;span&gt;&lt;i class=&quot;legend-dot&quot; style=&quot;background:#faae13&quot;&gt;&lt;/i&gt; Submitted: &lt;strong&gt;&lt;%=submitted%&gt;&lt;/strong&gt;&lt;/span&gt;&lt;span&gt;&lt;i class=&quot;legend-dot&quot; style=&quot;background:#2a6ffc&quot;&gt;&lt;/i&gt; Pending HR: &lt;strong&gt;&lt;%=pending%&gt;&lt;/strong&gt;&lt;/span&gt;&lt;span&gt;&lt;i class=&quot;legend-dot&quot; style=&quot;background:#179e6c&quot;&gt;&lt;/i&gt; Completed: &lt;strong&gt;&lt;%=completed%&gt;&lt;/strong&gt;&lt;/span&gt;&lt;span&gt;&lt;i class=&quot;legend-dot&quot; style=&quot;background:#fe455d&quot;&gt;&lt;/i&gt; Rejected: &lt;strong&gt;&lt;%=rejected%&gt;&lt;/strong&gt;&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t&lt;div class=&quot;ld-main zcs-card ld-card&quot;&gt;&lt;div class=&quot;zcs-flex zcs-justify-space-between zcs-align-items-center&quot;&gt;&lt;h3 class=&quot;zcs-m-0&quot;&gt;Upcoming approved leave&lt;/h3&gt;&lt;span class=&quot;zcs-badge zcs-badge-green&quot;&gt;Completed&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;zcs-table-wrapper zcs-rounded-sm&quot; style=&quot;margin-top:14px&quot;&gt;&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Employee&lt;/th&gt;&lt;th&gt;Leave type&lt;/th&gt;&lt;th&gt;Dates&lt;/th&gt;&lt;th&gt;Days&lt;/th&gt;&lt;th&gt;Status&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;% rowCount = 0; for each r in upcoming { if(rowCount &lt; 6) { rowCount = rowCount + 1; %&gt;&lt;tr&gt;&lt;td&gt;&lt;%=r.Employee.Employee_Name%&gt;&lt;/td&gt;&lt;td&gt;&lt;%=r.Leave_Type.Leave_Type_Name%&gt;&lt;/td&gt;&lt;td&gt;&lt;%=r.Start_Date%&gt; - &lt;%=r.End_Date%&gt;&lt;/td&gt;&lt;td&gt;&lt;%=r.Requested_Days%&gt;&lt;/td&gt;&lt;td&gt;&lt;span class=&quot;zcs-badge zcs-badge-green&quot;&gt;Completed&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;&lt;% } } if(rowCount == 0) { %&gt;&lt;tr&gt;&lt;td colspan=&quot;5&quot; class=&quot;ld-sub&quot;&gt;No upcoming approved leave in your current view.&lt;/td&gt;&lt;/tr&gt;&lt;% } %&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t&lt;div class=&quot;ld-side zcs-card ld-card&quot;&gt;&lt;h3 class=&quot;zcs-m-0&quot;&gt;My remaining balances&lt;/h3&gt;&lt;div class=&quot;zcs-row zcs-gap-12&quot; style=&quot;margin-top:14px&quot;&gt;&lt;% balanceCount = 0; for each b in balances { balanceCount = balanceCount + 1; %&gt;&lt;div class=&quot;ld-balance zcs-card&quot;&gt;&lt;div class=&quot;ld-sub&quot;&gt;&lt;%=b.Leave_Type.Leave_Type_Name%&gt;&lt;/div&gt;&lt;div class=&quot;zcs-font-24 zcs-font-semibold&quot;&gt;&lt;%=b.Remaining_Days%&gt;&lt;/div&gt;&lt;div class=&quot;ld-sub&quot;&gt;days remaining&lt;/div&gt;&lt;/div&gt;&lt;% } if(balanceCount == 0) { %&gt;&lt;div class=&quot;ld-sub&quot;&gt;No current-year balance records are available.&lt;/div&gt;&lt;% } %&gt;&lt;/div&gt;&lt;/div&gt;\n\t&lt;/div&gt;\n&lt;/div&gt;\n\t\t\t\t\t\t &lt;%}%&gt;\n\t\t\t\t ]]>\n\t\t\t\t</dsp>\n\t\t\t</column>\n\t\t</row>\n\t</layout>\n</zml>"
+		}
+	}
+
+	workflow
+	{
+		form
+		{
+			Employees_On_Validate as "Validate Employee Manager"
+			{
+			    type = form
+			    form = Employees
+			    record event = on add or edit
+			    description = "Prevents an employee from being assigned as their own manager."
+			
+			    on validate
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                if (input.Manager != null && input.ID != null && input.Manager == input.ID)
+			                {
+			                    alert "An employee cannot be assigned as their own manager.";
+			                    cancel submit;
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Leave_Balances_On_Load as "Initialize Leave Balance"
+			{
+			    type = form
+			    form = Leave_Balances
+			    record event = on add
+			
+			    on load
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                if (input.Balance_Year == null)
+			                {
+			                    input.Balance_Year = zoho.currentdate.getYear();
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Leave_Balances_On_Validate as "Validate Leave Balance"
+			{
+			    type = form
+			    form = Leave_Balances
+			    record event = on add or edit
+			    description = "Prevents invalid, overused, or duplicate annual leave balances."
+			
+			    on validate
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                employee_record = Employees[ID == input.Employee];
+			                input.Manager_Email = null;
+			                if (employee_record.count() > 0 && employee_record.Manager != null)
+			                {
+			                    manager_record = Employees[ID == employee_record.Manager];
+			                    if (manager_record.count() > 0)
+			                    {
+			                        input.Manager_Email = manager_record.Work_Email;
+			                    }
+			                }
+			                allocation = ifnull(input.Opening_Allocation, 0);
+			                used = ifnull(input.Used_Days, 0);
+			                if (allocation < 0 || used < 0)
+			                {
+			                    alert "Allocation and used days cannot be negative.";
+			                    cancel submit;
+			                }
+			                if (used > allocation)
+			                {
+			                    alert "Used days cannot exceed the opening allocation.";
+			                    cancel submit;
+			                }
+			                duplicates = Leave_Balances[Employee == input.Employee && Leave_Type == input.Leave_Type && Balance_Year == input.Balance_Year && ID != input.ID];
+			                if (duplicates.count() > 0)
+			                {
+			                    alert "A balance already exists for this employee, leave type, and year.";
+			                    cancel submit;
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Employee_On_User_Input as "Set Assigned Manager"
+			{
+			    type = form
+			    form = Leave_Requests
+			    record event = on add or edit
+			
+			    on user input of Employee
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                input.Assigned_Manager = null;
+			                if (input.Employee != null)
+			                {
+			                    employee_record = Employees[ID == input.Employee];
+			                    if (employee_record.count() > 0)
+			                    {
+			                        input.Assigned_Manager = employee_record.Manager;
+			                    }
+			                }
+			            )
+			        }
+			    }
+			}
+
+			End_Date_On_User_Input as "Recalculate Requested Days from End Date"
+			{
+			    type = form
+			    form = Leave_Requests
+			    record event = on add or edit
+			
+			    on user input of End_Date
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                input.Requested_Days = 0;
+			                if (input.Leave_Type != null && input.Start_Date != null && input.End_Date != null && input.End_Date >= input.Start_Date)
+			                {
+			                    leave_type_record = Leave_Types[ID == input.Leave_Type];
+			                    day_count = input.Start_Date.daysBetween(input.End_Date) + 1;
+			                    day_list = ".".leftpad(day_count - 1).toList("");
+			                    current_date = input.Start_Date;
+			                    days = 0;
+			                    for each day_item in day_list
+			                    {
+			                        if (leave_type_record.Count_Weekends == true || (current_date.getDayOfWeek() != 1 && current_date.getDayOfWeek() != 7))
+			                        {
+			                            days = days + 1;
+			                        }
+			                        current_date = current_date.addDay(1);
+			                    }
+			                    input.Requested_Days = days;
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Leave_Requests_On_Load as "Initialize Leave Request"
+			{
+			    type = form
+			    form = Leave_Requests
+			    record event = on add or edit
+			
+			    on load
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                disable Requested_Days;
+			                disable Assigned_Manager;
+			                disable Status;
+			                disable Manager_Action_Date;
+			                disable HR_Processed_By;
+			                disable HR_Processed_Date;
+			                disable Balance_Before;
+			                disable Balance_After;
+			                if (input.ID == null)
+			                {
+			                    employee_record = Employees[Work_Email == zoho.loginuser && Employment_Status == "Active"];
+			                    if (employee_record.count() > 0)
+			                    {
+			                        input.Employee = employee_record.ID;
+			                        input.Assigned_Manager = employee_record.Manager;
+			                        disable Employee;
+			                    }
+			                    input.Status = "Submitted";
+			                    hide Manager_Comments;
+			                    hide Manager_Action_Date;
+			                    hide HR_Comments;
+			                    hide HR_Processed_By;
+			                    hide HR_Processed_Date;
+			                    hide Balance_Before;
+			                    hide Balance_After;
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Leave_Requests_On_Success as "Notify Manager of Leave Request"
+			{
+			    type = form
+			    form = Leave_Requests
+			    record event = on add
+			
+			    on success
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                manager_record = Employees[ID == input.Assigned_Manager];
+			                employee_record = Employees[ID == input.Employee];
+			                if (manager_record.count() > 0)
+			                {
+			                    sendmail
+			                    (
+			                        from : zoho.adminuserid
+			                        to : manager_record.Work_Email
+			                        subject : "Leave request awaiting your review"
+			                        message : employee_record.Employee_Name + " submitted a leave request from " + input.Start_Date + " to " + input.End_Date + "."
+			                    )
+			                }
+			                insert into Audit_Log
+			                [
+			                    Event_Time = zoho.currenttime
+			                    Actor_Email = zoho.loginuser
+			                    Action = "Submitted"
+			                    Leave_Request = input.ID
+			                    Previous_Status = ""
+			                    New_Status = "Submitted"
+			                    Details = "Leave request submitted for manager review."
+			                ]
+			            )
+			        }
+			    }
+			}
+
+			Leave_Requests_On_Validate as "Validate Leave Request"
+			{
+			    type = form
+			    form = Leave_Requests
+			    record event = on add or edit
+			
+			    on validate
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                if (input.End_Date < input.Start_Date)
+			                {
+			                    alert "End date must be on or after the start date.";
+			                    cancel submit;
+			                }
+			                if (input.Start_Date.getYear() != input.End_Date.getYear())
+			                {
+			                    alert "A leave request must fall within one balance year.";
+			                    cancel submit;
+			                }
+			                employee_record = Employees[ID == input.Employee && Employment_Status == "Active"];
+			                if (employee_record.count() == 0)
+			                {
+			                    alert "The selected employee is not active.";
+			                    cancel submit;
+			                }
+			                if (employee_record.Manager == null)
+			                {
+			                    alert "No manager is assigned to this employee.";
+			                    cancel submit;
+			                }
+			                input.Assigned_Manager = employee_record.Manager;
+			                leave_type_record = Leave_Types[ID == input.Leave_Type && Active == true];
+			                if (leave_type_record.count() == 0)
+			                {
+			                    alert "The selected leave type is not active.";
+			                    cancel submit;
+			                }
+			                if (ifnull(input.Requested_Days, 0) <= 0)
+			                {
+			                    alert "The request must include at least one working day.";
+			                    cancel submit;
+			                }
+			                balance_record = Leave_Balances[Employee == input.Employee && Leave_Type == input.Leave_Type && Balance_Year == input.Start_Date.getYear()];
+			                if (balance_record.count() == 0)
+			                {
+			                    alert "No leave balance exists for this employee, leave type, and year.";
+			                    cancel submit;
+			                }
+			                if (balance_record.Remaining_Days < input.Requested_Days)
+			                {
+			                    alert "The requested days exceed the available leave balance.";
+			                    cancel submit;
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Leave_Type_On_User_Input as "Recalculate Requested Days by Leave Type"
+			{
+			    type = form
+			    form = Leave_Requests
+			    record event = on add or edit
+			
+			    on user input of Leave_Type
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                input.Requested_Days = 0;
+			                if (input.Leave_Type != null && input.Start_Date != null && input.End_Date != null && input.End_Date >= input.Start_Date)
+			                {
+			                    leave_type_record = Leave_Types[ID == input.Leave_Type];
+			                    day_count = input.Start_Date.daysBetween(input.End_Date) + 1;
+			                    day_list = ".".leftpad(day_count - 1).toList("");
+			                    current_date = input.Start_Date;
+			                    days = 0;
+			                    for each day_item in day_list
+			                    {
+			                        if (leave_type_record.Count_Weekends == true || (current_date.getDayOfWeek() != 1 && current_date.getDayOfWeek() != 7))
+			                        {
+			                            days = days + 1;
+			                        }
+			                        current_date = current_date.addDay(1);
+			                    }
+			                    input.Requested_Days = days;
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Start_Date_On_User_Input as "Recalculate Requested Days from Start Date"
+			{
+			    type = form
+			    form = Leave_Requests
+			    record event = on add or edit
+			
+			    on user input of Start_Date
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                input.Requested_Days = 0;
+			                if (input.Leave_Type != null && input.Start_Date != null && input.End_Date != null && input.End_Date >= input.Start_Date)
+			                {
+			                    leave_type_record = Leave_Types[ID == input.Leave_Type];
+			                    day_count = input.Start_Date.daysBetween(input.End_Date) + 1;
+			                    day_list = ".".leftpad(day_count - 1).toList("");
+			                    current_date = input.Start_Date;
+			                    days = 0;
+			                    for each day_item in day_list
+			                    {
+			                        if (leave_type_record.Count_Weekends == true || (current_date.getDayOfWeek() != 1 && current_date.getDayOfWeek() != 7))
+			                        {
+			                            days = days + 1;
+			                        }
+			                        current_date = current_date.addDay(1);
+			                    }
+			                    input.Requested_Days = days;
+			                }
+			            )
+			        }
+			    }
+			}
+
+			Leave_Types_On_Validate as "Validate Leave Type Allocation"
+			{
+			    type = form
+			    form = Leave_Types
+			    record event = on add or edit
+			    description = "Ensures the default annual allocation is not negative."
+			
+			    on validate
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                if (ifnull(input.Default_Annual_Allocation, 0) < 0)
+			                {
+			                    alert "Default annual allocation cannot be negative.";
+			                    cancel submit;
+			                }
+			            )
+			        }
+			    }
+			}
+		}
+
+		blueprint
+		{
+			Leave_Request_Lifecycle as "Leave Request Lifecycle"
+			{
+			    type = blueprint
+			    form = Leave_Requests
+			
+			    start
+			    {
+			        start stage = "Submitted"
+			    }
+			
+			    stages
+			    {
+			        "Submitted" { }
+			        "Pending HR" { }
+			        "Completed" { }
+			        "Rejected" { }
+			    }
+			
+			    transitions
+			    {
+			        Approve as "Approve"
+			        {
+			            type = normal
+			            from stage = "Submitted"
+			            to stage = "Pending HR"
+			            before
+			            {
+			                transition owner
+			                (
+			                    permissions = {"Manager"}
+			                )
+			                confirmation before execution
+			                (
+			                    message = "Approve this request and send it to HR?"
+			                    confirm button text = "Approve"
+			                    cancel button text = "Cancel"
+			                )
+			            }
+			            after
+			            {
+			                actions
+			                {
+			                    custom deluge script
+			                    (
+			                        Manager_Action_Date = zoho.currenttime;
+			                        employee_record = Employees[ID == input.Employee];
+			                        if (employee_record.count() > 0)
+			                        {
+			                            sendmail
+			                            (
+			                                from : zoho.adminuserid
+			                                to : employee_record.Work_Email
+			                                subject : "Leave request approved by manager"
+			                                message : "Your leave request has been approved by your manager and is pending HR balance processing."
+			                            )
+			                        }
+			                        insert into Audit_Log
+			                        [
+			                            Event_Time = zoho.currenttime
+			                            Actor_Email = zoho.loginuser
+			                            Action = "Manager Approved"
+			                            Leave_Request = input.ID
+			                            Previous_Status = "Submitted"
+			                            New_Status = "Pending HR"
+			                            Details = ifnull(input.Manager_Comments, "Manager approved the request.")
+			                        ]
+			                    )
+			                }
+			            }
+			        }
+			
+			        Reject as "Reject"
+			        {
+			            type = normal
+			            from stage = "Submitted"
+			            to stage = "Rejected"
+			            before
+			            {
+			                transition owner
+			                (
+			                    permissions = {"Manager"}
+			                )
+			                confirmation before execution
+			                (
+			                    message = "Reject this leave request?"
+			                    confirm button text = "Reject"
+			                    cancel button text = "Cancel"
+			                )
+			            }
+			            after
+			            {
+			                actions
+			                {
+			                    custom deluge script
+			                    (
+			                        Manager_Action_Date = zoho.currenttime;
+			                        employee_record = Employees[ID == input.Employee];
+			                        if (employee_record.count() > 0)
+			                        {
+			                            sendmail
+			                            (
+			                                from : zoho.adminuserid
+			                                to : employee_record.Work_Email
+			                                subject : "Leave request rejected"
+			                                message : "Your leave request was rejected. Manager comments: " + ifnull(input.Manager_Comments, "No comments provided.")
+			                            )
+			                        }
+			                        insert into Audit_Log
+			                        [
+			                            Event_Time = zoho.currenttime
+			                            Actor_Email = zoho.loginuser
+			                            Action = "Manager Rejected"
+			                            Leave_Request = input.ID
+			                            Previous_Status = "Submitted"
+			                            New_Status = "Rejected"
+			                            Details = ifnull(input.Manager_Comments, "Manager rejected the request.")
+			                        ]
+			                    )
+			                }
+			            }
+			        }
+			
+			        Confirm_Balance_Update as "Confirm Balance Update"
+			        {
+			            type = normal
+			            from stage = "Pending HR"
+			            to stage = "Completed"
+			            before
+			            {
+			                transition owner
+			                (
+			                    permissions = {"HR"}
+			                )
+			                transition criteria = ( Balance_After is null )
+			                confirmation before execution
+			                (
+			                    message = "Deduct this request from the employee's leave balance and complete it?"
+			                    confirm button text = "Confirm"
+			                    cancel button text = "Cancel"
+			                )
+			            }
+			            after
+			            {
+			                actions
+			                {
+			                    custom deluge script
+			                    (
+			                        balance_record = Leave_Balances[Employee == input.Employee && Leave_Type == input.Leave_Type && Balance_Year == input.Start_Date.getYear()];
+			                        Balance_Before = balance_record.Remaining_Days;
+			                        balance_record.Used_Days = balance_record.Used_Days + input.Requested_Days;
+			                        Balance_After = Balance_Before - input.Requested_Days;
+			                        HR_Processed_By = zoho.loginuser;
+			                        HR_Processed_Date = zoho.currenttime;
+			                        employee_record = Employees[ID == input.Employee];
+			                        if (employee_record.count() > 0)
+			                        {
+			                            sendmail
+			                            (
+			                                from : zoho.adminuserid
+			                                to : employee_record.Work_Email
+			                                subject : "Leave request completed"
+			                                message : "Your leave request is fully approved and your leave balance has been updated."
+			                            )
+			                        }
+			                        insert into Audit_Log
+			                        [
+			                            Event_Time = zoho.currenttime
+			                            Actor_Email = zoho.loginuser
+			                            Action = "HR Completed"
+			                            Leave_Request = input.ID
+			                            Previous_Status = "Pending HR"
+			                            New_Status = "Completed"
+			                            Details = "Balance updated from " + Balance_Before + " to " + Balance_After + ". " + ifnull(input.HR_Comments, "")
+			                        ]
+			                    )
+			                }
+			            }
+			        }
+			    }
+			}
+		}
+	}
+
+	share_settings
+	{
+	"Employee"
+	{
+	    name = "Employee"
+	    type = Users_Permissions
+	    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+	    description = "Employees submit leave requests and view their own requests and balances."
+	    ModulePermissions
+	    {
+	        Leave_Balances
+	        {
+	            enabled = View,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                My_Leave_Balances={"View"}
+	            }
+	        }
+	        Leave_Requests
+	        {
+	            enabled = Create,View,Edit,Search,Tab
+	            allFieldsVisible = false
+	            ReportPermissions
+	            {
+	                My_Leave_Requests={"View"}
+	                Approved_Leave_Calendar={"View"}
+	            }
+	            FieldPermissions
+	            {
+	                Request_Number{visibility:true,readonly:true}
+	                Employee{visibility:true,readonly:true}
+	                Leave_Type{visibility:true,readonly:false}
+	                Start_Date{visibility:true,readonly:false}
+	                End_Date{visibility:true,readonly:false}
+	                Requested_Days{visibility:true,readonly:true}
+	                Reason{visibility:true,readonly:false}
+	                Supporting_Document{visibility:true,readonly:false}
+	                Assigned_Manager{visibility:true,readonly:true}
+	                Status{visibility:true,readonly:true}
+	                Manager_Comments{visibility:true,readonly:true}
+	                Manager_Action_Date{visibility:true,readonly:true}
+	                HR_Comments{visibility:true,readonly:true}
+	                HR_Processed_By{visibility:false}
+	                HR_Processed_Date{visibility:true,readonly:true}
+	                Balance_Before{visibility:true,readonly:true}
+	                Balance_After{visibility:true,readonly:true}
+	            }
+	        }
+	        Leave_Dashboard
+	        {
+	            enabled = tab
+	        }
+	    }
+	}
+	"HR"
+	{
+	    name = "HR"
+	    type = Users_Permissions
+	    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+	    description = "HR manages employees, leave policies, balances, and approved request completion."
+	    ModulePermissions
+	    {
+	        Employees
+	        {
+	            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Employees={"View","Edit","Delete"}
+	            }
+	        }
+	        Leave_Types
+	        {
+	            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Leave_Types={"View","Edit","Delete"}
+	            }
+	        }
+	        Leave_Balances
+	        {
+	            enabled = Create,Viewall,Modifyall,Import,Export,Tab,View,Edit,Delete,Search
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Leave_Balances={"View","Edit","Delete"}
+	                My_Leave_Balances={"View"}
+	                Team_Leave_Balances={"View"}
+	            }
+	        }
+	        Leave_Requests
+	        {
+	            enabled = Viewall,Modifyall,Export,Tab,View,Edit,Search
+	            allFieldsVisible = false
+	            ReportPermissions
+	            {
+	                All_Leave_Requests={"View","Edit"}
+	                My_Leave_Requests={"View"}
+	                Manager_Review_Queue={"View"}
+	                HR_Processing_Queue={"View","Edit"}
+	                Leave_Request_Board={"View","Edit"}
+	                Approved_Leave_Calendar={"View"}
+	            }
+	            FieldPermissions
+	            {
+	                Request_Number{visibility:true,readonly:true}
+	                Employee{visibility:true,readonly:true}
+	                Leave_Type{visibility:true,readonly:true}
+	                Start_Date{visibility:true,readonly:true}
+	                End_Date{visibility:true,readonly:true}
+	                Requested_Days{visibility:true,readonly:true}
+	                Reason{visibility:true,readonly:true}
+	                Supporting_Document{visibility:true,readonly:true}
+	                Assigned_Manager{visibility:true,readonly:true}
+	                Status{visibility:true,readonly:true}
+	                Manager_Comments{visibility:true,readonly:true}
+	                Manager_Action_Date{visibility:true,readonly:true}
+	                HR_Comments{visibility:true,readonly:false}
+	                HR_Processed_By{visibility:true,readonly:true}
+	                HR_Processed_Date{visibility:true,readonly:true}
+	                Balance_Before{visibility:true,readonly:true}
+	                Balance_After{visibility:true,readonly:true}
+	            }
+	        }
+	        Audit_Log
+	        {
+	            enabled = Viewall,Export,Tab,View,Search
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                Leave_Audit_Log={"View"}
+	            }
+	        }
+	        Leave_Dashboard
+	        {
+	            enabled = tab
+	        }
+	    }
+	}
+	"Manager"
+	{
+	    name = "Manager"
+	    type = Users_Permissions
+	    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+	    description = "Managers review assigned employee leave requests and view team leave."
+	    ModulePermissions
+	    {
+	        Employees
+	        {
+	            enabled = View,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                All_Employees={"View"}
+	            }
+	        }
+	        Leave_Balances
+	        {
+	            enabled = View,Search,Tab
+	            allFieldsVisible = true
+	            ReportPermissions
+	            {
+	                My_Leave_Balances={"View"}
+	                Team_Leave_Balances={"View"}
+	            }
+	        }
+	        Leave_Requests
+	        {
+	            enabled = Create,View,Edit,Search,Tab
+	            allFieldsVisible = false
+	            ReportPermissions
+	            {
+	                My_Leave_Requests={"View"}
+	                Manager_Review_Queue={"View","Edit"}
+	                Approved_Leave_Calendar={"View"}
+	            }
+	            FieldPermissions
+	            {
+	                Request_Number{visibility:true,readonly:true}
+	                Employee{visibility:true,readonly:true}
+	                Leave_Type{visibility:true,readonly:false}
+	                Start_Date{visibility:true,readonly:false}
+	                End_Date{visibility:true,readonly:false}
+	                Requested_Days{visibility:true,readonly:true}
+	                Reason{visibility:true,readonly:false}
+	                Supporting_Document{visibility:true,readonly:false}
+	                Assigned_Manager{visibility:true,readonly:true}
+	                Status{visibility:true,readonly:true}
+	                Manager_Comments{visibility:true,readonly:true}
+	                Manager_Action_Date{visibility:true,readonly:true}
+	                HR_Comments{visibility:true,readonly:true}
+	                HR_Processed_By{visibility:false}
+	                HR_Processed_Date{visibility:true,readonly:true}
+	                Balance_Before{visibility:true,readonly:true}
+	                Balance_After{visibility:true,readonly:true}
+	            }
+	        }
+	        Leave_Dashboard
+	        {
+	            enabled = tab
+	        }
+	    }
+	}
+	}
+
+	web
+	{
+	forms
+	{
+	    form Employees { label placement = top }
+	    form Leave_Types { label placement = top }
+	    form Leave_Balances { label placement = top }
+	    form Leave_Requests { label placement = top }
+	    form Audit_Log { label placement = top }
+	}
+	reports
+	{
+		report Leave_Audit_Log
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Event_Time Actor_Email Action Leave_Request Previous_Status New_Status Details ) ) ) menu ( header ( Edit ) record ( Edit ) ) action ( on click ( View Record ) on right click ( Edit View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Event_Time Actor_Email Action Leave_Request Previous_Status New_Status Details ) ) ) menu ( header ( Edit ) ) )
+		}
+	
+		report All_Employees
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Employee_ID Employee_Name Work_Email Department Job_Title Manager Employment_Status Hire_Date ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Employee_ID Employee_Name Work_Email Department Job_Title Manager Employment_Status Hire_Date ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report All_Leave_Balances
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Employee Leave_Type Balance_Year Opening_Allocation Used_Days Remaining_Days ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Employee Leave_Type Balance_Year Opening_Allocation Used_Days Remaining_Days ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	
+		report My_Leave_Balances
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Employee Leave_Type Balance_Year Opening_Allocation Used_Days Remaining_Days ) ) ) menu ( header ( Edit ) record ( Edit ) ) action ( on click ( View Record ) on right click ( Edit View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Employee Leave_Type Balance_Year Opening_Allocation Used_Days Remaining_Days ) ) ) menu ( header ( Edit ) ) )
+		}
+	
+		report Team_Leave_Balances
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Employee Leave_Type Balance_Year Opening_Allocation Used_Days Remaining_Days ) ) ) menu ( header ( Edit ) record ( Edit ) ) action ( on click ( View Record ) on right click ( Edit View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Employee Leave_Type Balance_Year Opening_Allocation Used_Days Remaining_Days ) ) ) menu ( header ( Edit ) ) )
+		}
+	
+		report All_Leave_Requests
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Request_Number Employee Leave_Type Start_Date End_Date Requested_Days Assigned_Manager Status ) ) ) menu ( header ( Edit ) record ( Edit ) ) action ( on click ( View Record ) on right click ( Edit View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Request_Number Employee Leave_Type Start_Date End_Date Requested_Days Reason Supporting_Document Assigned_Manager Status Manager_Comments Manager_Action_Date HR_Comments HR_Processed_By HR_Processed_Date Balance_Before Balance_After ) ) ) menu ( header ( Edit ) ) )
+		}
+	
+		report Approved_Leave_Calendar
+		{
+		 quickview ( layout ( type = 1 datablock1 ( layout type = -1 fields ( Employee Leave_Type Start_Date End_Date Requested_Days Status ) ) ) menu ( header ( Edit ) record ( Edit ) ) action ( on click ( View Record ) on right click ( Edit View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Employee Leave_Type Start_Date End_Date Requested_Days Status ) ) ) menu ( header ( Edit ) ) )
+		}
+	
+		report HR_Processing_Queue
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Request_Number Employee Leave_Type Start_Date End_Date Requested_Days Assigned_Manager Status ) ) ) menu ( header ( Edit ) record ( Edit ) ) action ( on click ( View Record ) on right click ( Edit View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Request_Number Employee Leave_Type Start_Date End_Date Requested_Days Assigned_Manager Status Manager_Comments Manager_Action_Date ) ) ) menu ( header ( Edit ) ) )
+		}
+	
+		report Leave_Request_Board
+		{
+		 quickview ( layout ( type = 1 datablock1 ( layout type = -1 fields ( Request_Number Employee Leave_Type Start_Date End_Date Requested_Days Assigned_Manager Status ) ) ) menu ( header ( Edit ) record ( Edit ) ) action ( on click ( View Record ) on right click ( Edit View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Request_Number Employee Leave_Type Start_Date End_Date Requested_Days Assigned_Manager Status ) ) ) menu ( header ( Edit ) ) )
+		}
+	
+		report Manager_Review_Queue
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Request_Number Employee Leave_Type Start_Date End_Date Requested_Days Assigned_Manager Status ) ) ) menu ( header ( Edit ) record ( Edit ) ) action ( on click ( View Record ) on right click ( Edit View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Request_Number Employee Leave_Type Start_Date End_Date Requested_Days Reason Supporting_Document Assigned_Manager Status ) ) ) menu ( header ( Edit ) ) )
+		}
+	
+		report My_Leave_Requests
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Request_Number Employee Leave_Type Start_Date End_Date Requested_Days Status ) ) ) menu ( header ( Edit ) record ( Edit ) ) action ( on click ( View Record ) on right click ( Edit View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Request_Number Employee Leave_Type Start_Date End_Date Requested_Days Status Manager_Comments HR_Comments ) ) ) menu ( header ( Edit ) ) )
+		}
+	
+		report All_Leave_Types
+		{
+		 quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Leave_Type_Name Description Default_Annual_Allocation Count_Weekends Active ) ) ) menu ( header ( Edit Duplicate Delete ) record ( Edit Duplicate Delete ) ) action ( on click ( View Record ) on right click ( Edit Delete Duplicate View Record ) ) )
+		 detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Leave_Type_Name Description Default_Annual_Allocation Count_Weekends Active ) ) ) menu ( header ( Edit Duplicate Delete ) ) )
+		}
+	}
+	menu
+	{
+	    space Leave_Management
+	    {
+	        displayname = "Leave Management"
+	        icon = "business-briefcase-24"
+	        section Dashboard_Section
+	        {
+	            displayname = "Dashboard"
+	            icon = "business-chart-bar-33"
+	            page Leave_Dashboard { icon = "business-chart-pie-36" }
+	        }
+	        section My_Leave_Section
+	        {
+	            displayname = "My Leave"
+	            icon = "travel-bag"
+	            form Leave_Requests { icon = "files-add" }
+	            report My_Leave_Requests { icon = "files-single-content-03" }
+	            report My_Leave_Balances { icon = "business-coins" }
+	        }
+	        section Manager_Review_Section
+	        {
+	            displayname = "Manager Review"
+	            icon = "users-single-body"
+	            report Manager_Review_Queue { icon = "files-check" }
+	            report Team_Leave_Balances { icon = "users-multiple-19" }
+	        }
+	        section HR_Administration_Section
+	        {
+	            displayname = "HR Administration"
+	            icon = "business-briefcase-24"
+	            form Employees { icon = "users-single-body" }
+	            report All_Employees { icon = "users-multiple-11" }
+	            form Leave_Types { icon = "files-single-content-03" }
+	            report All_Leave_Types { icon = "files-paper" }
+	            form Leave_Balances { icon = "business-coins" }
+	            report All_Leave_Balances { icon = "business-chart-bar-33" }
+	            report All_Leave_Requests { icon = "files-folder-14" }
+	            report HR_Processing_Queue { icon = "ui-2-hourglass" }
+	            report Leave_Request_Board { icon = "business-board-30" }
+	            form Audit_Log { icon = "files-archive-3d-content" }
+	            report Leave_Audit_Log { icon = "files-search" }
+	        }
+	        section Calendar_Section
+	        {
+	            displayname = "Calendar"
+	            icon = "business-agenda"
+	            report Approved_Leave_Calendar { icon = "business-agenda" }
+	        }
+	        section SharedAnalytics_Section
+	        {
+	            type = shared_user_report_section
+	            displayname = "Reports"
+	            icon = "business-chart-bar-33"
+	        }
+	    }
+	    preference
+	    {
+	        icon
+	        {
+	            style = outline
+	            show = {space,section,component}
+	        }
+	    }
+	}
+	customize
+	{
+	    layout
+	    {
+	        theme = "theme_2"
+	        variant = "variant_2"
+	    }
+	    font = "lato"
+	    color options
+	    {
+	        name = "Leave Blue Teal"
+	        brand color = "#0F766E"
+	        type = "custom"
+	        dark mode color = "#115E59"
+	    }
+	    logo
+	    {
+	        preference = "app_icon"
+	        placement = "left"
+	    }
+	}
+	}
+}

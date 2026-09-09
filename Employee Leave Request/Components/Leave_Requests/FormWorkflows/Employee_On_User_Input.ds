@@ -1,0 +1,25 @@
+Employee_On_User_Input as "Set Assigned Manager"
+{
+    type = form
+    form = Leave_Requests
+    record event = on add or edit
+
+    on user input of Employee
+    {
+        actions
+        {
+            custom deluge script
+            (
+                input.Assigned_Manager = null;
+                if (input.Employee != null)
+                {
+                    employee_record = Employees[ID == input.Employee];
+                    if (employee_record.count() > 0)
+                    {
+                        input.Assigned_Manager = employee_record.Manager;
+                    }
+                }
+            )
+        }
+    }
+}

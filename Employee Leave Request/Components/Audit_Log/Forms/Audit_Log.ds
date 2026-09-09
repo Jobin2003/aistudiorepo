@@ -1,0 +1,103 @@
+form Audit_Log
+{
+    title
+    {
+        displayname = "Audit Log"
+        on add = "Add Audit Event"
+        on edit = "Edit Audit Event"
+    }
+
+    Audit_Details
+    (
+        type = section
+        displayname = "Audit Details"
+        row = 1
+        column = 0
+    )
+    must have Event_Time
+    (
+        type = datetime
+        displayname = "Event Time"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Actor_Email
+    (
+        type = email
+        displayname = "Actor Email"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Action
+    (
+        type = picklist
+        displayname = "Action"
+        values = {"Submitted", "Manager Approved", "Manager Rejected", "HR Completed", "Balance Updated"}
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Leave_Request
+    (
+        type = picklist
+        displayname = "Leave Request"
+        values = Leave_Requests.ID
+        displayformat = [Request_Number]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    Previous_Status
+    (
+        type = text
+        displayname = "Previous Status"
+        row = 1
+        column = 1
+        width = medium
+    )
+    New_Status
+    (
+        type = text
+        displayname = "New Status"
+        row = 1
+        column = 2
+        width = medium
+    )
+    Details
+    (
+        type = textarea
+        displayname = "Details"
+        height = 100px
+        row = 1
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Audit Event"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Audit Event"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

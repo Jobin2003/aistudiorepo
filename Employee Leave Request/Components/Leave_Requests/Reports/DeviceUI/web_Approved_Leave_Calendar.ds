@@ -1,0 +1,5 @@
+report Approved_Leave_Calendar
+{
+ quickview ( layout ( type = 1 datablock1 ( layout type = -1 fields ( Employee Leave_Type Start_Date End_Date Requested_Days Status ) ) ) menu ( header ( Edit ) record ( Edit ) ) action ( on click ( View Record ) on right click ( Edit View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Employee Leave_Type Start_Date End_Date Requested_Days Status ) ) ) menu ( header ( Edit ) ) )
+}

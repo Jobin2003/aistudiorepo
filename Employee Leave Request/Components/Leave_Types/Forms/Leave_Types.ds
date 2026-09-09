@@ -1,0 +1,92 @@
+form Leave_Types
+{
+    title
+    {
+        displayname = "Leave Types"
+        on add = "Add Leave Type"
+        on edit = "Edit Leave Type"
+    }
+    success message = "Leave type saved successfully."
+
+    Details
+    (
+        type = section
+        displayname = "Leave Type Details"
+        row = 1
+        column = 0
+    )
+    must have unique Leave_Type_Name
+    (
+        type = text
+        displayname = "Leave Type Name"
+        row = 1
+        column = 1
+        width = medium
+    )
+    Description
+    (
+        type = textarea
+        displayname = "Description"
+        height = 100px
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Default_Annual_Allocation
+    (
+        type = decimal
+        displayname = "Default Annual Allocation"
+        decimalplace = 2
+        row = 1
+        column = 1
+        width = medium
+    )
+    Count_Weekends
+    (
+        type = checkbox
+        displayname = "Count Weekends"
+        initial value = false
+        row = 1
+        column = 2
+        width = medium
+    )
+    Active
+    (
+        type = checkbox
+        displayname = "Active"
+        initial value = true
+        row = 1
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Leave Type"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Leave Type"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

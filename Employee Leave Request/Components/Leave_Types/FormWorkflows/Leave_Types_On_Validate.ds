@@ -1,0 +1,22 @@
+Leave_Types_On_Validate as "Validate Leave Type Allocation"
+{
+    type = form
+    form = Leave_Types
+    record event = on add or edit
+    description = "Ensures the default annual allocation is not negative."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if (ifnull(input.Default_Annual_Allocation, 0) < 0)
+                {
+                    alert "Default annual allocation cannot be negative.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

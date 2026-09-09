@@ -1,0 +1,27 @@
+list Manager_Review_Queue
+{
+    displayName = "Manager Review Queue"
+    show all rows from Leave_Requests [Assigned_Manager.Work_Email == zoho.loginuser && Status == "Submitted"]
+    (
+        Request_Number
+        Employee
+        Leave_Type
+        Start_Date
+        End_Date
+        Requested_Days
+        Reason
+        Supporting_Document
+        Assigned_Manager
+        Status
+    )
+    filters
+    (
+        Employee
+        Leave_Type
+        Start_Date
+    )
+    sort by
+    (
+        Start_Date ascending
+    )
+}

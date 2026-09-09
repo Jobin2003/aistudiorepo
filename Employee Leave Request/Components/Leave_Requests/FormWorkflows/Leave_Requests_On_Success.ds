@@ -1,0 +1,38 @@
+Leave_Requests_On_Success as "Notify Manager of Leave Request"
+{
+    type = form
+    form = Leave_Requests
+    record event = on add
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                manager_record = Employees[ID == input.Assigned_Manager];
+                employee_record = Employees[ID == input.Employee];
+                if (manager_record.count() > 0)
+                {
+                    sendmail
+                    (
+                        from : zoho.adminuserid
+                        to : manager_record.Work_Email
+                        subject : "Leave request awaiting your review"
+                        message : employee_record.Employee_Name + " submitted a leave request from " + input.Start_Date + " to " + input.End_Date + "."
+                    )
+                }
+                insert into Audit_Log
+                [
+                    Event_Time = zoho.currenttime
+                    Actor_Email = zoho.loginuser
+                    Action = "Submitted"
+                    Leave_Request = input.ID
+                    Previous_Status = ""
+                    New_Status = "Submitted"
+                    Details = "Leave request submitted for manager review."
+                ]
+            )
+        }
+    }
+}

@@ -1,0 +1,5 @@
+report Leave_Audit_Log
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Event_Time Actor_Email Action Leave_Request Previous_Status New_Status Details ) ) ) menu ( header ( Edit ) record ( Edit ) ) action ( on click ( View Record ) on right click ( Edit View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Event_Time Actor_Email Action Leave_Request Previous_Status New_Status Details ) ) ) menu ( header ( Edit ) ) )
+}

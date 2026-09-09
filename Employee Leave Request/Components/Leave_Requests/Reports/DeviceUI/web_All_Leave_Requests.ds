@@ -1,0 +1,5 @@
+report All_Leave_Requests
+{
+ quickview ( layout ( type = -1 datablock1 ( layout type = -1 fields ( Request_Number Employee Leave_Type Start_Date End_Date Requested_Days Assigned_Manager Status ) ) ) menu ( header ( Edit ) record ( Edit ) ) action ( on click ( View Record ) on right click ( Edit View Record ) ) )
+ detailview ( layout ( type = 1 datablock1 ( layout type = -2 fields ( Request_Number Employee Leave_Type Start_Date End_Date Requested_Days Reason Supporting_Document Assigned_Manager Status Manager_Comments Manager_Action_Date HR_Comments HR_Processed_By HR_Processed_Date Balance_Before Balance_After ) ) ) menu ( header ( Edit ) ) )
+}

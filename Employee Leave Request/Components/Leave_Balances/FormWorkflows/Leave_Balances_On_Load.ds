@@ -1,0 +1,20 @@
+Leave_Balances_On_Load as "Initialize Leave Balance"
+{
+    type = form
+    form = Leave_Balances
+    record event = on add
+
+    on load
+    {
+        actions
+        {
+            custom deluge script
+            (
+                if (input.Balance_Year == null)
+                {
+                    input.Balance_Year = zoho.currentdate.getYear();
+                }
+            )
+        }
+    }
+}

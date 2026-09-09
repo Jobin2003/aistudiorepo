@@ -1,0 +1,45 @@
+default list All_Employees
+{
+    displayName = "All Employees"
+    show all rows from Employees
+    (
+        Employee_ID
+        Employee_Name
+        Work_Email
+        Department
+        Job_Title
+        Manager
+        Employment_Status
+        Hire_Date
+        (
+            displayformat = fulldate
+        )
+    )
+    filters
+    (
+        Department
+        Employment_Status
+        Manager
+    )
+    group by
+    (
+        properties
+        (
+            display record count = true
+        )
+        Department ascending
+    )
+    sort by
+    (
+        Employee_Name ascending
+    )
+    conditional formatting
+    (
+        "Inactive Employees"
+        {
+            condition = (Employment_Status == "Inactive")
+            fields = [Employee_Name, Work_Email, Department, Employment_Status]
+            format = "background-color:#FEE2E2;color:#991B1B"
+        }
+    )
+}

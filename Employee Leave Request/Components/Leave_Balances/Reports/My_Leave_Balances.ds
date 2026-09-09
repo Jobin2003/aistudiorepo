@@ -1,0 +1,23 @@
+list My_Leave_Balances
+{
+    displayName = "My Leave Balances"
+    show all rows from Leave_Balances [Employee.Work_Email == zoho.loginuser]
+    (
+        Employee
+        Leave_Type
+        Balance_Year
+        Opening_Allocation
+        Used_Days
+        Remaining_Days
+    )
+    filters
+    (
+        Leave_Type
+        Balance_Year
+    )
+    sort by
+    (
+        Balance_Year descending
+        Leave_Type ascending
+    )
+}

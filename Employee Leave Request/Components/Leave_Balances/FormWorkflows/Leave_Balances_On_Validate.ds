@@ -1,0 +1,45 @@
+Leave_Balances_On_Validate as "Validate Leave Balance"
+{
+    type = form
+    form = Leave_Balances
+    record event = on add or edit
+    description = "Prevents invalid, overused, or duplicate annual leave balances."
+
+    on validate
+    {
+        actions
+        {
+            custom deluge script
+            (
+                employee_record = Employees[ID == input.Employee];
+                input.Manager_Email = null;
+                if (employee_record.count() > 0 && employee_record.Manager != null)
+                {
+                    manager_record = Employees[ID == employee_record.Manager];
+                    if (manager_record.count() > 0)
+                    {
+                        input.Manager_Email = manager_record.Work_Email;
+                    }
+                }
+                allocation = ifnull(input.Opening_Allocation, 0);
+                used = ifnull(input.Used_Days, 0);
+                if (allocation < 0 || used < 0)
+                {
+                    alert "Allocation and used days cannot be negative.";
+                    cancel submit;
+                }
+                if (used > allocation)
+                {
+                    alert "Used days cannot exceed the opening allocation.";
+                    cancel submit;
+                }
+                duplicates = Leave_Balances[Employee == input.Employee && Leave_Type == input.Leave_Type && Balance_Year == input.Balance_Year && ID != input.ID];
+                if (duplicates.count() > 0)
+                {
+                    alert "A balance already exists for this employee, leave type, and year.";
+                    cancel submit;
+                }
+            )
+        }
+    }
+}

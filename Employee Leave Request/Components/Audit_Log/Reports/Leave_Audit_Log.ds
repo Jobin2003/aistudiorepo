@@ -1,0 +1,25 @@
+default list Leave_Audit_Log
+{
+    displayName = "Leave Audit Log"
+    show all rows from Audit_Log
+    (
+        Event_Time
+        Actor_Email
+        Action
+        Leave_Request
+        Previous_Status
+        New_Status
+        Details
+    )
+    filters
+    (
+        Action
+        Leave_Request
+        Actor_Email
+        Event_Time
+    )
+    sort by
+    (
+        Event_Time descending
+    )
+}

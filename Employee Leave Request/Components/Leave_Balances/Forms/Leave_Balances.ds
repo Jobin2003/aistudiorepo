@@ -1,0 +1,115 @@
+form Leave_Balances
+{
+    title
+    {
+        displayname = "Leave Balances"
+        on add = "Add Leave Balance"
+        on edit = "Edit Leave Balance"
+    }
+    success message = "Leave balance saved successfully."
+
+    Balance_Details
+    (
+        type = section
+        displayname = "Balance Details"
+        row = 1
+        column = 0
+    )
+    must have Employee
+    (
+        type = picklist
+        displayname = "Employee"
+        values = Employees.ID
+        displayformat = [Employee_Name.first_name]
+        searchable = true
+        row = 1
+        column = 1
+        width = medium
+    )
+    Manager_Email
+    (
+        type = email
+        displayname = "Manager Email"
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Leave_Type
+    (
+        type = picklist
+        displayname = "Leave Type"
+        values = Leave_Types[Active == true].ID
+        displayformat = [Leave_Type_Name]
+        searchable = true
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Balance_Year
+    (
+        type = number
+        displayname = "Balance Year"
+        row = 1
+        column = 1
+        width = medium
+    )
+    must have Opening_Allocation
+    (
+        type = decimal
+        displayname = "Opening Allocation"
+        decimalplace = 2
+        row = 1
+        column = 2
+        width = medium
+    )
+    must have Used_Days
+    (
+        type = decimal
+        displayname = "Used Days"
+        decimalplace = 2
+        initial value = 0
+        row = 1
+        column = 1
+        width = medium
+    )
+    Remaining_Days
+    (
+        type = formula
+        displayname = "Remaining Days"
+        value = Opening_Allocation - Used_Days
+        visibility = true
+        row = 1
+        column = 2
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Submit
+            (
+                type = submit
+                displayname = "Save Balance"
+            )
+            Reset
+            (
+                type = reset
+                displayname = "Reset"
+            )
+        }
+        on edit
+        {
+            Update
+            (
+                type = submit
+                displayname = "Update Balance"
+            )
+            Cancel
+            (
+                type = cancel
+                displayname = "Cancel"
+            )
+        }
+    }
+}

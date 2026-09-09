@@ -1,0 +1,34 @@
+kanban Leave_Request_Board
+{
+    displayName = "Leave Request Board"
+    show all rows from Leave_Requests
+    (
+        Request_Number
+        Employee
+        Leave_Type
+        Start_Date
+        End_Date
+        Requested_Days
+        Assigned_Manager
+        Status
+    )
+    filters
+    (
+        Employee
+        Leave_Type
+        Assigned_Manager
+        Status
+    )
+    sort by
+    (
+        Start_Date descending
+    )
+    options
+    (
+        display field = Status
+        othercolumn = "Other"
+        filter type = manual
+        sort order = custom
+        record count = enable
+    )
+}

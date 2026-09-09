@@ -1,0 +1,65 @@
+"Manager"
+{
+    name = "Manager"
+    type = Users_Permissions
+    permissions = { Chat:false, Predefined:false, ApiAccess:false, PIIAccess:true, ePHIAccess:false }
+    description = "Managers review assigned employee leave requests and view team leave."
+    ModulePermissions
+    {
+        Employees
+        {
+            enabled = View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                All_Employees={"View"}
+            }
+        }
+        Leave_Balances
+        {
+            enabled = View,Search,Tab
+            allFieldsVisible = true
+            ReportPermissions
+            {
+                My_Leave_Balances={"View"}
+                Team_Leave_Balances={"View"}
+            }
+        }
+        Leave_Requests
+        {
+            enabled = Create,View,Edit,Search,Tab
+            allFieldsVisible = false
+            ReportPermissions
+            {
+                My_Leave_Requests={"View"}
+                Manager_Review_Queue={"View","Edit"}
+                Approved_Leave_Calendar={"View"}
+            }
+            FieldPermissions
+            {
+                Request_Number{visibility:true,readonly:true}
+                Employee{visibility:true,readonly:true}
+                Leave_Type{visibility:true,readonly:false}
+                Start_Date{visibility:true,readonly:false}
+                End_Date{visibility:true,readonly:false}
+                Requested_Days{visibility:true,readonly:true}
+                Reason{visibility:true,readonly:false}
+                Supporting_Document{visibility:true,readonly:false}
+                Assigned_Manager{visibility:true,readonly:true}
+                Status{visibility:true,readonly:true}
+                Manager_Comments{visibility:true,readonly:true}
+                Manager_Action_Date{visibility:true,readonly:true}
+                HR_Comments{visibility:true,readonly:true}
+                HR_Processed_By{visibility:false}
+                HR_Processed_Date{visibility:true,readonly:true}
+                Balance_Before{visibility:true,readonly:true}
+                Balance_After{visibility:true,readonly:true}
+            }
+        }
+        Leave_Dashboard
+        {
+            enabled = tab
+        }
+    }
+}
+
