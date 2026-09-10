@@ -1,0 +1,490 @@
+Seed_Data_On_Success as "Load BRD Sample Data"
+{
+    type = form
+    form = Seed_Data
+    record event = on add
+
+    on success
+    {
+        actions
+        {
+            custom deluge script
+            (
+                /* ---- Guard: skip if data already loaded ---- */
+                existing = Spend_Request[ID != 0].count();
+                if(existing > 0) { return; }
+
+                /* ======================================================
+                   EMPLOYEE DIRECTORY (6 employees)
+                   Correct mapping per BRD:
+                   Carlos Medina   - Production
+                   Wei Zhang       - Maintenance & Utilities
+                   Amara Okafor   - Quality Assurance
+                   Elena Petrova  - Procurement & Stores
+                   Daniel Cohen   - IT & Systems
+                   Priya Nair     - HR & Admin
+                ====================================================== */
+                insert into Employee_Directory
+                [
+                    Employee_Name = "Carlos Medina"
+                    Department = "Production"
+                    Requester_ID = "EMP-001"
+                    Reporting_Manager = "Jason Miller"
+                    Department_Head = "Henrik Larsson"
+                ];
+                insert into Employee_Directory
+                [
+                    Employee_Name = "Wei Zhang"
+                    Department = "Maintenance & Utilities"
+                    Requester_ID = "EMP-002"
+                    Reporting_Manager = "Fatima Al-Sayed"
+                    Department_Head = "Aisha Bello"
+                ];
+                insert into Employee_Directory
+                [
+                    Employee_Name = "Amara Okafor"
+                    Department = "Quality Assurance"
+                    Requester_ID = "EMP-003"
+                    Reporting_Manager = "Marco Rossi"
+                    Department_Head = "Takeshi Yamamoto"
+                ];
+                insert into Employee_Directory
+                [
+                    Employee_Name = "Elena Petrova"
+                    Department = "Procurement & Stores"
+                    Requester_ID = "EMP-004"
+                    Reporting_Manager = "Grace Kim"
+                    Department_Head = "Isabella Fischer"
+                ];
+                insert into Employee_Directory
+                [
+                    Employee_Name = "Daniel Cohen"
+                    Department = "IT & Systems"
+                    Requester_ID = "EMP-005"
+                    Reporting_Manager = "Liam O'Connor"
+                    Department_Head = "Noah Bergstrom"
+                ];
+                insert into Employee_Directory
+                [
+                    Employee_Name = "Priya Nair"
+                    Department = "HR & Admin"
+                    Requester_ID = "EMP-006"
+                    Reporting_Manager = "Sofia Martins"
+                    Department_Head = "Chidi Eze"
+                ];
+
+                /* ======================================================
+                   REQUEST CATALOG (18 items - 3 per department)
+                ====================================================== */
+                /* Production */
+                insert into Request_Catalog [ Department = "Production" Item_Description = "Safety Gloves Bulk Order" Catalog_Cost = 450 ];
+                insert into Request_Catalog [ Department = "Production" Item_Description = "CNC Tooling Set" Catalog_Cost = 12000 ];
+                insert into Request_Catalog [ Department = "Production" Item_Description = "Industrial Conveyor Belt Replacement" Catalog_Cost = 85000 ];
+                /* Maintenance & Utilities */
+                insert into Request_Catalog [ Department = "Maintenance & Utilities" Item_Description = "HVAC Filter Replacement" Catalog_Cost = 600 ];
+                insert into Request_Catalog [ Department = "Maintenance & Utilities" Item_Description = "Hydraulic Press Repair Kit" Catalog_Cost = 22000 ];
+                insert into Request_Catalog [ Department = "Maintenance & Utilities" Item_Description = "Generator Overhaul" Catalog_Cost = 95000 ];
+                /* Quality Assurance */
+                insert into Request_Catalog [ Department = "Quality Assurance" Item_Description = "Lab Reagents Supply" Catalog_Cost = 800 ];
+                insert into Request_Catalog [ Department = "Quality Assurance" Item_Description = "Calibration Equipment" Catalog_Cost = 9500 ];
+                insert into Request_Catalog [ Department = "Quality Assurance" Item_Description = "Inspection Microscope" Catalog_Cost = 62000 ];
+                /* Procurement & Stores */
+                insert into Request_Catalog [ Department = "Procurement & Stores" Item_Description = "Bulk Packaging Materials" Catalog_Cost = 350 ];
+                insert into Request_Catalog [ Department = "Procurement & Stores" Item_Description = "Pallet Jack" Catalog_Cost = 2800 ];
+                insert into Request_Catalog [ Department = "Procurement & Stores" Item_Description = "Warehouse Shelving Units" Catalog_Cost = 7500 ];
+                /* IT & Systems */
+                insert into Request_Catalog [ Department = "IT & Systems" Item_Description = "Laptop - Dell XPS 15" Catalog_Cost = 1850 ];
+                insert into Request_Catalog [ Department = "IT & Systems" Item_Description = "Network Switch - Cisco 24-port" Catalog_Cost = 3200 ];
+                insert into Request_Catalog [ Department = "IT & Systems" Item_Description = "Server RAM Upgrade 64GB" Catalog_Cost = 75000 ];
+                /* HR & Admin */
+                insert into Request_Catalog [ Department = "HR & Admin" Item_Description = "Ergonomic Chairs x10" Catalog_Cost = 1200 ];
+                insert into Request_Catalog [ Department = "HR & Admin" Item_Description = "Office Furniture Set" Catalog_Cost = 4200 ];
+                insert into Request_Catalog [ Department = "HR & Admin" Item_Description = "Training Room AV System" Catalog_Cost = 55000 ];
+
+                /* ======================================================
+                   SPEND REQUESTS (18 BRD records)
+
+                   Status distribution:
+                   Auto_Approved  (4): BRQ-0301 to 0304 (cost <= $1,000)
+                   Pending_RM     (2): BRQ-0305, 0306
+                   Pending_Dept_Head (2): BRQ-0307, 0308 (3-Person tier, RM approved)
+                   Pending_Finance   (2): BRQ-0309, 0310 (RM approved)
+                   On_Hold        (2): BRQ-0311, 0312
+                   Approved       (4): BRQ-0313 to 0316
+                   Rejected       (2): BRQ-0317, 0318
+                ====================================================== */
+
+                /* ---- AUTO-APPROVED (4) ---- */
+                insert into Spend_Request
+                [
+                    Requester_Name = "Carlos Medina"
+                    Department = "Production"
+                    Requester_ID = "EMP-001"
+                    Reporting_Manager_Name = "Jason Miller"
+                    Department_Head_Name = "Henrik Larsson"
+                    Item_Description = "Safety Gloves Bulk Order"
+                    Estimated_Cost = 450
+                    Priority = "Low"
+                    Justification = "Quarterly safety stock replenishment for production floor"
+                    Request_ID = "BRQ-2026-0301"
+                    Status = "Auto_Approved"
+                    SLA_Due_Date = "01-Sep-2026"
+                    Submitted_Date = "01-Sep-2026"
+                ];
+
+                insert into Spend_Request
+                [
+                    Requester_Name = "Wei Zhang"
+                    Department = "Maintenance & Utilities"
+                    Requester_ID = "EMP-002"
+                    Reporting_Manager_Name = "Fatima Al-Sayed"
+                    Department_Head_Name = "Aisha Bello"
+                    Item_Description = "HVAC Filter Replacement"
+                    Estimated_Cost = 600
+                    Priority = "Low"
+                    Justification = "Monthly scheduled maintenance - filter replacement"
+                    Request_ID = "BRQ-2026-0302"
+                    Status = "Auto_Approved"
+                    SLA_Due_Date = "02-Sep-2026"
+                    Submitted_Date = "02-Sep-2026"
+                ];
+
+                insert into Spend_Request
+                [
+                    Requester_Name = "Amara Okafor"
+                    Department = "Quality Assurance"
+                    Requester_ID = "EMP-003"
+                    Reporting_Manager_Name = "Marco Rossi"
+                    Department_Head_Name = "Takeshi Yamamoto"
+                    Item_Description = "Lab Reagents Supply"
+                    Estimated_Cost = 800
+                    Priority = "Medium"
+                    Justification = "Biweekly reagent replenishment for QA lab"
+                    Request_ID = "BRQ-2026-0303"
+                    Status = "Auto_Approved"
+                    SLA_Due_Date = "03-Sep-2026"
+                    Submitted_Date = "03-Sep-2026"
+                ];
+
+                insert into Spend_Request
+                [
+                    Requester_Name = "Elena Petrova"
+                    Department = "Procurement & Stores"
+                    Requester_ID = "EMP-004"
+                    Reporting_Manager_Name = "Grace Kim"
+                    Department_Head_Name = "Isabella Fischer"
+                    Item_Description = "Bulk Packaging Materials"
+                    Estimated_Cost = 350
+                    Priority = "Low"
+                    Justification = "Shipping department restock - Q3 cycle"
+                    Request_ID = "BRQ-2026-0304"
+                    Status = "Auto_Approved"
+                    SLA_Due_Date = "04-Sep-2026"
+                    Submitted_Date = "04-Sep-2026"
+                ];
+
+                /* ---- PENDING REPORTING MANAGER (2) ---- */
+                insert into Spend_Request
+                [
+                    Requester_Name = "Daniel Cohen"
+                    Department = "IT & Systems"
+                    Requester_ID = "EMP-005"
+                    Reporting_Manager_Name = "Liam O'Connor"
+                    Department_Head_Name = "Noah Bergstrom"
+                    Item_Description = "Laptop - Dell XPS 15"
+                    Estimated_Cost = 1850
+                    Priority = "High"
+                    Justification = "Replacement for failed unit - developer team blocked on delivery"
+                    Request_ID = "BRQ-2026-0305"
+                    Status = "Pending_RM"
+                    SLA_Due_Date = "04-Nov-2026"
+                    Submitted_Date = "05-Sep-2026"
+                ];
+
+                insert into Spend_Request
+                [
+                    Requester_Name = "Priya Nair"
+                    Department = "HR & Admin"
+                    Requester_ID = "EMP-006"
+                    Reporting_Manager_Name = "Sofia Martins"
+                    Department_Head_Name = "Chidi Eze"
+                    Item_Description = "Training Room AV System"
+                    Estimated_Cost = 55000
+                    Priority = "Medium"
+                    Justification = "Upgrade for new induction programme starting Q4"
+                    Request_ID = "BRQ-2026-0306"
+                    Status = "Pending_RM"
+                    SLA_Due_Date = "05-Nov-2026"
+                    Submitted_Date = "06-Sep-2026"
+                ];
+
+                /* ---- PENDING DEPARTMENT HEAD (2) - 3-Person tier, RM already approved ---- */
+                insert into Spend_Request
+                [
+                    Requester_Name = "Carlos Medina"
+                    Department = "Production"
+                    Requester_ID = "EMP-001"
+                    Reporting_Manager_Name = "Jason Miller"
+                    Department_Head_Name = "Henrik Larsson"
+                    Item_Description = "Industrial Conveyor Belt Replacement"
+                    Estimated_Cost = 85000
+                    Priority = "High"
+                    Justification = "Belt showing critical wear - line stoppage risk within 2 weeks"
+                    Request_ID = "BRQ-2026-0307"
+                    Status = "Pending_Dept_Head"
+                    SLA_Due_Date = "06-Nov-2026"
+                    Submitted_Date = "07-Sep-2026"
+                ];
+
+                insert into Spend_Request
+                [
+                    Requester_Name = "Wei Zhang"
+                    Department = "Maintenance & Utilities"
+                    Requester_ID = "EMP-002"
+                    Reporting_Manager_Name = "Fatima Al-Sayed"
+                    Department_Head_Name = "Aisha Bello"
+                    Item_Description = "Generator Overhaul"
+                    Estimated_Cost = 95000
+                    Priority = "High"
+                    Justification = "Backup generator failed load test - plant safety risk"
+                    Request_ID = "BRQ-2026-0308"
+                    Status = "Pending_Dept_Head"
+                    SLA_Due_Date = "07-Nov-2026"
+                    Submitted_Date = "08-Sep-2026"
+                ];
+
+                /* ---- PENDING FINANCE (2) - RM approved, awaiting Finance Controller ---- */
+                insert into Spend_Request
+                [
+                    Requester_Name = "Amara Okafor"
+                    Department = "Quality Assurance"
+                    Requester_ID = "EMP-003"
+                    Reporting_Manager_Name = "Marco Rossi"
+                    Department_Head_Name = "Takeshi Yamamoto"
+                    Item_Description = "Calibration Equipment"
+                    Estimated_Cost = 9500
+                    Priority = "Medium"
+                    Justification = "ISO audit preparation - mandatory recalibration cycle"
+                    Request_ID = "BRQ-2026-0309"
+                    Status = "Pending_Finance"
+                    SLA_Due_Date = "08-Nov-2026"
+                    Submitted_Date = "09-Sep-2026"
+                ];
+
+                insert into Spend_Request
+                [
+                    Requester_Name = "Elena Petrova"
+                    Department = "Procurement & Stores"
+                    Requester_ID = "EMP-004"
+                    Reporting_Manager_Name = "Grace Kim"
+                    Department_Head_Name = "Isabella Fischer"
+                    Item_Description = "Pallet Jack"
+                    Estimated_Cost = 2800
+                    Priority = "Medium"
+                    Justification = "Forklift out for extended repairs - interim solution needed"
+                    Request_ID = "BRQ-2026-0310"
+                    Status = "Pending_Finance"
+                    SLA_Due_Date = "09-Nov-2026"
+                    Submitted_Date = "10-Sep-2026"
+                ];
+
+                /* ---- ON HOLD (2) ---- */
+                insert into Spend_Request
+                [
+                    Requester_Name = "Daniel Cohen"
+                    Department = "IT & Systems"
+                    Requester_ID = "EMP-005"
+                    Reporting_Manager_Name = "Liam O'Connor"
+                    Department_Head_Name = "Noah Bergstrom"
+                    Item_Description = "Network Switch - Cisco 24-port"
+                    Estimated_Cost = 3200
+                    Priority = "Medium"
+                    Justification = "Network expansion for Plant 3 east wing"
+                    Request_ID = "BRQ-2026-0311"
+                    Status = "On_Hold"
+                    SLA_Due_Date = "10-Nov-2026"
+                    Submitted_Date = "11-Sep-2026"
+                ];
+
+                insert into Spend_Request
+                [
+                    Requester_Name = "Amara Okafor"
+                    Department = "Quality Assurance"
+                    Requester_ID = "EMP-003"
+                    Reporting_Manager_Name = "Marco Rossi"
+                    Department_Head_Name = "Takeshi Yamamoto"
+                    Item_Description = "Inspection Microscope"
+                    Estimated_Cost = 62000
+                    Priority = "Medium"
+                    Justification = "Enhance micropart inspection capability for new product line"
+                    Request_ID = "BRQ-2026-0312"
+                    Status = "On_Hold"
+                    SLA_Due_Date = "11-Nov-2026"
+                    Submitted_Date = "12-Sep-2026"
+                ];
+
+                /* ---- APPROVED (4) ---- */
+                insert into Spend_Request
+                [
+                    Requester_Name = "Carlos Medina"
+                    Department = "Production"
+                    Requester_ID = "EMP-001"
+                    Reporting_Manager_Name = "Jason Miller"
+                    Department_Head_Name = "Henrik Larsson"
+                    Item_Description = "CNC Tooling Set"
+                    Estimated_Cost = 12000
+                    Priority = "High"
+                    Justification = "Current tools worn beyond tolerance limits - production quality at risk"
+                    Request_ID = "BRQ-2026-0313"
+                    Status = "Approved"
+                    SLA_Due_Date = "12-Nov-2026"
+                    Submitted_Date = "01-Sep-2026"
+                ];
+
+                insert into Spend_Request
+                [
+                    Requester_Name = "Wei Zhang"
+                    Department = "Maintenance & Utilities"
+                    Requester_ID = "EMP-002"
+                    Reporting_Manager_Name = "Fatima Al-Sayed"
+                    Department_Head_Name = "Aisha Bello"
+                    Item_Description = "Hydraulic Press Repair Kit"
+                    Estimated_Cost = 22000
+                    Priority = "High"
+                    Justification = "Press 3 offline - direct production line impact"
+                    Request_ID = "BRQ-2026-0314"
+                    Status = "Approved"
+                    SLA_Due_Date = "12-Nov-2026"
+                    Submitted_Date = "02-Sep-2026"
+                ];
+
+                insert into Spend_Request
+                [
+                    Requester_Name = "Elena Petrova"
+                    Department = "Procurement & Stores"
+                    Requester_ID = "EMP-004"
+                    Reporting_Manager_Name = "Grace Kim"
+                    Department_Head_Name = "Isabella Fischer"
+                    Item_Description = "Warehouse Shelving Units"
+                    Estimated_Cost = 7500
+                    Priority = "Medium"
+                    Justification = "Capacity expansion to support 30% more SKUs in Q4"
+                    Request_ID = "BRQ-2026-0315"
+                    Status = "Approved"
+                    SLA_Due_Date = "12-Nov-2026"
+                    Submitted_Date = "03-Sep-2026"
+                ];
+
+                insert into Spend_Request
+                [
+                    Requester_Name = "Priya Nair"
+                    Department = "HR & Admin"
+                    Requester_ID = "EMP-006"
+                    Reporting_Manager_Name = "Sofia Martins"
+                    Department_Head_Name = "Chidi Eze"
+                    Item_Description = "Office Furniture Set"
+                    Estimated_Cost = 4200
+                    Priority = "Low"
+                    Justification = "New joiners onboarding - 4 desks and chairs required"
+                    Request_ID = "BRQ-2026-0316"
+                    Status = "Approved"
+                    SLA_Due_Date = "12-Nov-2026"
+                    Submitted_Date = "04-Sep-2026"
+                ];
+
+                /* ---- REJECTED (2) ---- */
+                insert into Spend_Request
+                [
+                    Requester_Name = "Daniel Cohen"
+                    Department = "IT & Systems"
+                    Requester_ID = "EMP-005"
+                    Reporting_Manager_Name = "Liam O'Connor"
+                    Department_Head_Name = "Noah Bergstrom"
+                    Item_Description = "Server RAM Upgrade 64GB"
+                    Estimated_Cost = 75000
+                    Priority = "High"
+                    Justification = "Performance upgrade for analytics server - Q3 reporting bottleneck"
+                    Request_ID = "BRQ-2026-0317"
+                    Status = "Rejected"
+                    SLA_Due_Date = "12-Nov-2026"
+                    Submitted_Date = "05-Sep-2026"
+                ];
+
+                insert into Spend_Request
+                [
+                    Requester_Name = "Priya Nair"
+                    Department = "HR & Admin"
+                    Requester_ID = "EMP-006"
+                    Reporting_Manager_Name = "Sofia Martins"
+                    Department_Head_Name = "Chidi Eze"
+                    Item_Description = "Ergonomic Chairs x10"
+                    Estimated_Cost = 1200
+                    Priority = "Low"
+                    Justification = "Ergonomics audit recommendation - 10 workstations flagged"
+                    Request_ID = "BRQ-2026-0318"
+                    Status = "Rejected"
+                    SLA_Due_Date = "12-Nov-2026"
+                    Submitted_Date = "06-Sep-2026"
+                ];
+
+                /* ======================================================
+                   APPROVAL LOG (complete decision trail)
+                ====================================================== */
+                /* Auto-approved records */
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0301" Stage = "System" Approver_Name = "System" Decision = "Auto-Approved" Decision_Timestamp = "01-Sep-2026 09:00:00" Comments = "Auto-approved: amount under $1,000 threshold" ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0302" Stage = "System" Approver_Name = "System" Decision = "Auto-Approved" Decision_Timestamp = "02-Sep-2026 09:00:00" Comments = "Auto-approved: amount under $1,000 threshold" ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0303" Stage = "System" Approver_Name = "System" Decision = "Auto-Approved" Decision_Timestamp = "03-Sep-2026 09:15:00" Comments = "Auto-approved: amount under $1,000 threshold" ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0304" Stage = "System" Approver_Name = "System" Decision = "Auto-Approved" Decision_Timestamp = "04-Sep-2026 09:00:00" Comments = "Auto-approved: amount under $1,000 threshold" ];
+
+                /* Pending RM - only submission entries */
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0305" Stage = "System" Approver_Name = "Daniel Cohen" Decision = "Submitted" Decision_Timestamp = "05-Sep-2026 10:30:00" Comments = "Request submitted by Daniel Cohen from IT & Systems" ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0306" Stage = "System" Approver_Name = "Priya Nair" Decision = "Submitted" Decision_Timestamp = "06-Sep-2026 11:00:00" Comments = "Request submitted by Priya Nair from HR & Admin" ];
+
+                /* Pending Dept Head - submission + RM approval */
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0307" Stage = "System" Approver_Name = "Carlos Medina" Decision = "Submitted" Decision_Timestamp = "07-Sep-2026 09:00:00" Comments = "Request submitted by Carlos Medina from Production" ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0307" Stage = "Reporting Manager" Approver_Name = "Jason Miller" Decision = "Approved" Decision_Timestamp = "08-Sep-2026 10:00:00" Comments = "Belt wear confirmed - urgent. Escalating to Department Head." ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0308" Stage = "System" Approver_Name = "Wei Zhang" Decision = "Submitted" Decision_Timestamp = "08-Sep-2026 09:00:00" Comments = "Request submitted by Wei Zhang from Maintenance & Utilities" ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0308" Stage = "Reporting Manager" Approver_Name = "Fatima Al-Sayed" Decision = "Approved" Decision_Timestamp = "09-Sep-2026 09:30:00" Comments = "Safety risk confirmed by site inspection. Escalating to Department Head." ];
+
+                /* Pending Finance - submission + RM approval (2-Person tier) */
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0309" Stage = "System" Approver_Name = "Amara Okafor" Decision = "Submitted" Decision_Timestamp = "09-Sep-2026 10:00:00" Comments = "Request submitted by Amara Okafor from Quality Assurance" ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0309" Stage = "Reporting Manager" Approver_Name = "Marco Rossi" Decision = "Approved" Decision_Timestamp = "10-Sep-2026 09:00:00" Comments = "ISO audit mandatory requirement. Approved and routed to Finance." ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0310" Stage = "System" Approver_Name = "Elena Petrova" Decision = "Submitted" Decision_Timestamp = "10-Sep-2026 11:00:00" Comments = "Request submitted by Elena Petrova from Procurement & Stores" ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0310" Stage = "Reporting Manager" Approver_Name = "Grace Kim" Decision = "Approved" Decision_Timestamp = "11-Sep-2026 09:00:00" Comments = "Interim solution required - approved and routed to Finance." ];
+
+                /* On Hold - submission + hold action */
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0311" Stage = "System" Approver_Name = "Daniel Cohen" Decision = "Submitted" Decision_Timestamp = "11-Sep-2026 10:00:00" Comments = "Request submitted by Daniel Cohen from IT & Systems" ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0311" Stage = "Reporting Manager" Approver_Name = "Liam O'Connor" Decision = "On Hold" Decision_Timestamp = "12-Sep-2026 14:00:00" Comments = "Pending network topology review before procurement. Placed on hold." ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0312" Stage = "System" Approver_Name = "Amara Okafor" Decision = "Submitted" Decision_Timestamp = "12-Sep-2026 10:00:00" Comments = "Request submitted by Amara Okafor from Quality Assurance" ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0312" Stage = "Reporting Manager" Approver_Name = "Marco Rossi" Decision = "On Hold" Decision_Timestamp = "13-Sep-2026 11:00:00" Comments = "Awaiting Q4 capex allocation confirmation before proceeding." ];
+
+                /* Approved - full decision trail */
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0313" Stage = "System" Approver_Name = "Carlos Medina" Decision = "Submitted" Decision_Timestamp = "01-Sep-2026 10:00:00" Comments = "Request submitted by Carlos Medina from Production" ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0313" Stage = "Reporting Manager" Approver_Name = "Jason Miller" Decision = "Approved" Decision_Timestamp = "02-Sep-2026 09:30:00" Comments = "Tool wear confirmed by QA inspection report. Approved." ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0313" Stage = "Finance Controller" Approver_Name = "Frank Harris" Decision = "Approved" Decision_Timestamp = "03-Sep-2026 11:00:00" Comments = "Within budget allocation. Final approval granted." ];
+
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0314" Stage = "System" Approver_Name = "Wei Zhang" Decision = "Submitted" Decision_Timestamp = "02-Sep-2026 09:00:00" Comments = "Request submitted by Wei Zhang from Maintenance & Utilities" ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0314" Stage = "Reporting Manager" Approver_Name = "Fatima Al-Sayed" Decision = "Approved" Decision_Timestamp = "03-Sep-2026 10:00:00" Comments = "Press 3 downtime confirmed - production impact critical. Approved." ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0314" Stage = "Finance Controller" Approver_Name = "Frank Harris" Decision = "Approved" Decision_Timestamp = "04-Sep-2026 09:00:00" Comments = "Emergency maintenance expenditure approved within limits." ];
+
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0315" Stage = "System" Approver_Name = "Elena Petrova" Decision = "Submitted" Decision_Timestamp = "03-Sep-2026 10:00:00" Comments = "Request submitted by Elena Petrova from Procurement & Stores" ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0315" Stage = "Reporting Manager" Approver_Name = "Grace Kim" Decision = "Approved" Decision_Timestamp = "04-Sep-2026 09:30:00" Comments = "Q4 capacity plan confirmed. Approved." ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0315" Stage = "Finance Controller" Approver_Name = "Frank Harris" Decision = "Approved" Decision_Timestamp = "05-Sep-2026 10:00:00" Comments = "Approved - within warehouse capex budget." ];
+
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0316" Stage = "System" Approver_Name = "Priya Nair" Decision = "Submitted" Decision_Timestamp = "04-Sep-2026 11:00:00" Comments = "Request submitted by Priya Nair from HR & Admin" ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0316" Stage = "Reporting Manager" Approver_Name = "Sofia Martins" Decision = "Approved" Decision_Timestamp = "05-Sep-2026 09:00:00" Comments = "New joiners require workstations. Approved." ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0316" Stage = "Finance Controller" Approver_Name = "Frank Harris" Decision = "Approved" Decision_Timestamp = "06-Sep-2026 10:00:00" Comments = "Within HR budget. Approved." ];
+
+                /* Rejected - chain up to rejection point */
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0317" Stage = "System" Approver_Name = "Daniel Cohen" Decision = "Submitted" Decision_Timestamp = "05-Sep-2026 09:00:00" Comments = "Request submitted by Daniel Cohen from IT & Systems" ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0317" Stage = "Reporting Manager" Approver_Name = "Liam O'Connor" Decision = "Approved" Decision_Timestamp = "06-Sep-2026 10:00:00" Comments = "Performance bottleneck confirmed. Escalating to Department Head." ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0317" Stage = "Department Head" Approver_Name = "Noah Bergstrom" Decision = "Approved" Decision_Timestamp = "07-Sep-2026 09:30:00" Comments = "Technical need acknowledged. Escalating to Finance." ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0317" Stage = "Finance Controller" Approver_Name = "Frank Harris" Decision = "Rejected" Decision_Timestamp = "08-Sep-2026 11:00:00" Comments = "Over Q3 IT capex ceiling. Resubmit in Q4 budget cycle." ];
+
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0318" Stage = "System" Approver_Name = "Priya Nair" Decision = "Submitted" Decision_Timestamp = "06-Sep-2026 10:00:00" Comments = "Request submitted by Priya Nair from HR & Admin" ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0318" Stage = "Reporting Manager" Approver_Name = "Sofia Martins" Decision = "Approved" Decision_Timestamp = "07-Sep-2026 09:00:00" Comments = "Ergonomics audit requirement noted. Escalating to Department Head." ];
+                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0318" Stage = "Department Head" Approver_Name = "Chidi Eze" Decision = "Rejected" Decision_Timestamp = "08-Sep-2026 10:00:00" Comments = "Deferred - existing chairs sufficient per latest ergonomics re-review." ];
+            )
+        }
+    }
+}

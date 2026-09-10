@@ -466,43 +466,5 @@ Spend_Request_Blueprint as "Spend Request Approval Lifecycle"
             }
         }
 
-        Resubmit_From_Hold as "Resubmit from Hold"
-        {
-            type = normal
-            from stage = "On_Hold"
-            to stage   = "Submitted"
-
-            before
-            {
-                transition owner
-                (
-                    permissions = {"Requester"}
-                )
-            }
-
-            after
-            {
-                actions
-                {
-                    custom deluge script
-                    (
-                        update Spend_Request[ID == input.ID]
-                        [
-                            Status = "Submitted"
-                        ];
-                        req_id_val = input.Request_ID;
-                        insert into Approval_Log
-                        [
-                            Request_ID_Ref = req_id_val
-                            Stage = "System"
-                            Approver_Name = zoho.loginuserid
-                            Decision = "Submitted"
-                            Decision_Timestamp = zoho.currenttime
-                            Comments = "Request resubmitted by requester from On Hold state."
-                        ];
-                    )
-                }
-            }
-        }
     }
 }

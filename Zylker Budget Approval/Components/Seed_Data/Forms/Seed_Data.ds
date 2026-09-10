@@ -1,0 +1,33 @@
+form Seed_Data
+{
+    displayname = "Load Sample Data"
+    success message = "BRD sample data loaded successfully. Visit Approvals and Dashboard to see it."
+
+    Seed_Section
+    (
+        type = section
+        displayname = "Load Sample Data"
+        row = 1
+        column = 0
+    )
+    Confirm_Load
+    (
+        type = checkbox
+        displayname = "Confirm: Load 18 BRD sample records"
+        row = 1
+        column = 1
+        width = medium
+    )
+
+    actions
+    {
+        on add
+        {
+            Load_Data
+            (
+                type = submit
+                displayname = "Load Sample Data"
+            )
+        }
+    }
+}

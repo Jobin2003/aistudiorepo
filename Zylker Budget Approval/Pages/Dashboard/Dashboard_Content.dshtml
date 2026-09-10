@@ -7,14 +7,10 @@
     min-height: 100vh;
     font-family: 'Lato', sans-serif;
   }
-
-  /* PAGE HEADER */
   .dbc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
   .dbc-title  { font-size: 22px; font-weight: 700; color: #111827; margin: 0 0 4px 0; }
   .dbc-sub    { font-size: 13px; color: #6B7280; margin: 0; }
   .dbc-period { background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 20px; padding: 6px 16px; font-size: 12px; color: #1D4ED8; font-weight: 600; white-space: nowrap; margin-top: 4px; }
-
-  /* LOAD BANNER */
   .dbc-banner {
     background: #EFF6FF; border: 1.5px solid #BFDBFE; border-radius: 10px;
     padding: 18px 24px; display: flex; align-items: center; justify-content: space-between;
@@ -28,27 +24,17 @@
     border-radius: 6px; text-decoration: none; white-space: nowrap;
     display: inline-flex; align-items: center; gap: 6px;
   }
-
-  /* STAT ROW */
   .dbc-stat-row { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
   .dbc-stat {
     flex: 1; min-width: 150px; background: #FFFFFF; border-radius: 10px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 20px 20px 16px 20px;
     border-left: 4px solid #E5E7EB; position: relative; overflow: hidden;
   }
-  .dbc-stat-val   { font-size: 22px; font-weight: 700; color: #111827; display: block; line-height: 1.2; }
-  .dbc-stat-cnt   { font-size: 12px; color: #6B7280; display: block; margin-top: 2px; }
-  .dbc-stat-lbl   { font-size: 11px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 10px; display: block; }
-  .dbc-stat-tint  { position: absolute; right: -8px; bottom: -8px; font-size: 56px; opacity: 0.06; line-height: 1; }
-
-  /* ROW 2 */
+  .dbc-stat-val { font-size: 22px; font-weight: 700; color: #111827; display: block; line-height: 1.2; }
+  .dbc-stat-cnt { font-size: 12px; color: #6B7280; display: block; margin-top: 2px; }
+  .dbc-stat-lbl { font-size: 11px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 10px; display: block; }
   .dbc-row2 { display: flex; gap: 20px; margin-bottom: 24px; align-items: flex-start; flex-wrap: wrap; }
-
-  /* DONUT CARD */
-  .dbc-donut-card {
-    width: 320px; flex-shrink: 0; background: #FFFFFF;
-    border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px;
-  }
+  .dbc-donut-card { width: 320px; flex-shrink: 0; background: #FFFFFF; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px; }
   .dbc-card-title { font-size: 15px; font-weight: 700; color: #111827; margin: 0 0 18px 0; }
   .dbc-donut-wrap { position: relative; display: flex; justify-content: center; align-items: center; margin-bottom: 16px; }
   .dbc-donut-center { position: absolute; text-align: center; pointer-events: none; }
@@ -56,41 +42,24 @@
   .dbc-donut-lbl { font-size: 11px; color: #9CA3AF; display: block; }
   .dbc-legend-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
   .dbc-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-  .dbc-leg-name  { font-size: 13px; color: #374151; flex: 1; }
-  .dbc-leg-val   { font-size: 13px; font-weight: 700; color: #111827; }
+  .dbc-leg-name { font-size: 13px; color: #374151; flex: 1; }
+  .dbc-leg-val  { font-size: 13px; font-weight: 700; color: #111827; }
   .dbc-leg-count { font-size: 12px; color: #9CA3AF; margin-left: 6px; }
-
-  /* BAR CARD */
-  .dbc-bar-card {
-    flex: 1; min-width: 0; background: #FFFFFF;
-    border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px;
-  }
-  .dbc-card-sub  { font-size: 12px; color: #9CA3AF; display: block; margin-top: -14px; margin-bottom: 18px; }
-  .dbc-bar-row   { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-  .dbc-bar-dept  { font-size: 13px; color: #374151; width: 165px; flex-shrink: 0; }
+  .dbc-bar-card { flex: 1; min-width: 0; background: #FFFFFF; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px; }
+  .dbc-card-sub { font-size: 12px; color: #9CA3AF; display: block; margin-top: -14px; margin-bottom: 18px; }
+  .dbc-bar-row  { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .dbc-bar-dept { font-size: 13px; color: #374151; width: 165px; flex-shrink: 0; }
   .dbc-bar-track { flex: 1; background: #F1F5F9; border-radius: 4px; height: 26px; overflow: hidden; }
   .dbc-bar-fill  { height: 26px; border-radius: 4px; background: #2563EB; }
   .dbc-bar-val   { font-size: 12px; font-weight: 700; color: #374151; width: 80px; text-align: right; flex-shrink: 0; }
-
-  /* ROW 3 */
   .dbc-row3 { display: flex; gap: 20px; margin-bottom: 24px; align-items: flex-start; flex-wrap: wrap; }
-
-  /* FUNNEL CARD */
-  .dbc-funnel-card {
-    flex: 1; min-width: 0; background: #FFFFFF;
-    border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px;
-  }
+  .dbc-funnel-card { flex: 1; min-width: 0; background: #FFFFFF; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px; }
   .dbc-funnel-row   { display: flex; align-items: center; gap: 12px; margin-bottom: 11px; }
   .dbc-funnel-stage { font-size: 13px; color: #374151; width: 148px; flex-shrink: 0; }
   .dbc-funnel-track { flex: 1; background: #F1F5F9; border-radius: 4px; height: 24px; overflow: hidden; }
   .dbc-funnel-fill  { height: 24px; border-radius: 4px; }
   .dbc-funnel-cnt   { font-size: 12px; font-weight: 700; color: #374151; width: 28px; text-align: right; flex-shrink: 0; }
-
-  /* ESCALATION CARD */
-  .dbc-esc-card {
-    width: 360px; flex-shrink: 0; background: #FFFFFF;
-    border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px;
-  }
+  .dbc-esc-card { width: 360px; flex-shrink: 0; background: #FFFFFF; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px; }
   .dbc-esc-top  { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
   .dbc-esc-ttl  { font-size: 15px; font-weight: 700; color: #111827; margin: 0; }
   .dbc-esc-bdg  { background: #FEE2E2; color: #EF4444; border-radius: 20px; padding: 3px 10px; font-size: 12px; font-weight: 700; }
@@ -99,8 +68,6 @@
   .dbc-esc-id   { font-size: 14px; font-weight: 700; color: #111827; }
   .dbc-esc-days { font-size: 13px; font-weight: 700; color: #EF4444; }
   .dbc-esc-meta { font-size: 12px; color: #6B7280; }
-
-  /* FOOTER */
   .dbc-footer { margin-top: 8px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
   .dbc-foot-lbl { font-size: 13px; color: #374151; }
   .dbc-turn-bdg { background: #F3F4F6; border-radius: 20px; padding: 5px 14px; font-size: 13px; color: #374151; }
@@ -108,97 +75,176 @@
 </style>
 
 <%
-  /* Read all values from page variables (set in onload script in Dashboard.ds) */
-  total_requested_value = input.total_requested_value;
-  total_requests        = input.total_requests;
-  approved_value        = input.approved_value;
-  approved_count        = input.approved_count;
-  pending_value         = input.pending_value;
-  pending_count         = input.pending_count;
-  rejected_value        = input.rejected_value;
-  rejected_count        = input.rejected_count;
-  auto_count            = input.auto_count;
-  auto_value            = input.auto_value;
-  two_person_count      = input.two_person_count;
-  two_person_value      = input.two_person_value;
-  three_person_count    = input.three_person_count;
-  three_person_value    = input.three_person_value;
-  three_dash            = input.three_dash;
-  two_dash              = input.two_dash;
-  auto_dash             = input.auto_dash;
-  two_offset            = input.two_offset;
-  auto_offset           = input.auto_offset;
-  it_w = input.it_w; qa_w = input.qa_w; prod_w = input.prod_w;
-  maint_w = input.maint_w; proc_w = input.proc_w; hr_w = input.hr_w;
-  it_disp = input.it_disp; qa_disp = input.qa_disp; prod_disp = input.prod_disp;
-  maint_disp = input.maint_disp; proc_disp = input.proc_disp; hr_disp = input.hr_disp;
-  submitted_n    = input.submitted_n;
-  auto_cleared_n = input.auto_cleared_n;
-  sent_chain_n   = input.sent_chain_n;
-  pend_rm_n      = input.pend_rm_n;
-  pend_dh_n      = input.pend_dh_n;
-  pend_fin_n     = input.pend_fin_n;
-  approved_n     = input.approved_n;
-  rejected_n     = input.rejected_n;
-  submitted_w    = input.submitted_w;
-  auto_cleared_w = input.auto_cleared_w;
-  sent_chain_w   = input.sent_chain_w;
-  pend_rm_w      = input.pend_rm_w;
-  pend_dh_w      = input.pend_dh_w;
-  pend_fin_w     = input.pend_fin_w;
-  approved_w     = input.approved_w;
-  rejected_w     = input.rejected_w;
-  esc_badge      = input.esc_badge;
-  esc1_id        = input.esc1_id;
-  esc1_dept      = input.esc1_dept;
-  esc1_stage     = input.esc1_stage;
-  esc1_days      = input.esc1_days;
-  esc2_id        = input.esc2_id;
-  esc2_dept      = input.esc2_dept;
-  esc2_stage     = input.esc2_stage;
-  esc2_days      = input.esc2_days;
+  all_reqs = Spend_Request[ID != 0].count();
 
-  /* Guard nulls */
-  if(total_requested_value == null || total_requested_value == "") { total_requested_value = "$0"; }
-  if(total_requests == null || total_requests == "")               { total_requests = "0"; }
-  if(approved_value == null || approved_value == "")               { approved_value = "$0"; }
-  if(approved_count == null || approved_count == "")               { approved_count = "0"; }
-  if(pending_value == null || pending_value == "")                 { pending_value = "$0"; }
-  if(pending_count == null || pending_count == "")                 { pending_count = "0"; }
-  if(rejected_value == null || rejected_value == "")               { rejected_value = "$0"; }
-  if(rejected_count == null || rejected_count == "")               { rejected_count = "0"; }
-  if(three_dash == null || three_dash == "")   { three_dash = "0"; }
-  if(two_dash == null || two_dash == "")       { two_dash   = "0"; }
-  if(auto_dash == null || auto_dash == "")     { auto_dash  = "0"; }
-  if(two_offset == null || two_offset == "")   { two_offset = "0"; }
-  if(auto_offset == null || auto_offset == "") { auto_offset = "0"; }
-  if(esc_badge == null || esc_badge == "")     { esc_badge = "0 overdue"; }
-  if(esc1_id == null || esc1_id == "")         { esc1_id = "-"; esc1_dept = "-"; esc1_stage = "-"; esc1_days = "0"; }
-  if(esc2_id == null || esc2_id == "")         { esc2_id = "-"; esc2_dept = "-"; esc2_stage = "-"; esc2_days = "0"; }
+  if(all_reqs > 0)
+  {
+    show_banner = false;
 
-  /* Show load banner only if no data */
-  all_n_raw = total_requests;
-  show_banner = false;
-  if(all_n_raw == "0" || all_n_raw == null || all_n_raw == "") { show_banner = true; }
+    /* KPI counts */
+    total_sum   = Spend_Request[ID != 0].sum(Estimated_Cost);
+    appr_cnt    = Spend_Request[Status == "Approved" || Status == "Auto_Approved"].count();
+    approved_sum = Spend_Request[Status == "Approved" || Status == "Auto_Approved"].sum(Estimated_Cost);
+    pend_cnt    = Spend_Request[Status == "Pending_RM" || Status == "Pending_Dept_Head" || Status == "Pending_Finance"].count();
+    pending_sum = Spend_Request[Status == "Pending_RM" || Status == "Pending_Dept_Head" || Status == "Pending_Finance"].sum(Estimated_Cost);
+    rej_cnt     = Spend_Request[Status == "Rejected"].count();
+    rejected_sum = Spend_Request[Status == "Rejected"].sum(Estimated_Cost);
+
+    total_requested_value = "$" + total_sum.toLong();
+    total_requests  = "" + all_reqs;
+    approved_value  = "$" + approved_sum.toLong();
+    approved_count  = "" + appr_cnt;
+    pending_value   = "$" + pending_sum.toLong();
+    pending_count   = "" + pend_cnt;
+    rejected_value  = "$" + rejected_sum.toLong();
+    rejected_count  = "" + rej_cnt;
+
+    /* Tier breakdown */
+    auto_s  = Spend_Request[Estimated_Cost <= 1000].sum(Estimated_Cost);
+    two_s   = Spend_Request[Estimated_Cost > 1000 && Estimated_Cost <= 50000].sum(Estimated_Cost);
+    three_s = Spend_Request[Estimated_Cost > 50000].sum(Estimated_Cost);
+    auto_cnt  = Spend_Request[Estimated_Cost <= 1000].count();
+    two_cnt   = Spend_Request[Estimated_Cost > 1000 && Estimated_Cost <= 50000].count();
+    three_cnt = Spend_Request[Estimated_Cost > 50000].count();
+    auto_value  = "$" + auto_s.toLong();
+    two_value   = "$" + two_s.toLong();
+    three_value = "$" + three_s.toLong();
+    auto_count  = "" + auto_cnt;
+    two_count   = "" + two_cnt;
+    three_count = "" + three_cnt;
+
+    if(total_sum > 0)
+    {
+      three_dash  = "" + ((three_s / total_sum) * 502).toLong();
+      two_dash    = "" + ((two_s / total_sum) * 502).toLong();
+      auto_dash   = "" + ((auto_s / total_sum) * 502).toLong();
+      two_offset  = "" + (502 - three_dash.toLong()).toLong();
+      auto_offset = "" + (502 - three_dash.toLong() - two_dash.toLong()).toLong();
+    }
+    else
+    {
+      three_dash = "502"; two_dash = "0"; auto_dash = "0";
+      two_offset = "0"; auto_offset = "0";
+    }
+
+    /* Department bar chart */
+    it_pct    = Spend_Request[Department == "IT & Systems"].sum(Estimated_Cost);
+    qa_pct    = Spend_Request[Department == "Quality Assurance"].sum(Estimated_Cost);
+    prod_pct  = Spend_Request[Department == "Production"].sum(Estimated_Cost);
+    maint_pct = Spend_Request[Department == "Maintenance & Utilities"].sum(Estimated_Cost);
+    proc_pct  = Spend_Request[Department == "Procurement & Stores"].sum(Estimated_Cost);
+    hr_pct    = Spend_Request[Department == "HR & Admin"].sum(Estimated_Cost);
+    bar_max = it_pct;
+    if(qa_pct > bar_max)   { bar_max = qa_pct; }
+    if(prod_pct > bar_max) { bar_max = prod_pct; }
+    if(maint_pct > bar_max){ bar_max = maint_pct; }
+    if(proc_pct > bar_max) { bar_max = proc_pct; }
+    if(hr_pct > bar_max)   { bar_max = hr_pct; }
+    if(bar_max > 0)
+    {
+      it_w    = "" + ((it_pct / bar_max) * 100).toLong() + "%";
+      qa_w    = "" + ((qa_pct / bar_max) * 100).toLong() + "%";
+      prod_w  = "" + ((prod_pct / bar_max) * 100).toLong() + "%";
+      maint_w = "" + ((maint_pct / bar_max) * 100).toLong() + "%";
+      proc_w  = "" + ((proc_pct / bar_max) * 100).toLong() + "%";
+      hr_w    = "" + ((hr_pct / bar_max) * 100).toLong() + "%";
+    }
+    else
+    {
+      it_w = "100%"; qa_w = "93%"; prod_w = "90%"; maint_w = "77%"; proc_w = "66%"; hr_w = "49%";
+    }
+    it_disp    = "$" + it_pct.toLong();
+    qa_disp    = "$" + qa_pct.toLong();
+    prod_disp  = "$" + prod_pct.toLong();
+    maint_disp = "$" + maint_pct.toLong();
+    proc_disp  = "$" + proc_pct.toLong();
+    hr_disp    = "$" + hr_pct.toLong();
+
+    /* Funnel */
+    a_clr = Spend_Request[Estimated_Cost <= 1000].count();
+    s_chn = Spend_Request[Estimated_Cost > 1000].count();
+    p_rm  = Spend_Request[Status == "Pending_RM"].count();
+    p_dh  = Spend_Request[Status == "Pending_Dept_Head"].count();
+    p_fn  = Spend_Request[Status == "Pending_Finance"].count();
+    submitted_n    = "" + all_reqs;
+    auto_cleared_n = "" + a_clr;
+    sent_chain_n   = "" + s_chn;
+    pend_rm_n      = "" + p_rm;
+    pend_dh_n      = "" + p_dh;
+    pend_fin_n     = "" + p_fn;
+    approved_n     = "" + appr_cnt;
+    rejected_n     = "" + rej_cnt;
+    submitted_w    = "100%";
+    auto_cleared_w = "" + ((a_clr / all_reqs) * 100).toLong() + "%";
+    sent_chain_w   = "" + ((s_chn / all_reqs) * 100).toLong() + "%";
+    pend_rm_w      = "" + ((p_rm / all_reqs) * 100).toLong() + "%";
+    pend_dh_w      = "" + ((p_dh / all_reqs) * 100).toLong() + "%";
+    pend_fin_w     = "" + ((p_fn / all_reqs) * 100).toLong() + "%";
+    approved_w     = "" + ((appr_cnt / all_reqs) * 100).toLong() + "%";
+    rejected_w     = "" + ((rej_cnt / all_reqs) * 100).toLong() + "%";
+
+    /* Escalation - live overdue records */
+    overdue_recs = Spend_Request[SLA_Due_Date < zoho.currentdate && (Status == "Pending_RM" || Status == "Pending_Dept_Head" || Status == "Pending_Finance")];
+    esc_count = overdue_recs.count();
+    esc_badge = "" + esc_count + " overdue";
+    esc1_id = "-"; esc1_dept = "-"; esc1_stage = "-"; esc1_days = "0";
+    esc2_id = "-"; esc2_dept = "-"; esc2_stage = "-"; esc2_days = "0";
+    esc_idx = 0;
+    for each r in overdue_recs
+    {
+      days_val = "" + (zoho.currentdate - r.SLA_Due_Date);
+      if(esc_idx == 0)
+      {
+        esc1_id = r.Request_ID; esc1_dept = r.Department; esc1_stage = r.Status; esc1_days = days_val;
+        esc_idx = esc_idx + 1;
+      }
+      else if(esc_idx == 1)
+      {
+        esc2_id = r.Request_ID; esc2_dept = r.Department; esc2_stage = r.Status; esc2_days = days_val;
+        break;
+      }
+    }
+  }
+  else
+  {
+    /* No data yet - show banner and hardcoded BRD preview values */
+    show_banner = true;
+    total_requested_value = "$778,360"; total_requests = "18";
+    approved_value = "$113,860";   approved_count = "9";
+    pending_value  = "$519,500";   pending_count  = "6";
+    rejected_value = "$145,000";   rejected_count = "3";
+    auto_value = "$3,360";  auto_count = "6";
+    two_value  = "$141,000"; two_count  = "6";
+    three_value = "$634,000"; three_count = "6";
+    three_dash = "409"; two_dash = "91"; auto_dash = "2";
+    two_offset = "93"; auto_offset = "2";
+    it_w = "100%"; qa_w = "93%"; prod_w = "90%"; maint_w = "77%"; proc_w = "66%"; hr_w = "49%";
+    it_disp = "$163,560"; qa_disp = "$152,280"; prod_disp = "$147,350";
+    maint_disp = "$126,620"; proc_disp = "$108,340"; hr_disp = "$80,210";
+    submitted_n = "18"; auto_cleared_n = "6"; sent_chain_n = "12";
+    pend_rm_n = "2"; pend_dh_n = "2"; pend_fin_n = "2"; approved_n = "9"; rejected_n = "3";
+    submitted_w = "100%"; auto_cleared_w = "33%"; sent_chain_w = "67%";
+    pend_rm_w = "11%"; pend_dh_w = "11%"; pend_fin_w = "11%"; approved_w = "50%"; rejected_w = "17%";
+    esc_badge = "2 overdue";
+    esc1_id = "BRQ-2026-0309"; esc1_dept = "Quality Assurance"; esc1_stage = "Pending RM"; esc1_days = "10";
+    esc2_id = "BRQ-2026-0306"; esc2_dept = "Maintenance &amp; Utilities"; esc2_stage = "Pending Dept Head"; esc2_days = "5";
+  }
 %>
 
 <div class="dbc-wrap">
 
-  <!-- LOAD BANNER (only when DB empty) -->
   <% if(show_banner) { %>
   <div class="dbc-banner">
     <div>
-      <div class="dbc-banner-title">No data yet - App is empty</div>
-      <div class="dbc-banner-sub">Load all 18 BRD sample requests, 6 employees, 18 catalog items, and full approval history in one click.</div>
+      <div class="dbc-banner-title">No data yet - Load sample data to get started</div>
+      <div class="dbc-banner-sub">Loads 18 BRD spend requests, 6 employees, 18 catalog items, and a full approval log in one click. The preview below shows what the dashboard will look like.</div>
     </div>
-    <a class="dbc-load-btn" href="#Page:Dashboard?load=true">
-      <i class="zc-li-outline ui-1-upload-to-cloud" style="font-size:15px;"></i>
+    <a class="dbc-load-btn" href="#Form:Seed_Data">
       Load Sample Data
     </a>
   </div>
   <% } %>
 
-  <!-- PAGE HEADER -->
   <div class="dbc-header">
     <div>
       <h1 class="dbc-title">Spend &amp; Approval Dashboard</h1>
@@ -207,7 +253,6 @@
     <span class="dbc-period">Reporting Period: Sep 2026</span>
   </div>
 
-  <!-- STAT CARDS -->
   <div class="dbc-stat-row">
     <div class="dbc-stat" style="border-left-color:#2563EB;">
       <span class="dbc-stat-val"><%= total_requested_value %></span>
@@ -231,10 +276,7 @@
     </div>
   </div>
 
-  <!-- ROW 2: DONUT + BAR CHART -->
   <div class="dbc-row2">
-
-    <!-- DONUT -->
     <div class="dbc-donut-card">
       <h2 class="dbc-card-title">Approval Tier Breakdown</h2>
       <div class="dbc-donut-wrap">
@@ -261,22 +303,20 @@
       <div class="dbc-legend-row">
         <span class="dbc-dot" style="background:#F59E0B;"></span>
         <span class="dbc-leg-name">2-Person</span>
-        <span class="dbc-leg-val"><%= two_person_value %></span>
-        <span class="dbc-leg-count"><%= two_person_count %> req</span>
+        <span class="dbc-leg-val"><%= two_value %></span>
+        <span class="dbc-leg-count"><%= two_count %> req</span>
       </div>
       <div class="dbc-legend-row">
         <span class="dbc-dot" style="background:#2563EB;"></span>
         <span class="dbc-leg-name">3-Person</span>
-        <span class="dbc-leg-val"><%= three_person_value %></span>
-        <span class="dbc-leg-count"><%= three_person_count %> req</span>
+        <span class="dbc-leg-val"><%= three_value %></span>
+        <span class="dbc-leg-count"><%= three_count %> req</span>
       </div>
     </div>
 
-    <!-- DEPT BAR CHART -->
     <div class="dbc-bar-card">
       <h2 class="dbc-card-title">Department-Wise Spend</h2>
       <span class="dbc-card-sub">By total estimated cost (USD)</span>
-
       <div class="dbc-bar-row">
         <span class="dbc-bar-dept">IT &amp; Systems</span>
         <div class="dbc-bar-track"><div class="dbc-bar-fill" style="width:<%= it_w %>;"></div></div>
@@ -310,14 +350,10 @@
     </div>
   </div>
 
-  <!-- ROW 3: FUNNEL + ESCALATION -->
   <div class="dbc-row3">
-
-    <!-- FUNNEL -->
     <div class="dbc-funnel-card">
       <h2 class="dbc-card-title">Approval Funnel</h2>
       <span class="dbc-card-sub">Stage progression from submission to resolution</span>
-
       <div class="dbc-funnel-row">
         <span class="dbc-funnel-stage">Submitted</span>
         <div class="dbc-funnel-track"><div class="dbc-funnel-fill" style="width:<%= submitted_w %>;background:#9CA3AF;"></div></div>
@@ -360,13 +396,12 @@
       </div>
     </div>
 
-    <!-- ESCALATION LIST -->
     <div class="dbc-esc-card">
       <div class="dbc-esc-top">
         <h2 class="dbc-esc-ttl">Escalation - SLA Overdue</h2>
         <span class="dbc-esc-bdg"><%= esc_badge %></span>
       </div>
-      <% if(esc1_id != "-" && esc1_id != null && esc1_id != "") { %>
+      <% if(esc1_id != "-") { %>
       <div class="dbc-esc-item">
         <div class="dbc-esc-row">
           <span class="dbc-esc-id"><%= esc1_id %></span>
@@ -375,7 +410,7 @@
         <div class="dbc-esc-meta"><%= esc1_dept %> &middot; <%= esc1_stage %></div>
       </div>
       <% } %>
-      <% if(esc2_id != "-" && esc2_id != null && esc2_id != "") { %>
+      <% if(esc2_id != "-") { %>
       <div class="dbc-esc-item">
         <div class="dbc-esc-row">
           <span class="dbc-esc-id"><%= esc2_id %></span>
@@ -384,13 +419,12 @@
         <div class="dbc-esc-meta"><%= esc2_dept %> &middot; <%= esc2_stage %></div>
       </div>
       <% } %>
-      <% if((esc1_id == "-" || esc1_id == null || esc1_id == "") && (esc2_id == "-" || esc2_id == null || esc2_id == "")) { %>
+      <% if(esc1_id == "-" && esc2_id == "-") { %>
       <div style="font-size:13px;color:#9CA3AF;font-style:italic;padding:8px 0;">No overdue requests at this time.</div>
       <% } %>
     </div>
   </div>
 
-  <!-- FOOTER: AVG TURNAROUND -->
   <div class="dbc-footer">
     <span class="dbc-foot-lbl">Avg. Approval Turnaround</span>
     <span class="dbc-turn-bdg"><strong>2-Person:</strong> 2.4 days</span>

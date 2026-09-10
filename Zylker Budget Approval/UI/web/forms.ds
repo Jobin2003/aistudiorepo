@@ -20,4 +20,8 @@ forms
     {
         label placement = top
     }
+    form Seed_Data
+    {
+        label placement = top
+    }
 }

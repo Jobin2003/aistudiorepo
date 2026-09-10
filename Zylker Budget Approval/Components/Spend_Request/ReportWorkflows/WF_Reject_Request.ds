@@ -1,0 +1,30 @@
+WF_Reject_Request as "Reject"
+{
+    type = functions
+    form = Spend_Request
+    execution type = for each record
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                update Spend_Request[ID == input.ID]
+                [
+                    Status = "Rejected"
+                ];
+
+                insert into Approval_Log
+                [
+                    Request_ID_Ref = input.Request_ID
+                    Stage = input.Status
+                    Approver_Name = zoho.loginuser
+                    Decision = "Rejected"
+                    Decision_Timestamp = zoho.currenttime
+                    Comments = "Request rejected"
+                ];
+            )
+        }
+    }
+}

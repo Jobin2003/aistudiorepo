@@ -57,10 +57,6 @@
         {
             enabled = tab
         }
-        Approvals
-        {
-            enabled = tab
-        }
         Dashboard
         {
             enabled = tab

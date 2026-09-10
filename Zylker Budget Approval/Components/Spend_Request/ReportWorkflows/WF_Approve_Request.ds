@@ -1,0 +1,59 @@
+WF_Approve_Request as "Approve"
+{
+    type = functions
+    form = Spend_Request
+    execution type = for each record
+
+    on start
+    {
+        actions
+        {
+            on click
+            (
+                cur_status = input.Status;
+                cost_val = input.Estimated_Cost;
+
+                if(cost_val <= 1000) { tier = "Auto"; }
+                else if(cost_val <= 50000) { tier = "2-Person"; }
+                else { tier = "3-Person"; }
+
+                if(cur_status == "Pending_RM" && tier == "2-Person")
+                {
+                    new_status = "Pending_Finance";
+                }
+                else if(cur_status == "Pending_RM" && tier == "3-Person")
+                {
+                    new_status = "Pending_Dept_Head";
+                }
+                else if(cur_status == "Pending_Dept_Head")
+                {
+                    new_status = "Pending_Finance";
+                }
+                else if(cur_status == "Pending_Finance")
+                {
+                    new_status = "Approved";
+                }
+                else
+                {
+                    /* Status is not in an actionable pending state - do nothing */
+                    return;
+                }
+
+                update Spend_Request[ID == input.ID]
+                [
+                    Status = new_status
+                ];
+
+                insert into Approval_Log
+                [
+                    Request_ID_Ref = input.Request_ID
+                    Stage = cur_status
+                    Approver_Name = zoho.loginuser
+                    Decision = "Approved"
+                    Decision_Timestamp = zoho.currenttime
+                    Comments = "Approved - advanced to " + new_status
+                ];
+            )
+        }
+    }
+}

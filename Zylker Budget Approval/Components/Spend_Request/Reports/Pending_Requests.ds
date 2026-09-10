@@ -1,19 +1,117 @@
-list Pending_Requests
+kanban Pending_Requests
 {
-    displayName = "Pending Requests"
-    show all rows from Spend_Request [Status == "Pending_RM" || Status == "Pending_Dept_Head" || Status == "Pending_Finance"]
+    displayName = "Approvals Queue"
+    show all rows from Spend_Request [Status == "Pending_RM" || Status == "Pending_Dept_Head" || Status == "Pending_Finance" || Status == "On_Hold"]
     (
         Request_ID
         Requester_Name
         Department
+        Item_Description
         Estimated_Cost
         Approval_Tier
         Status
-        SLA_Due_Date
         Priority
-        Item_Description
+        SLA_Due_Date
         Submitted_Date
+        Justification
+
+        custom action "Approve"
+        (
+            workflow = WF_Approve_Request
+            show action for each record = true
+            column header = "Actions"
+            success message = "Request approved and advanced to next stage."
+            condition = (Status == "Pending_RM" || Status == "Pending_Dept_Head" || Status == "Pending_Finance")
+            confirmation before execution
+            (
+                message for individual record = "Approve this request and advance it to the next stage?"
+                confirm button text = "Yes, Approve"
+                cancel button text = "Cancel"
+            )
+        )
+
+        custom action "Hold"
+        (
+            workflow = WF_Hold_Request
+            show action for each record = true
+            column header = "Actions"
+            success message = "Request placed on hold."
+            condition = (Status == "Pending_RM" || Status == "Pending_Dept_Head" || Status == "Pending_Finance")
+            confirmation before execution
+            (
+                message for individual record = "Place this request on hold? It can be resubmitted later."
+                confirm button text = "Yes, Hold"
+                cancel button text = "Cancel"
+            )
+        )
+
+        custom action "Reject"
+        (
+            workflow = WF_Reject_Request
+            show action for each record = true
+            column header = "Actions"
+            success message = "Request has been rejected."
+            condition = (Status == "Pending_RM" || Status == "Pending_Dept_Head" || Status == "Pending_Finance")
+            confirmation before execution
+            (
+                message for individual record = "Reject this request? This action cannot be undone."
+                confirm button text = "Yes, Reject"
+                cancel button text = "Cancel"
+            )
+        )
     )
-    filters ( Status  Department )
-    sort by ( SLA_Due_Date ascending )
+
+    filters
+    (
+        Department
+        Priority
+        Approval_Tier
+        "High Priority" : (Priority == "High")
+        "SLA Overdue" : (SLA_Due_Date < zoho.currentdate)
+        "Pending RM" : (Status == "Pending_RM")
+        "Pending Dept Head" : (Status == "Pending_Dept_Head")
+        "Pending Finance" : (Status == "Pending_Finance")
+        "On Hold" : (Status == "On_Hold")
+    )
+
+    sort by
+    (
+        SLA_Due_Date ascending
+        Priority descending
+    )
+
+    options
+    (
+        display field = Status
+        sort order = ascending
+        record count = enable
+    )
+
+    conditional formatting
+    (
+        "SLA Overdue"
+        {
+            condition = (SLA_Due_Date < zoho.currentdate)
+            fields = [Request_ID, SLA_Due_Date]
+            format = "background-color:#FFF1F2;color:#EF4444;font-weight:bold"
+        }
+        "High Priority"
+        {
+            condition = (Priority == "High")
+            fields = [Priority]
+            format = "color:#DC2626;font-weight:bold"
+        }
+        "3-Person Tier"
+        {
+            condition = (Approval_Tier == "3-Person")
+            fields = [Approval_Tier]
+            format = "color:#2563EB;font-weight:bold"
+        }
+        "2-Person Tier"
+        {
+            condition = (Approval_Tier == "2-Person")
+            fields = [Approval_Tier]
+            format = "color:#D97706;font-weight:bold"
+        }
+    )
 }

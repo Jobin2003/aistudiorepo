@@ -57,7 +57,7 @@
         {
             enabled = tab
         }
-        Approvals
+        Dashboard
         {
             enabled = tab
         }

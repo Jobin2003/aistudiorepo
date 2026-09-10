@@ -13,10 +13,14 @@ report Pending_Requests
                     Request_ID
                     Requester_Name
                     Department
+                    Item_Description
                     Estimated_Cost
                     Approval_Tier
-                    Status
+                    Priority
                     SLA_Due_Date
+                    "Approve"
+                    "Hold"
+                    "Reject"
                 )
             )
         )
@@ -25,14 +29,15 @@ report Pending_Requests
             header
             (
                 Edit
-                Duplicate
                 Delete
             )
             record
             (
                 Edit
-                Duplicate
                 Delete
+                "Approve"
+                "Hold"
+                "Reject"
             )
         )
         action
@@ -45,8 +50,10 @@ report Pending_Requests
             (
                 Edit
                 Delete
-                Duplicate
                 View Record
+                "Approve"
+                "Hold"
+                "Reject"
             )
         )
     )
@@ -58,18 +65,31 @@ report Pending_Requests
             datablock1
             (
                 layout type = -2
+                title = "Request Details"
                 fields
                 (
                     Request_ID
                     Requester_Name
                     Department
+                    Item_Description
                     Estimated_Cost
                     Approval_Tier
-                    Status
-                    SLA_Due_Date
                     Priority
-                    Item_Description
+                    Justification
                     Submitted_Date
+                    SLA_Due_Date
+                )
+            )
+            datablock2
+            (
+                layout type = -2
+                title = "Approval Action"
+                fields
+                (
+                    Status
+                    "Approve"
+                    "Hold"
+                    "Reject"
                 )
             )
         )
@@ -78,7 +98,6 @@ report Pending_Requests
             header
             (
                 Edit
-                Duplicate
                 Delete
             )
         )

@@ -313,6 +313,40 @@ application "Zylker-Budget-Approval"
 		    }
 		}
 
+		form Seed_Data
+		{
+		    displayname = "Load Sample Data"
+		    success message = "BRD sample data loaded successfully. Visit Approvals and Dashboard to see it."
+		
+		    Seed_Section
+		    (
+		        type = section
+		        displayname = "Load Sample Data"
+		        row = 1
+		        column = 0
+		    )
+		    Confirm_Load
+		    (
+		        type = checkbox
+		        displayname = "Confirm: Load 18 BRD sample records"
+		        row = 1
+		        column = 1
+		        width = medium
+		    )
+		
+		    actions
+		    {
+		        on add
+		        {
+		            Load_Data
+		            (
+		                type = submit
+		                displayname = "Load Sample Data"
+		            )
+		        }
+		    }
+		}
+
 		form Spend_Request
 		{
 		    displayname = "Spend Request"
@@ -327,8 +361,11 @@ application "Zylker-Budget-Approval"
 		    )
 		    must have Requester_Name
 		    (
-		        type = text
+		        type = picklist
 		        displayname = "Requester Name"
+		        values = Employee_Directory.Employee_Name
+		        displayformat = [Employee_Name]
+		        searchable = true
 		        row = 1
 		        column = 1
 		        width = medium
@@ -436,7 +473,7 @@ application "Zylker-Budget-Approval"
 		    (
 		        type = section
 		        displayname = "Status & Tracking"
-		        visibility = true
+		        visibility = false
 		        row = 3
 		        column = 1
 		    )
@@ -608,6 +645,15 @@ application "Zylker-Budget-Approval"
 		    sort by ( Department ascending )
 		}
 
+		list Seed_Data_Log
+		{
+		    displayName = "Sample Data Loader"
+		    show all rows from Seed_Data
+		    (
+		        Confirm_Load
+		    )
+		}
+
 		default list All_Requests
 		{
 		    displayName = "All Requests"
@@ -629,228 +675,137 @@ application "Zylker-Budget-Approval"
 		    sort by ( Submitted_Date descending )
 		}
 
-		list Pending_Requests
+		kanban Pending_Requests
 		{
-		    displayName = "Pending Requests"
-		    show all rows from Spend_Request [Status == "Pending_RM" || Status == "Pending_Dept_Head" || Status == "Pending_Finance"]
+		    displayName = "Approvals Queue"
+		    show all rows from Spend_Request [Status == "Pending_RM" || Status == "Pending_Dept_Head" || Status == "Pending_Finance" || Status == "On_Hold"]
 		    (
 		        Request_ID
 		        Requester_Name
 		        Department
+		        Item_Description
 		        Estimated_Cost
 		        Approval_Tier
 		        Status
-		        SLA_Due_Date
 		        Priority
-		        Item_Description
+		        SLA_Due_Date
 		        Submitted_Date
+		        Justification
+		
+		        custom action "Approve"
+		        (
+		            workflow = WF_Approve_Request
+		            show action for each record = true
+		            column header = "Actions"
+		            success message = "Request approved and advanced to next stage."
+		            condition = (Status == "Pending_RM" || Status == "Pending_Dept_Head" || Status == "Pending_Finance")
+		            confirmation before execution
+		            (
+		                message for individual record = "Approve this request and advance it to the next stage?"
+		                confirm button text = "Yes, Approve"
+		                cancel button text = "Cancel"
+		            )
+		        )
+		
+		        custom action "Hold"
+		        (
+		            workflow = WF_Hold_Request
+		            show action for each record = true
+		            column header = "Actions"
+		            success message = "Request placed on hold."
+		            condition = (Status == "Pending_RM" || Status == "Pending_Dept_Head" || Status == "Pending_Finance")
+		            confirmation before execution
+		            (
+		                message for individual record = "Place this request on hold? It can be resubmitted later."
+		                confirm button text = "Yes, Hold"
+		                cancel button text = "Cancel"
+		            )
+		        )
+		
+		        custom action "Reject"
+		        (
+		            workflow = WF_Reject_Request
+		            show action for each record = true
+		            column header = "Actions"
+		            success message = "Request has been rejected."
+		            condition = (Status == "Pending_RM" || Status == "Pending_Dept_Head" || Status == "Pending_Finance")
+		            confirmation before execution
+		            (
+		                message for individual record = "Reject this request? This action cannot be undone."
+		                confirm button text = "Yes, Reject"
+		                cancel button text = "Cancel"
+		            )
+		        )
 		    )
-		    filters ( Status  Department )
-		    sort by ( SLA_Due_Date ascending )
+		
+		    filters
+		    (
+		        Department
+		        Priority
+		        Approval_Tier
+		        "High Priority" : (Priority == "High")
+		        "SLA Overdue" : (SLA_Due_Date < zoho.currentdate)
+		        "Pending RM" : (Status == "Pending_RM")
+		        "Pending Dept Head" : (Status == "Pending_Dept_Head")
+		        "Pending Finance" : (Status == "Pending_Finance")
+		        "On Hold" : (Status == "On_Hold")
+		    )
+		
+		    sort by
+		    (
+		        SLA_Due_Date ascending
+		        Priority descending
+		    )
+		
+		    options
+		    (
+		        display field = Status
+		        sort order = ascending
+		        record count = enable
+		    )
+		
+		    conditional formatting
+		    (
+		        "SLA Overdue"
+		        {
+		            condition = (SLA_Due_Date < zoho.currentdate)
+		            fields = [Request_ID, SLA_Due_Date]
+		            format = "background-color:#FFF1F2;color:#EF4444;font-weight:bold"
+		        }
+		        "High Priority"
+		        {
+		            condition = (Priority == "High")
+		            fields = [Priority]
+		            format = "color:#DC2626;font-weight:bold"
+		        }
+		        "3-Person Tier"
+		        {
+		            condition = (Approval_Tier == "3-Person")
+		            fields = [Approval_Tier]
+		            format = "color:#2563EB;font-weight:bold"
+		        }
+		        "2-Person Tier"
+		        {
+		            condition = (Approval_Tier == "2-Person")
+		            fields = [Approval_Tier]
+		            format = "color:#D97706;font-weight:bold"
+		        }
+		    )
 		}
 	}
 
 	pages
 	{
-		page Approvals(string active_tab, string selected_id, string queue_json, string detail_json, string log_json)
-		{
-					displayname = "Approvals"
-					Content="<zml>\n\t<layout>\n\t\t<row>\n\t\t\t<column width='100%'>\n\t\t\t\t<dsp id='ap_approvals_content' elementName='Approvals_Content'>\n\t\t\t\t\t<![CDATA[htmlpage ap_approvals_content()\ncontent\n&lt;%{%&gt;\n\t\t&lt;link href=&apos;https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&amp;display=swap&apos; rel=&apos;stylesheet&apos;&gt;\n&lt;style&gt;\n\t* { box-sizing: border-box; }\n\t.ap-wrap {\n\t\tpadding: 24px 28px 40px 28px;\n\t\tbackground: #F8FAFC;\n\t\tmin-height: 100vh;\n\t\tfont-family: &apos;Lato&apos;, sans-serif;\n\t}\n\t.ap-page-title { font-size: 22px; font-weight: 700; color: #111827; margin: 0 0 4px 0; }\n\t.ap-page-sub   { font-size: 13px; color: #6B7280; margin: 0 0 20px 0; }\n\n\t/* TABS */\n\t.ap-tabs-row {\n\t\tborder-bottom: 1px solid #E5E7EB;\n\t\tdisplay: flex;\n\t\tgap: 28px;\n\t\tmargin-bottom: 20px;\n\t\tflex-wrap: wrap;\n\t}\n\t.ap-tab {\n\t\tfont-size: 14px;\n\t\tcolor: #6B7280;\n\t\ttext-decoration: none;\n\t\tpadding-bottom: 10px;\n\t\tdisplay: inline-block;\n\t\tborder-bottom: 3px solid transparent;\n\t\twhite-space: nowrap;\n\t\tfont-family: &apos;Lato&apos;, sans-serif;\n\t}\n\t.ap-tab.active { font-weight: 700; color: #2563EB; border-bottom-color: #2563EB; }\n\n\t/* SPLIT LAYOUT */\n\t.ap-split { display: flex; gap: 20px; align-items: flex-start; }\n\n\t/* QUEUE */\n\t.ap-queue {\n\t\tflex: 1;\n\t\tmin-width: 0;\n\t\tbackground: #FFFFFF;\n\t\tborder-radius: 10px;\n\t\tbox-shadow: 0 1px 3px rgba(0,0,0,0.08);\n\t\toverflow: hidden;\n\t}\n\t.ap-q-head {\n\t\tbackground: #F9FAFB;\n\t\tpadding: 11px 16px;\n\t\tdisplay: grid;\n\t\tgrid-template-columns: 44px 1fr 130px 100px 85px 105px 105px;\n\t\tgap: 8px;\n\t\tfont-size: 11px;\n\t\tfont-weight: 700;\n\t\tcolor: #6B7280;\n\t\tborder-bottom: 1px solid #E5E7EB;\n\t\ttext-transform: uppercase;\n\t\tletter-spacing: 0.5px;\n\t}\n\t.ap-q-row {\n\t\tdisplay: grid;\n\t\tgrid-template-columns: 44px 1fr 130px 100px 85px 105px 105px;\n\t\tgap: 8px;\n\t\tpadding: 13px 16px;\n\t\tborder-bottom: 1px solid #F3F4F6;\n\t\ttext-decoration: none;\n\t\tcolor: inherit;\n\t\talign-items: center;\n\t}\n\t.ap-q-row.sel  { background: #EFF6FF; }\n\t.ap-q-row.norm { background: #FFFFFF; }\n\t.ap-avatar {\n\t\twidth: 36px; height: 36px;\n\t\tbackground: #2563EB; color: #FFFFFF;\n\t\tfont-size: 12px; font-weight: 700;\n\t\tdisplay: flex; align-items: center; justify-content: center;\n\t\tborder-radius: 50%;\n\t\tflex-shrink: 0;\n\t\tfont-family: &apos;Lato&apos;, sans-serif;\n\t}\n\t.ap-name-line  { font-size: 14px; font-weight: 700; color: #111827; display: block; }\n\t.ap-id-line    { font-size: 12px; color: #9CA3AF; display: block; margin-top: 1px; }\n\t.ap-dept-cell  { font-size: 13px; color: #374151; }\n\t.ap-amt-cell   { font-size: 14px; font-weight: 700; color: #111827; }\n\t.ap-pill       { border-radius: 20px; padding: 3px 10px; font-size: 12px; font-weight: 700; display: inline-block; white-space: nowrap; }\n\t.tier-auto     { background: #DCFCE7; color: #16AD78; }\n\t.tier-2p       { background: #FEF9C3; color: #D97706; }\n\t.tier-3p       { background: #EFF6FF; color: #2563EB; }\n\t.st-pending    { background: #FEF9C3; color: #D97706; }\n\t.st-approved   { background: #DCFCE7; color: #16AD78; }\n\t.st-rejected   { background: #FEE2E2; color: #EF4444; }\n\t.st-hold       { background: #FEF3C7; color: #92400E; }\n\t.sla-ok        { font-size: 13px; color: #374151; }\n\t.sla-over      { font-size: 12px; color: #EF4444; font-weight: 700; }\n\t.ap-empty      { padding: 32px 16px; text-align: center; font-size: 14px; color: #9CA3AF; }\n\n\t/* DETAIL PANEL */\n\t.ap-detail {\n\t\twidth: 430px;\n\t\tflex-shrink: 0;\n\t\tbackground: #FFFFFF;\n\t\tborder-radius: 10px;\n\t\tbox-shadow: 0 1px 3px rgba(0,0,0,0.08);\n\t\toverflow: hidden;\n\t}\n\t.ap-d-header { background: #F9FAFB; border-bottom: 1px solid #E5E7EB; padding: 16px 20px; }\n\t.ap-d-req-id { font-size: 15px; font-weight: 700; color: #111827; display: block; }\n\t.ap-d-desc   { font-size: 13px; color: #6B7280; display: block; margin-top: 4px; }\n\n\t/* STEPPER */\n\t.ap-stepper { padding: 18px 20px; border-bottom: 1px solid #F3F4F6; display: flex; align-items: center; }\n\t.ap-step-col { display: flex; flex-direction: column; align-items: center; gap: 5px; }\n\t.ap-step-circle {\n\t\twidth: 34px; height: 34px; border-radius: 50%;\n\t\tdisplay: flex; align-items: center; justify-content: center;\n\t\tfont-size: 12px; font-weight: 700;\n\t\tfont-family: &apos;Lato&apos;, sans-serif;\n\t}\n\t.sc-done    { background: #2563EB; color: #FFFFFF; }\n\t.sc-active  { background: #FFFFFF; color: #2563EB; border: 2px solid #2563EB; }\n\t.sc-pending { background: #FFFFFF; color: #9CA3AF; border: 2px solid #D1D5DB; }\n\t.ap-step-lbl { font-size: 11px; text-align: center; white-space: nowrap; }\n\t.sl-done    { font-weight: 700; color: #2563EB; }\n\t.sl-active  { font-weight: 700; color: #2563EB; }\n\t.sl-pending { color: #9CA3AF; }\n\t.ap-connector { flex: 1; height: 2px; margin-bottom: 18px; }\n\t.conn-done    { background: #2563EB; }\n\t.conn-pending { background: #E5E7EB; }\n\n\t/* STAT CARDS */\n\t.ap-stats { display: flex; gap: 10px; padding: 14px 20px; border-bottom: 1px solid #F3F4F6; }\n\t.ap-stat-card { flex: 1; border-radius: 8px; padding: 12px 14px; }\n\t.ap-stat-val { display: block; font-weight: 700; color: #111827; font-size: 15px; }\n\t.ap-stat-lbl { display: block; font-size: 11px; color: #6B7280; margin-top: 4px; }\n\n\t/* REQUEST DETAILS */\n\t.ap-req-grid {\n\t\tpadding: 14px 20px;\n\t\tborder-bottom: 1px solid #F3F4F6;\n\t\tdisplay: grid;\n\t\tgrid-template-columns: 1fr 1fr;\n\t\tgap: 12px;\n\t}\n\t.ap-field { display: flex; flex-direction: column; gap: 3px; }\n\t.ap-field.span2 { grid-column: 1 / -1; }\n\t.ap-flbl { font-size: 11px; color: #6B7280; text-transform: uppercase; letter-spacing: 0.5px; }\n\t.ap-fval { font-size: 13px; font-weight: 700; color: #111827; }\n\n\t/* COST BREAKDOWN */\n\t.ap-breakdown { padding: 14px 20px; border-bottom: 1px solid #F3F4F6; }\n\t.ap-sec-title { font-size: 13px; font-weight: 700; color: #374151; margin: 0 0 10px 0; display: block; }\n\t.ap-breakdown-table { width: 100%; border-collapse: collapse; font-size: 13px; }\n\t.ap-breakdown-table th {\n\t\tbackground: #F9FAFB; font-size: 11px; font-weight: 700; color: #6B7280;\n\t\ttext-transform: uppercase; letter-spacing: 0.5px; padding: 8px 10px; text-align: left;\n\t}\n\t.ap-breakdown-table th.right { text-align: right; }\n\t.ap-breakdown-table td { padding: 8px 10px; border-bottom: 1px solid #F3F4F6; color: #374151; }\n\t.ap-breakdown-table td.right { text-align: right; }\n\t.ap-breakdown-total td { background: #F9FAFB; font-weight: 700; color: #111827; border-top: 2px solid #E5E7EB; }\n\n\t/* ACTIVITY LOG */\n\t.ap-log { padding: 14px 20px; border-bottom: 1px solid #F3F4F6; }\n\t.ap-log-entry { display: flex; gap: 12px; margin-bottom: 12px; }\n\t.ap-log-left  { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }\n\t.ap-log-dot   { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }\n\t.ap-log-line  { width: 2px; flex: 1; min-height: 18px; margin-top: 3px; }\n\t.ap-log-right { flex: 1; }\n\t.ap-log-time  { font-size: 11px; color: #9CA3AF; display: block; }\n\t.ap-log-desc  { font-size: 13px; color: #374151; display: block; margin-top: 2px; font-weight: 600; }\n\t.ap-log-comment { font-size: 12px; font-style: italic; color: #9CA3AF; display: block; margin-top: 2px; }\n\n\t/* ACTION BAR */\n\t.ap-actions { padding: 14px 20px; background: #FFFFFF; border-top: 1px solid #E5E7EB; display: flex; gap: 10px; }\n\t.ap-btn {\n\t\tflex: 1; height: 40px; border-radius: 6px;\n\t\tfont-size: 14px; font-weight: 700;\n\t\tfont-family: &apos;Lato&apos;, sans-serif;\n\t\tdisplay: flex; align-items: center; justify-content: center;\n\t\ttext-decoration: none;\n\t}\n\t.btn-approve { background: #16AD78; color: #FFFFFF; }\n\t.btn-hold    { background: #F59E0B; color: #FFFFFF; }\n\t.btn-reject  { background: #EF4444; color: #FFFFFF; }\n\t.ap-no-action { padding: 12px 20px; font-size: 13px; color: #9CA3AF; text-align: center; font-style: italic; }\n&lt;/style&gt;\n\n&lt;%\n\t/* ---- Tab + selected ID ---- */\n\tcur_tab = input.active_tab;\n\tif(cur_tab == null || cur_tab == &quot;&quot;) { cur_tab = &quot;all&quot;; }\n\tcur_sel = input.selected_id;\n\tif(cur_sel == null || cur_sel == &quot;&quot;) { cur_sel = &quot;BRQ-2026-0303&quot;; }\n\n\t/* ---- Live tab counts ---- */\n\tall_cnt = Spend_Request[Status != &quot;Auto_Approved&quot; &amp;&amp; Status != &quot;Submitted&quot;].count();\n\trm_cnt  = Spend_Request[Status == &quot;Pending_RM&quot;].count();\n\tdh_cnt  = Spend_Request[Status == &quot;Pending_Dept_Head&quot;].count();\n\tfin_cnt = Spend_Request[Status == &quot;Pending_Finance&quot;].count();\n\n\t/* ---- Parse detail record ---- */\n\td_req_id = cur_sel;\n\td_desc = &quot;&quot;; d_dept = &quot;&quot;; d_requester = &quot;&quot;;\n\td_priority = &quot;&quot;; d_submitted = &quot;&quot;; d_amount = &quot;&quot;;\n\td_tier = &quot;&quot;; d_sla = &quot;&quot;; d_status = &quot;&quot;;\n\n\tdet_str = input.detail_json;\n\tif(det_str != null &amp;&amp; det_str != &quot;&quot; &amp;&amp; det_str != &quot;[]&quot;)\n\t{\n\t\tdet_list = det_str.toList();\n\t\tif(det_list.size() &gt; 0)\n\t\t{\n\t\t\tdet_map  = det_list.get(0).toMap();\n\t\t\td_req_id    = det_map.get(&quot;Request_ID&quot;);\n\t\t\td_desc      = det_map.get(&quot;Item_Description&quot;);\n\t\t\td_dept      = det_map.get(&quot;Department&quot;);\n\t\t\td_requester = det_map.get(&quot;Requester_Name&quot;);\n\t\t\td_priority  = det_map.get(&quot;Priority&quot;);\n\t\t\td_submitted = det_map.get(&quot;Submitted_Date&quot;);\n\t\t\td_amount    = det_map.get(&quot;Estimated_Cost&quot;);\n\t\t\td_tier      = det_map.get(&quot;Approval_Tier&quot;);\n\t\t\td_sla       = det_map.get(&quot;SLA_Due_Date&quot;);\n\t\t\td_status    = det_map.get(&quot;Status&quot;);\n\t\t}\n\t}\n\n\t/* ---- Safe defaults (only if genuinely null/empty) ---- */\n\tif(d_req_id == null || d_req_id == &quot;&quot;)       { d_req_id    = cur_sel; }\n\tif(d_desc == null || d_desc == &quot;&quot;)           { d_desc      = &quot;-&quot;; }\n\tif(d_dept == null || d_dept == &quot;&quot;)           { d_dept      = &quot;-&quot;; }\n\tif(d_requester == null || d_requester == &quot;&quot;) { d_requester = &quot;-&quot;; }\n\tif(d_priority == null || d_priority == &quot;&quot;)   { d_priority  = &quot;-&quot;; }\n\tif(d_submitted == null || d_submitted == &quot;&quot;) { d_submitted = &quot;-&quot;; }\n\tif(d_amount == null || d_amount == &quot;&quot;)       { d_amount    = &quot;0&quot;; }\n\tif(d_tier == null || d_tier == &quot;&quot;)           { d_tier      = &quot;-&quot;; }\n\tif(d_sla == null || d_sla == &quot;&quot;)             { d_sla       = &quot;-&quot;; }\n\tif(d_status == null || d_status == &quot;&quot;)       { d_status    = &quot;Pending_RM&quot;; }\n\n\t/* ---- Stage label for Approval_Action links ---- */\n\td_stage_lbl = &quot;Reporting Manager&quot;;\n\tif(d_status == &quot;Pending_Dept_Head&quot;) { d_stage_lbl = &quot;Department Head&quot;; }\n\tif(d_status == &quot;Pending_Finance&quot;)   { d_stage_lbl = &quot;Finance Controller&quot;; }\n\n\t/* ---- Stepper state ---- */\n\ts_rm  = &quot;pending&quot;; s_dh = &quot;pending&quot;; s_fin = &quot;pending&quot;;\n\tc1 = &quot;pending&quot;; c2 = &quot;pending&quot;;\n\tif(d_status == &quot;Pending_RM&quot;)\n\t{\n\t\ts_rm = &quot;active&quot;;\n\t}\n\telse if(d_status == &quot;Pending_Dept_Head&quot;)\n\t{\n\t\ts_rm = &quot;done&quot;; c1 = &quot;done&quot;; s_dh = &quot;active&quot;;\n\t}\n\telse if(d_status == &quot;Pending_Finance&quot;)\n\t{\n\t\ts_rm = &quot;done&quot;; c1 = &quot;done&quot;; s_dh = &quot;done&quot;; c2 = &quot;done&quot;; s_fin = &quot;active&quot;;\n\t}\n\telse if(d_status == &quot;Approved&quot;)\n\t{\n\t\ts_rm = &quot;done&quot;; c1 = &quot;done&quot;; s_dh = &quot;done&quot;; c2 = &quot;done&quot;; s_fin = &quot;done&quot;;\n\t}\n\n\t/* ---- Action bar visibility ---- */\n\tshow_actions = true;\n\tif(d_status == &quot;Approved&quot; || d_status == &quot;Rejected&quot; || d_status == &quot;On_Hold&quot; || d_status == &quot;Auto_Approved&quot;)\n\t{\n\t\tshow_actions = false;\n\t}\n\n\t/* ---- Tier pill class ---- */\n\td_tier_cls = &quot;ap-pill tier-3p&quot;;\n\tif(d_tier == &quot;Auto&quot;)     { d_tier_cls = &quot;ap-pill tier-auto&quot;; }\n\tif(d_tier == &quot;2-Person&quot;) { d_tier_cls = &quot;ap-pill tier-2p&quot;; }\n%&gt;\n\n&lt;div class=&quot;ap-wrap&quot;&gt;\n\n\t&lt;h1 class=&quot;ap-page-title&quot;&gt;Approvals&lt;/h1&gt;\n\t&lt;p class=&quot;ap-page-sub&quot;&gt;Review and act on all spend requests. Click a row to view details and take action.&lt;/p&gt;\n\n\t&lt;!-- TABS --&gt;\n\t&lt;div class=&quot;ap-tabs-row&quot;&gt;\n\t\t&lt;a class=&quot;ap-tab&lt;% if(cur_tab == &quot;all&quot;) { %&gt; active&lt;% } %&gt;&quot;\n\t\t\t href=&quot;#Page:Approvals?active_tab=all&amp;selected_id=&lt;%= cur_sel %&gt;&quot;&gt;\n\t\t\tAll (&lt;%= all_cnt %&gt;)\n\t\t&lt;/a&gt;\n\t\t&lt;a class=&quot;ap-tab&lt;% if(cur_tab == &quot;rm&quot;) { %&gt; active&lt;% } %&gt;&quot;\n\t\t\t href=&quot;#Page:Approvals?active_tab=rm&amp;selected_id=&lt;%= cur_sel %&gt;&quot;&gt;\n\t\t\tReporting Manager (&lt;%= rm_cnt %&gt;)\n\t\t&lt;/a&gt;\n\t\t&lt;a class=&quot;ap-tab&lt;% if(cur_tab == &quot;dept_head&quot;) { %&gt; active&lt;% } %&gt;&quot;\n\t\t\t href=&quot;#Page:Approvals?active_tab=dept_head&amp;selected_id=&lt;%= cur_sel %&gt;&quot;&gt;\n\t\t\tDepartment Head (&lt;%= dh_cnt %&gt;)\n\t\t&lt;/a&gt;\n\t\t&lt;a class=&quot;ap-tab&lt;% if(cur_tab == &quot;finance&quot;) { %&gt; active&lt;% } %&gt;&quot;\n\t\t\t href=&quot;#Page:Approvals?active_tab=finance&amp;selected_id=&lt;%= cur_sel %&gt;&quot;&gt;\n\t\t\tFinance (&lt;%= fin_cnt %&gt;)\n\t\t&lt;/a&gt;\n\t&lt;/div&gt;\n\n\t&lt;!-- SPLIT PANEL --&gt;\n\t&lt;div class=&quot;ap-split&quot;&gt;\n\n\t\t&lt;!-- LEFT: QUEUE TABLE --&gt;\n\t\t&lt;div class=&quot;ap-queue&quot;&gt;\n\t\t\t&lt;div class=&quot;ap-q-head&quot;&gt;\n\t\t\t\t&lt;div&gt;&lt;/div&gt;\n\t\t\t\t&lt;div&gt;Requester&lt;/div&gt;\n\t\t\t\t&lt;div&gt;Department&lt;/div&gt;\n\t\t\t\t&lt;div&gt;Amount&lt;/div&gt;\n\t\t\t\t&lt;div&gt;Tier&lt;/div&gt;\n\t\t\t\t&lt;div&gt;Status&lt;/div&gt;\n\t\t\t\t&lt;div&gt;SLA Due&lt;/div&gt;\n\t\t\t&lt;/div&gt;\n\n\t\t\t&lt;%\n\t\t\t\tq_str = input.queue_json;\n\t\t\t\tq_has = false;\n\t\t\t\tif(q_str != null &amp;&amp; q_str != &quot;&quot; &amp;&amp; q_str != &quot;[]&quot;)\n\t\t\t\t{\n\t\t\t\t\tq_list = q_str.toList();\n\t\t\t\t\tif(q_list.size() &gt; 0)\n\t\t\t\t\t{\n\t\t\t\t\t\tq_has = true;\n\t\t\t\t\t\tfor each q_item in q_list\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tq_map    = q_item.toMap();\n\t\t\t\t\t\t\tq_id     = q_map.get(&quot;Request_ID&quot;);\n\t\t\t\t\t\t\tq_name   = q_map.get(&quot;Requester_Name&quot;);\n\t\t\t\t\t\t\tq_dept   = q_map.get(&quot;Department&quot;);\n\t\t\t\t\t\t\tq_amt    = q_map.get(&quot;Estimated_Cost&quot;);\n\t\t\t\t\t\t\tq_tier   = q_map.get(&quot;Approval_Tier&quot;);\n\t\t\t\t\t\t\tq_stat   = q_map.get(&quot;Status&quot;);\n\t\t\t\t\t\t\tq_sla    = q_map.get(&quot;SLA_Due_Date&quot;);\n\n\t\t\t\t\t\t\tif(q_id == null || q_id == &quot;&quot;)     { q_id   = &quot;&quot;; }\n\t\t\t\t\t\t\tif(q_name == null || q_name == &quot;&quot;) { q_name = &quot;Unknown&quot;; }\n\t\t\t\t\t\t\tif(q_dept == null || q_dept == &quot;&quot;) { q_dept = &quot;-&quot;; }\n\t\t\t\t\t\t\tif(q_amt == null || q_amt == &quot;&quot;)   { q_amt  = &quot;0&quot;; }\n\t\t\t\t\t\t\tif(q_tier == null || q_tier == &quot;&quot;) { q_tier = &quot;-&quot;; }\n\t\t\t\t\t\t\tif(q_stat == null || q_stat == &quot;&quot;) { q_stat = &quot;&quot;; }\n\t\t\t\t\t\t\tif(q_sla == null || q_sla == &quot;&quot;)   { q_sla  = &quot;-&quot;; }\n\n\t\t\t\t\t\t\t/* Initials */\n\t\t\t\t\t\t\tq_init = &quot;?&quot;;\n\t\t\t\t\t\t\tif(q_name.length() &gt; 0)\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\tfl = q_name.subString(0, 1);\n\t\t\t\t\t\t\t\tsp = q_name.indexOf(&quot; &quot;);\n\t\t\t\t\t\t\t\tif(sp &gt; 0)\n\t\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\t\tsl = q_name.subString(sp + 1, sp + 2);\n\t\t\t\t\t\t\t\t\tq_init = fl + sl;\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\telse\n\t\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\t\tq_init = fl;\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t}\n\n\t\t\t\t\t\t\t/* Row class */\n\t\t\t\t\t\t\tq_row_cls = &quot;ap-q-row norm&quot;;\n\t\t\t\t\t\t\tif(q_id == cur_sel) { q_row_cls = &quot;ap-q-row sel&quot;; }\n\n\t\t\t\t\t\t\t/* Tier pill */\n\t\t\t\t\t\t\tq_tier_cls = &quot;ap-pill tier-3p&quot;;\n\t\t\t\t\t\t\tif(q_tier == &quot;Auto&quot;)     { q_tier_cls = &quot;ap-pill tier-auto&quot;; }\n\t\t\t\t\t\t\tif(q_tier == &quot;2-Person&quot;) { q_tier_cls = &quot;ap-pill tier-2p&quot;; }\n\n\t\t\t\t\t\t\t/* Status pill */\n\t\t\t\t\t\t\tq_stat_cls = &quot;ap-pill st-pending&quot;;\n\t\t\t\t\t\t\tq_stat_lbl = &quot;Pending&quot;;\n\t\t\t\t\t\t\tif(q_stat == &quot;Approved&quot; || q_stat == &quot;Auto_Approved&quot;) { q_stat_cls = &quot;ap-pill st-approved&quot;; q_stat_lbl = &quot;Approved&quot;; }\n\t\t\t\t\t\t\tif(q_stat == &quot;Rejected&quot;)    { q_stat_cls = &quot;ap-pill st-rejected&quot;; q_stat_lbl = &quot;Rejected&quot;; }\n\t\t\t\t\t\t\tif(q_stat == &quot;On_Hold&quot;)     { q_stat_cls = &quot;ap-pill st-hold&quot;; q_stat_lbl = &quot;On Hold&quot;; }\n\t\t\t\t\t\t\tif(q_stat == &quot;Submitted&quot;)   { q_stat_cls = &quot;ap-pill st-pending&quot;; q_stat_lbl = &quot;Submitted&quot;; }\n\t\t\t%&gt;\n\t\t\t&lt;a class=&quot;&lt;%= q_row_cls %&gt;&quot;\n\t\t\t\t href=&quot;#Page:Approvals?active_tab=&lt;%= cur_tab %&gt;&amp;selected_id=&lt;%= q_id %&gt;&quot;&gt;\n\t\t\t\t&lt;div&gt;&lt;div class=&quot;ap-avatar&quot;&gt;&lt;%= q_init %&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;div&gt;\n\t\t\t\t\t&lt;span class=&quot;ap-name-line&quot;&gt;&lt;%= q_name %&gt;&lt;/span&gt;\n\t\t\t\t\t&lt;span class=&quot;ap-id-line&quot;&gt;&lt;%= q_id %&gt;&lt;/span&gt;\n\t\t\t\t&lt;/div&gt;\n\t\t\t\t&lt;div class=&quot;ap-dept-cell&quot;&gt;&lt;%= q_dept %&gt;&lt;/div&gt;\n\t\t\t\t&lt;div class=&quot;ap-amt-cell&quot;&gt;$&lt;%= q_amt %&gt;&lt;/div&gt;\n\t\t\t\t&lt;div&gt;&lt;span class=&quot;&lt;%= q_tier_cls %&gt;&quot;&gt;&lt;%= q_tier %&gt;&lt;/span&gt;&lt;/div&gt;\n\t\t\t\t&lt;div&gt;&lt;span class=&quot;&lt;%= q_stat_cls %&gt;&quot;&gt;&lt;%= q_stat_lbl %&gt;&lt;/span&gt;&lt;/div&gt;\n\t\t\t\t&lt;div class=&quot;sla-ok&quot;&gt;&lt;%= q_sla %&gt;&lt;/div&gt;\n\t\t\t&lt;/a&gt;\n\t\t\t&lt;%\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tif(q_has == false)\n\t\t\t\t{\n\t\t\t%&gt;\n\t\t\t&lt;div class=&quot;ap-empty&quot;&gt;No requests found. Load sample data from the Dashboard page to populate records.&lt;/div&gt;\n\t\t\t&lt;%\n\t\t\t\t}\n\t\t\t%&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;!-- END QUEUE --&gt;\n\n\t\t&lt;!-- RIGHT: DETAIL PANEL --&gt;\n\t\t&lt;div class=&quot;ap-detail&quot;&gt;\n\n\t\t\t&lt;!-- HEADER --&gt;\n\t\t\t&lt;div class=&quot;ap-d-header&quot;&gt;\n\t\t\t\t&lt;span class=&quot;ap-d-req-id&quot;&gt;&lt;%= d_req_id %&gt;&lt;/span&gt;\n\t\t\t\t&lt;span class=&quot;ap-d-desc&quot;&gt;&lt;%= d_desc %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\n\t\t\t&lt;!-- STEPPER --&gt;\n\t\t\t&lt;div class=&quot;ap-stepper&quot;&gt;\n\t\t\t\t&lt;%\n\t\t\t\t\tif(d_tier == &quot;2-Person&quot;)\n\t\t\t\t\t{\n\t\t\t\t\t\tconn_2p = &quot;conn-pending&quot;;\n\t\t\t\t\t\tif(s_rm == &quot;done&quot;) { conn_2p = &quot;conn-done&quot;; }\n\t\t\t\t%&gt;\n\t\t\t\t&lt;div class=&quot;ap-step-col&quot;&gt;\n\t\t\t\t\t&lt;div class=&quot;ap-step-circle sc-&lt;%= s_rm %&gt;&quot;&gt;\n\t\t\t\t\t\t&lt;% if(s_rm == &quot;done&quot;) { %&gt;\n\t\t\t\t\t\t\t&lt;i class=&quot;zc-li-outline ui-1-check-simple&quot; style=&quot;font-size:13px;&quot;&gt;&lt;/i&gt;\n\t\t\t\t\t\t&lt;% } else { %&gt;1&lt;% } %&gt;\n\t\t\t\t\t&lt;/div&gt;\n\t\t\t\t\t&lt;span class=&quot;ap-step-lbl sl-&lt;%= s_rm %&gt;&quot;&gt;RM&lt;/span&gt;\n\t\t\t\t&lt;/div&gt;\n\t\t\t\t&lt;div class=&quot;ap-connector &lt;%= conn_2p %&gt;&quot;&gt;&lt;/div&gt;\n\t\t\t\t&lt;div class=&quot;ap-step-col&quot;&gt;\n\t\t\t\t\t&lt;div class=&quot;ap-step-circle sc-&lt;%= s_fin %&gt;&quot;&gt;\n\t\t\t\t\t\t&lt;% if(s_fin == &quot;done&quot;) { %&gt;\n\t\t\t\t\t\t\t&lt;i class=&quot;zc-li-outline ui-1-check-simple&quot; style=&quot;font-size:13px;&quot;&gt;&lt;/i&gt;\n\t\t\t\t\t\t&lt;% } else { %&gt;2&lt;% } %&gt;\n\t\t\t\t\t&lt;/div&gt;\n\t\t\t\t\t&lt;span class=&quot;ap-step-lbl sl-&lt;%= s_fin %&gt;&quot;&gt;Finance&lt;/span&gt;\n\t\t\t\t&lt;/div&gt;\n\t\t\t\t&lt;%\n\t\t\t\t\t}\n\t\t\t\t\telse\n\t\t\t\t\t{\n\t\t\t\t%&gt;\n\t\t\t\t&lt;div class=&quot;ap-step-col&quot;&gt;\n\t\t\t\t\t&lt;div class=&quot;ap-step-circle sc-&lt;%= s_rm %&gt;&quot;&gt;\n\t\t\t\t\t\t&lt;% if(s_rm == &quot;done&quot;) { %&gt;\n\t\t\t\t\t\t\t&lt;i class=&quot;zc-li-outline ui-1-check-simple&quot; style=&quot;font-size:13px;&quot;&gt;&lt;/i&gt;\n\t\t\t\t\t\t&lt;% } else { %&gt;1&lt;% } %&gt;\n\t\t\t\t\t&lt;/div&gt;\n\t\t\t\t\t&lt;span class=&quot;ap-step-lbl sl-&lt;%= s_rm %&gt;&quot;&gt;RM&lt;/span&gt;\n\t\t\t\t&lt;/div&gt;\n\t\t\t\t&lt;div class=&quot;ap-connector conn-&lt;%= c1 %&gt;&quot;&gt;&lt;/div&gt;\n\t\t\t\t&lt;div class=&quot;ap-step-col&quot;&gt;\n\t\t\t\t\t&lt;div class=&quot;ap-step-circle sc-&lt;%= s_dh %&gt;&quot;&gt;\n\t\t\t\t\t\t&lt;% if(s_dh == &quot;done&quot;) { %&gt;\n\t\t\t\t\t\t\t&lt;i class=&quot;zc-li-outline ui-1-check-simple&quot; style=&quot;font-size:13px;&quot;&gt;&lt;/i&gt;\n\t\t\t\t\t\t&lt;% } else { %&gt;2&lt;% } %&gt;\n\t\t\t\t\t&lt;/div&gt;\n\t\t\t\t\t&lt;span class=&quot;ap-step-lbl sl-&lt;%= s_dh %&gt;&quot;&gt;Dept Head&lt;/span&gt;\n\t\t\t\t&lt;/div&gt;\n\t\t\t\t&lt;div class=&quot;ap-connector conn-&lt;%= c2 %&gt;&quot;&gt;&lt;/div&gt;\n\t\t\t\t&lt;div class=&quot;ap-step-col&quot;&gt;\n\t\t\t\t\t&lt;div class=&quot;ap-step-circle sc-&lt;%= s_fin %&gt;&quot;&gt;\n\t\t\t\t\t\t&lt;% if(s_fin == &quot;done&quot;) { %&gt;\n\t\t\t\t\t\t\t&lt;i class=&quot;zc-li-outline ui-1-check-simple&quot; style=&quot;font-size:13px;&quot;&gt;&lt;/i&gt;\n\t\t\t\t\t\t&lt;% } else { %&gt;3&lt;% } %&gt;\n\t\t\t\t\t&lt;/div&gt;\n\t\t\t\t\t&lt;span class=&quot;ap-step-lbl sl-&lt;%= s_fin %&gt;&quot;&gt;Finance&lt;/span&gt;\n\t\t\t\t&lt;/div&gt;\n\t\t\t\t&lt;%\n\t\t\t\t\t}\n\t\t\t\t%&gt;\n\t\t\t&lt;/div&gt;\n\n\t\t\t&lt;!-- STAT CARDS --&gt;\n\t\t\t&lt;div class=&quot;ap-stats&quot;&gt;\n\t\t\t\t&lt;div class=&quot;ap-stat-card&quot; style=&quot;background:#EFF6FF;&quot;&gt;\n\t\t\t\t\t&lt;span class=&quot;ap-stat-val&quot; style=&quot;font-size:17px;&quot;&gt;$&lt;%= d_amount %&gt;&lt;/span&gt;\n\t\t\t\t\t&lt;span class=&quot;ap-stat-lbl&quot;&gt;Request Value&lt;/span&gt;\n\t\t\t\t&lt;/div&gt;\n\t\t\t\t&lt;div class=&quot;ap-stat-card&quot; style=&quot;background:#FFF8E7;&quot;&gt;\n\t\t\t\t\t&lt;span class=&quot;ap-stat-val&quot; style=&quot;color:#D97706;font-size:13px;&quot;&gt;&lt;%= d_tier %&gt;&lt;/span&gt;\n\t\t\t\t\t&lt;span class=&quot;ap-stat-lbl&quot;&gt;Approval Tier&lt;/span&gt;\n\t\t\t\t&lt;/div&gt;\n\t\t\t\t&lt;div class=&quot;ap-stat-card&quot; style=&quot;background:#F0FDF4;&quot;&gt;\n\t\t\t\t\t&lt;span class=&quot;ap-stat-val&quot; style=&quot;color:#16AD78;font-size:12px;&quot;&gt;&lt;%= d_sla %&gt;&lt;/span&gt;\n\t\t\t\t\t&lt;span class=&quot;ap-stat-lbl&quot;&gt;SLA Due Date&lt;/span&gt;\n\t\t\t\t&lt;/div&gt;\n\t\t\t&lt;/div&gt;\n\n\t\t\t&lt;!-- REQUEST DETAILS --&gt;\n\t\t\t&lt;div class=&quot;ap-req-grid&quot;&gt;\n\t\t\t\t&lt;div class=&quot;ap-field&quot;&gt;\n\t\t\t\t\t&lt;span class=&quot;ap-flbl&quot;&gt;Department&lt;/span&gt;\n\t\t\t\t\t&lt;span class=&quot;ap-fval&quot;&gt;&lt;%= d_dept %&gt;&lt;/span&gt;\n\t\t\t\t&lt;/div&gt;\n\t\t\t\t&lt;div class=&quot;ap-field&quot;&gt;\n\t\t\t\t\t&lt;span class=&quot;ap-flbl&quot;&gt;Requester&lt;/span&gt;\n\t\t\t\t\t&lt;span class=&quot;ap-fval&quot;&gt;&lt;%= d_requester %&gt;&lt;/span&gt;\n\t\t\t\t&lt;/div&gt;\n\t\t\t\t&lt;div class=&quot;ap-field&quot;&gt;\n\t\t\t\t\t&lt;span class=&quot;ap-flbl&quot;&gt;Priority&lt;/span&gt;\n\t\t\t\t\t&lt;span class=&quot;ap-fval&quot;&gt;&lt;%= d_priority %&gt;&lt;/span&gt;\n\t\t\t\t&lt;/div&gt;\n\t\t\t\t&lt;div class=&quot;ap-field&quot;&gt;\n\t\t\t\t\t&lt;span class=&quot;ap-flbl&quot;&gt;Submitted Date&lt;/span&gt;\n\t\t\t\t\t&lt;span class=&quot;ap-fval&quot;&gt;&lt;%= d_submitted %&gt;&lt;/span&gt;\n\t\t\t\t&lt;/div&gt;\n\t\t\t\t&lt;div class=&quot;ap-field span2&quot;&gt;\n\t\t\t\t\t&lt;span class=&quot;ap-flbl&quot;&gt;Item / Description&lt;/span&gt;\n\t\t\t\t\t&lt;span class=&quot;ap-fval&quot;&gt;&lt;%= d_desc %&gt;&lt;/span&gt;\n\t\t\t\t&lt;/div&gt;\n\t\t\t&lt;/div&gt;\n\n\t\t\t&lt;!-- ACTIVITY LOG --&gt;\n\t\t\t&lt;div class=&quot;ap-log&quot;&gt;\n\t\t\t\t&lt;span class=&quot;ap-sec-title&quot;&gt;Activity Log&lt;/span&gt;\n\t\t\t\t&lt;%\n\t\t\t\t\tlog_str = input.log_json;\n\t\t\t\t\tlog_found = false;\n\t\t\t\t\tif(log_str != null &amp;&amp; log_str != &quot;&quot; &amp;&amp; log_str != &quot;[]&quot;)\n\t\t\t\t\t{\n\t\t\t\t\t\tlog_list = log_str.toList();\n\t\t\t\t\t\tif(log_list.size() &gt; 0)\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tlog_found = true;\n\t\t\t\t\t\t\tfor each log_item in log_list\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\tlm          = log_item.toMap();\n\t\t\t\t\t\t\t\tl_time      = lm.get(&quot;Decision_Timestamp&quot;);\n\t\t\t\t\t\t\t\tl_stage     = lm.get(&quot;Stage&quot;);\n\t\t\t\t\t\t\t\tl_approver  = lm.get(&quot;Approver_Name&quot;);\n\t\t\t\t\t\t\t\tl_decision  = lm.get(&quot;Decision&quot;);\n\t\t\t\t\t\t\t\tl_comment   = lm.get(&quot;Comments&quot;);\n\n\t\t\t\t\t\t\t\tif(l_time == null || l_time == &quot;&quot;)         { l_time     = &quot;&quot;; }\n\t\t\t\t\t\t\t\tif(l_stage == null || l_stage == &quot;&quot;)       { l_stage    = &quot;&quot;; }\n\t\t\t\t\t\t\t\tif(l_approver == null || l_approver == &quot;&quot;) { l_approver = &quot;&quot;; }\n\t\t\t\t\t\t\t\tif(l_decision == null || l_decision == &quot;&quot;) { l_decision = &quot;&quot;; }\n\t\t\t\t\t\t\t\tif(l_comment == null)                      { l_comment  = &quot;&quot;; }\n\n\t\t\t\t\t\t\t\tl_dot  = &quot;#9CA3AF&quot;;\n\t\t\t\t\t\t\t\tl_line = &quot;#E5E7EB&quot;;\n\t\t\t\t\t\t\t\tif(l_decision == &quot;Approved&quot;)      { l_dot = &quot;#16AD78&quot;; l_line = &quot;#DCFCE7&quot;; }\n\t\t\t\t\t\t\t\tif(l_decision == &quot;Auto-Approved&quot;)  { l_dot = &quot;#2563EB&quot;; l_line = &quot;#BFDBFE&quot;; }\n\t\t\t\t\t\t\t\tif(l_decision == &quot;On_Hold&quot;)        { l_dot = &quot;#F59E0B&quot;; l_line = &quot;#FEF9C3&quot;; }\n\t\t\t\t\t\t\t\tif(l_decision == &quot;On Hold&quot;)        { l_dot = &quot;#F59E0B&quot;; l_line = &quot;#FEF9C3&quot;; }\n\t\t\t\t\t\t\t\tif(l_decision == &quot;Rejected&quot;)       { l_dot = &quot;#EF4444&quot;; l_line = &quot;#FEE2E2&quot;; }\n\n\t\t\t\t\t\t\t\tl_desc = l_stage;\n\t\t\t\t\t\t\t\tif(l_approver != &quot;&quot;) { l_desc = l_stage + &quot; - &quot; + l_approver; }\n\t\t\t\t%&gt;\n\t\t\t\t&lt;div class=&quot;ap-log-entry&quot;&gt;\n\t\t\t\t\t&lt;div class=&quot;ap-log-left&quot;&gt;\n\t\t\t\t\t\t&lt;div class=&quot;ap-log-dot&quot; style=&quot;background:&lt;%= l_dot %&gt;;&quot;&gt;&lt;/div&gt;\n\t\t\t\t\t\t&lt;div class=&quot;ap-log-line&quot; style=&quot;background:&lt;%= l_line %&gt;;&quot;&gt;&lt;/div&gt;\n\t\t\t\t\t&lt;/div&gt;\n\t\t\t\t\t&lt;div class=&quot;ap-log-right&quot;&gt;\n\t\t\t\t\t\t&lt;span class=&quot;ap-log-time&quot;&gt;&lt;%= l_time %&gt;&lt;/span&gt;\n\t\t\t\t\t\t&lt;span class=&quot;ap-log-desc&quot;&gt;&lt;%= l_decision %&gt; - &lt;%= l_desc %&gt;&lt;/span&gt;\n\t\t\t\t\t\t&lt;% if(l_comment != &quot;&quot;) { %&gt;\n\t\t\t\t\t\t&lt;span class=&quot;ap-log-comment&quot;&gt;&lt;%= l_comment %&gt;&lt;/span&gt;\n\t\t\t\t\t\t&lt;% } %&gt;\n\t\t\t\t\t&lt;/div&gt;\n\t\t\t\t&lt;/div&gt;\n\t\t\t\t&lt;%\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t\tif(log_found == false)\n\t\t\t\t\t{\n\t\t\t\t%&gt;\n\t\t\t\t&lt;div style=&quot;font-size:13px;color:#9CA3AF;font-style:italic;&quot;&gt;No activity log entries for this request yet.&lt;/div&gt;\n\t\t\t\t&lt;%\n\t\t\t\t\t}\n\t\t\t\t%&gt;\n\t\t\t&lt;/div&gt;\n\n\t\t\t&lt;!-- ACTION BAR --&gt;\n\t\t\t&lt;% if(show_actions) { %&gt;\n\t\t\t&lt;div class=&quot;ap-actions&quot;&gt;\n\t\t\t\t&lt;a class=&quot;ap-btn btn-approve&quot;\n\t\t\t\t\t href=&quot;#Page:Approval_Action?Request_ID_Input=&lt;%= d_req_id %&gt;&amp;Approver_Stage=&lt;%= d_stage_lbl %&gt;&amp;Decision=Approved&quot;&gt;\n\t\t\t\t\tApprove\n\t\t\t\t&lt;/a&gt;\n\t\t\t\t&lt;a class=&quot;ap-btn btn-hold&quot;\n\t\t\t\t\t href=&quot;#Page:Approval_Action?Request_ID_Input=&lt;%= d_req_id %&gt;&amp;Approver_Stage=&lt;%= d_stage_lbl %&gt;&amp;Decision=On_Hold&quot;&gt;\n\t\t\t\t\tHold\n\t\t\t\t&lt;/a&gt;\n\t\t\t\t&lt;a class=&quot;ap-btn btn-reject&quot;\n\t\t\t\t\t href=&quot;#Page:Approval_Action?Request_ID_Input=&lt;%= d_req_id %&gt;&amp;Approver_Stage=&lt;%= d_stage_lbl %&gt;&amp;Decision=Rejected&quot;&gt;\n\t\t\t\t\tReject\n\t\t\t\t&lt;/a&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;% } else { %&gt;\n\t\t\t&lt;div class=&quot;ap-no-action&quot;&gt;\n\t\t\t\tThis request has been &lt;%= d_status %&gt;. No further actions available.\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;% } %&gt;\n\n\t\t&lt;/div&gt;\n\t\t&lt;!-- END DETAIL PANEL --&gt;\n\n\t&lt;/div&gt;\n\t&lt;!-- END SPLIT --&gt;\n\n&lt;/div&gt;\n&lt;%}%&gt;\n\t\t\t\t\t]]>\n\t\t\t\t</dsp>\n\t\t\t</column>\n\t\t</row>\n\t</layout>\n</zml>"
-					script
-					{
-						active_tab = input.active_tab;
-						if(active_tab == null || active_tab == "")
-						{
-						  active_tab = "all";
-						}
-						selected_id = input.selected_id;
-						if(selected_id == null || selected_id == "")
-						{
-						  selected_id = "BRQ-2026-0303";
-						}
-						
-						if(active_tab == "rm")
-						{
-						  queue_records = Spend_Request[Status == "Pending_RM"];
-						}
-						else if(active_tab == "dept_head")
-						{
-						  queue_records = Spend_Request[Status == "Pending_Dept_Head"];
-						}
-						else if(active_tab == "finance")
-						{
-						  queue_records = Spend_Request[Status == "Pending_Finance"];
-						}
-						else
-						{
-						  queue_records = Spend_Request[Status != "Auto_Approved" && Status != "Submitted"];
-						}
-						queue_json = queue_records.toJSONList();
-						
-						detail_records = Spend_Request[Request_ID == selected_id];
-						detail_json = detail_records.toJSONList();
-						
-						log_records = Approval_Log[Request_ID_Ref == selected_id];
-						log_json = log_records.toJSONList();
-					}
-		}
-
-		page Dashboard(string total_requests, string total_requested_value, string approved_count, string approved_value, string pending_count, string pending_value, string rejected_count, string rejected_value, string auto_count, string auto_value, string two_person_count, string two_person_value, string three_person_count, string three_person_value, string three_dash, string two_dash, string auto_dash, string two_offset, string auto_offset, string it_w, string qa_w, string prod_w, string maint_w, string proc_w, string hr_w, string it_disp, string qa_disp, string prod_disp, string maint_disp, string proc_disp, string hr_disp, string submitted_n, string auto_cleared_n, string sent_chain_n, string pend_rm_n, string pend_dh_n, string pend_fin_n, string approved_n, string rejected_n, string submitted_w, string auto_cleared_w, string sent_chain_w, string pend_rm_w, string pend_dh_w, string pend_fin_w, string approved_w, string rejected_w, string esc_badge, string esc1_id, string esc1_dept, string esc1_stage, string esc1_days, string esc2_id, string esc2_dept, string esc2_stage, string esc2_days)
+		page Dashboard
 		{
 					displayname = "Dashboard"
-					Content="<zml>\n\t<layout>\n\t\t<row>\n\t\t\t<column width='100%'>\n\t\t\t\t<dsp id='db_dashboard_content' elementName='Dashboard_Content'>\n\t\t\t\t\t<![CDATA[htmlpage db_dashboard_content()\n\t\t\t\t\t\t content\n\t\t\t\t\t\t &lt;%{%&gt;\n\t\t\t\t\t\t\t\t &lt;link href=&apos;https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&amp;display=swap&apos; rel=&apos;stylesheet&apos;&gt;\n&lt;style&gt;\n\t* { box-sizing: border-box; }\n\t.dbc-wrap {\n\t\tpadding: 24px 28px 40px 28px;\n\t\tbackground: #F8FAFC;\n\t\tmin-height: 100vh;\n\t\tfont-family: &apos;Lato&apos;, sans-serif;\n\t}\n\n\t/* PAGE HEADER */\n\t.dbc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }\n\t.dbc-title  { font-size: 22px; font-weight: 700; color: #111827; margin: 0 0 4px 0; }\n\t.dbc-sub    { font-size: 13px; color: #6B7280; margin: 0; }\n\t.dbc-period { background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 20px; padding: 6px 16px; font-size: 12px; color: #1D4ED8; font-weight: 600; white-space: nowrap; margin-top: 4px; }\n\n\t/* LOAD BANNER */\n\t.dbc-banner {\n\t\tbackground: #EFF6FF; border: 1.5px solid #BFDBFE; border-radius: 10px;\n\t\tpadding: 18px 24px; display: flex; align-items: center; justify-content: space-between;\n\t\tmargin-bottom: 24px; flex-wrap: wrap; gap: 14px;\n\t}\n\t.dbc-banner-title { font-size: 15px; font-weight: 700; color: #1E40AF; margin-bottom: 4px; }\n\t.dbc-banner-sub   { font-size: 13px; color: #3B82F6; }\n\t.dbc-load-btn {\n\t\tbackground: #2563EB; color: #FFFFFF; font-size: 14px; font-weight: 700;\n\t\tfont-family: &apos;Lato&apos;, sans-serif; padding: 10px 22px;\n\t\tborder-radius: 6px; text-decoration: none; white-space: nowrap;\n\t\tdisplay: inline-flex; align-items: center; gap: 6px;\n\t}\n\n\t/* STAT ROW */\n\t.dbc-stat-row { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }\n\t.dbc-stat {\n\t\tflex: 1; min-width: 150px; background: #FFFFFF; border-radius: 10px;\n\t\tbox-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 20px 20px 16px 20px;\n\t\tborder-left: 4px solid #E5E7EB; position: relative; overflow: hidden;\n\t}\n\t.dbc-stat-val   { font-size: 22px; font-weight: 700; color: #111827; display: block; line-height: 1.2; }\n\t.dbc-stat-cnt   { font-size: 12px; color: #6B7280; display: block; margin-top: 2px; }\n\t.dbc-stat-lbl   { font-size: 11px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 10px; display: block; }\n\t.dbc-stat-tint  { position: absolute; right: -8px; bottom: -8px; font-size: 56px; opacity: 0.06; line-height: 1; }\n\n\t/* ROW 2 */\n\t.dbc-row2 { display: flex; gap: 20px; margin-bottom: 24px; align-items: flex-start; flex-wrap: wrap; }\n\n\t/* DONUT CARD */\n\t.dbc-donut-card {\n\t\twidth: 320px; flex-shrink: 0; background: #FFFFFF;\n\t\tborder-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px;\n\t}\n\t.dbc-card-title { font-size: 15px; font-weight: 700; color: #111827; margin: 0 0 18px 0; }\n\t.dbc-donut-wrap { position: relative; display: flex; justify-content: center; align-items: center; margin-bottom: 16px; }\n\t.dbc-donut-center { position: absolute; text-align: center; pointer-events: none; }\n\t.dbc-donut-val { font-size: 15px; font-weight: 700; color: #111827; display: block; }\n\t.dbc-donut-lbl { font-size: 11px; color: #9CA3AF; display: block; }\n\t.dbc-legend-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }\n\t.dbc-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }\n\t.dbc-leg-name  { font-size: 13px; color: #374151; flex: 1; }\n\t.dbc-leg-val   { font-size: 13px; font-weight: 700; color: #111827; }\n\t.dbc-leg-count { font-size: 12px; color: #9CA3AF; margin-left: 6px; }\n\n\t/* BAR CARD */\n\t.dbc-bar-card {\n\t\tflex: 1; min-width: 0; background: #FFFFFF;\n\t\tborder-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px;\n\t}\n\t.dbc-card-sub  { font-size: 12px; color: #9CA3AF; display: block; margin-top: -14px; margin-bottom: 18px; }\n\t.dbc-bar-row   { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }\n\t.dbc-bar-dept  { font-size: 13px; color: #374151; width: 165px; flex-shrink: 0; }\n\t.dbc-bar-track { flex: 1; background: #F1F5F9; border-radius: 4px; height: 26px; overflow: hidden; }\n\t.dbc-bar-fill  { height: 26px; border-radius: 4px; background: #2563EB; }\n\t.dbc-bar-val   { font-size: 12px; font-weight: 700; color: #374151; width: 80px; text-align: right; flex-shrink: 0; }\n\n\t/* ROW 3 */\n\t.dbc-row3 { display: flex; gap: 20px; margin-bottom: 24px; align-items: flex-start; flex-wrap: wrap; }\n\n\t/* FUNNEL CARD */\n\t.dbc-funnel-card {\n\t\tflex: 1; min-width: 0; background: #FFFFFF;\n\t\tborder-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px;\n\t}\n\t.dbc-funnel-row   { display: flex; align-items: center; gap: 12px; margin-bottom: 11px; }\n\t.dbc-funnel-stage { font-size: 13px; color: #374151; width: 148px; flex-shrink: 0; }\n\t.dbc-funnel-track { flex: 1; background: #F1F5F9; border-radius: 4px; height: 24px; overflow: hidden; }\n\t.dbc-funnel-fill  { height: 24px; border-radius: 4px; }\n\t.dbc-funnel-cnt   { font-size: 12px; font-weight: 700; color: #374151; width: 28px; text-align: right; flex-shrink: 0; }\n\n\t/* ESCALATION CARD */\n\t.dbc-esc-card {\n\t\twidth: 360px; flex-shrink: 0; background: #FFFFFF;\n\t\tborder-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px;\n\t}\n\t.dbc-esc-top  { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }\n\t.dbc-esc-ttl  { font-size: 15px; font-weight: 700; color: #111827; margin: 0; }\n\t.dbc-esc-bdg  { background: #FEE2E2; color: #EF4444; border-radius: 20px; padding: 3px 10px; font-size: 12px; font-weight: 700; }\n\t.dbc-esc-item { background: #FEF2F2; border-left: 3px solid #EF4444; border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; }\n\t.dbc-esc-row  { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }\n\t.dbc-esc-id   { font-size: 14px; font-weight: 700; color: #111827; }\n\t.dbc-esc-days { font-size: 13px; font-weight: 700; color: #EF4444; }\n\t.dbc-esc-meta { font-size: 12px; color: #6B7280; }\n\n\t/* FOOTER */\n\t.dbc-footer { margin-top: 8px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }\n\t.dbc-foot-lbl { font-size: 13px; color: #374151; }\n\t.dbc-turn-bdg { background: #F3F4F6; border-radius: 20px; padding: 5px 14px; font-size: 13px; color: #374151; }\n\t.dbc-turn-bdg strong { font-weight: 700; }\n&lt;/style&gt;\n\n&lt;%\n\t/* Read all values from page variables (set in onload script in Dashboard.ds) */\n\ttotal_requested_value = input.total_requested_value;\n\ttotal_requests        = input.total_requests;\n\tapproved_value        = input.approved_value;\n\tapproved_count        = input.approved_count;\n\tpending_value         = input.pending_value;\n\tpending_count         = input.pending_count;\n\trejected_value        = input.rejected_value;\n\trejected_count        = input.rejected_count;\n\tauto_count            = input.auto_count;\n\tauto_value            = input.auto_value;\n\ttwo_person_count      = input.two_person_count;\n\ttwo_person_value      = input.two_person_value;\n\tthree_person_count    = input.three_person_count;\n\tthree_person_value    = input.three_person_value;\n\tthree_dash            = input.three_dash;\n\ttwo_dash              = input.two_dash;\n\tauto_dash             = input.auto_dash;\n\ttwo_offset            = input.two_offset;\n\tauto_offset           = input.auto_offset;\n\tit_w = input.it_w; qa_w = input.qa_w; prod_w = input.prod_w;\n\tmaint_w = input.maint_w; proc_w = input.proc_w; hr_w = input.hr_w;\n\tit_disp = input.it_disp; qa_disp = input.qa_disp; prod_disp = input.prod_disp;\n\tmaint_disp = input.maint_disp; proc_disp = input.proc_disp; hr_disp = input.hr_disp;\n\tsubmitted_n    = input.submitted_n;\n\tauto_cleared_n = input.auto_cleared_n;\n\tsent_chain_n   = input.sent_chain_n;\n\tpend_rm_n      = input.pend_rm_n;\n\tpend_dh_n      = input.pend_dh_n;\n\tpend_fin_n     = input.pend_fin_n;\n\tapproved_n     = input.approved_n;\n\trejected_n     = input.rejected_n;\n\tsubmitted_w    = input.submitted_w;\n\tauto_cleared_w = input.auto_cleared_w;\n\tsent_chain_w   = input.sent_chain_w;\n\tpend_rm_w      = input.pend_rm_w;\n\tpend_dh_w      = input.pend_dh_w;\n\tpend_fin_w     = input.pend_fin_w;\n\tapproved_w     = input.approved_w;\n\trejected_w     = input.rejected_w;\n\tesc_badge      = input.esc_badge;\n\tesc1_id        = input.esc1_id;\n\tesc1_dept      = input.esc1_dept;\n\tesc1_stage     = input.esc1_stage;\n\tesc1_days      = input.esc1_days;\n\tesc2_id        = input.esc2_id;\n\tesc2_dept      = input.esc2_dept;\n\tesc2_stage     = input.esc2_stage;\n\tesc2_days      = input.esc2_days;\n\n\t/* Guard nulls */\n\tif(total_requested_value == null || total_requested_value == &quot;&quot;) { total_requested_value = &quot;$0&quot;; }\n\tif(total_requests == null || total_requests == &quot;&quot;)               { total_requests = &quot;0&quot;; }\n\tif(approved_value == null || approved_value == &quot;&quot;)               { approved_value = &quot;$0&quot;; }\n\tif(approved_count == null || approved_count == &quot;&quot;)               { approved_count = &quot;0&quot;; }\n\tif(pending_value == null || pending_value == &quot;&quot;)                 { pending_value = &quot;$0&quot;; }\n\tif(pending_count == null || pending_count == &quot;&quot;)                 { pending_count = &quot;0&quot;; }\n\tif(rejected_value == null || rejected_value == &quot;&quot;)               { rejected_value = &quot;$0&quot;; }\n\tif(rejected_count == null || rejected_count == &quot;&quot;)               { rejected_count = &quot;0&quot;; }\n\tif(three_dash == null || three_dash == &quot;&quot;)   { three_dash = &quot;0&quot;; }\n\tif(two_dash == null || two_dash == &quot;&quot;)       { two_dash   = &quot;0&quot;; }\n\tif(auto_dash == null || auto_dash == &quot;&quot;)     { auto_dash  = &quot;0&quot;; }\n\tif(two_offset == null || two_offset == &quot;&quot;)   { two_offset = &quot;0&quot;; }\n\tif(auto_offset == null || auto_offset == &quot;&quot;) { auto_offset = &quot;0&quot;; }\n\tif(esc_badge == null || esc_badge == &quot;&quot;)     { esc_badge = &quot;0 overdue&quot;; }\n\tif(esc1_id == null || esc1_id == &quot;&quot;)         { esc1_id = &quot;-&quot;; esc1_dept = &quot;-&quot;; esc1_stage = &quot;-&quot;; esc1_days = &quot;0&quot;; }\n\tif(esc2_id == null || esc2_id == &quot;&quot;)         { esc2_id = &quot;-&quot;; esc2_dept = &quot;-&quot;; esc2_stage = &quot;-&quot;; esc2_days = &quot;0&quot;; }\n\n\t/* Show load banner only if no data */\n\tall_n_raw = total_requests;\n\tshow_banner = false;\n\tif(all_n_raw == &quot;0&quot; || all_n_raw == null || all_n_raw == &quot;&quot;) { show_banner = true; }\n%&gt;\n\n&lt;div class=&quot;dbc-wrap&quot;&gt;\n\n\t&lt;!-- LOAD BANNER (only when DB empty) --&gt;\n\t&lt;% if(show_banner) { %&gt;\n\t&lt;div class=&quot;dbc-banner&quot;&gt;\n\t\t&lt;div&gt;\n\t\t\t&lt;div class=&quot;dbc-banner-title&quot;&gt;No data yet - App is empty&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-banner-sub&quot;&gt;Load all 18 BRD sample requests, 6 employees, 18 catalog items, and full approval history in one click.&lt;/div&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;a class=&quot;dbc-load-btn&quot; href=&quot;#Page:Dashboard?load=true&quot;&gt;\n\t\t\t&lt;i class=&quot;zc-li-outline ui-1-upload-to-cloud&quot; style=&quot;font-size:15px;&quot;&gt;&lt;/i&gt;\n\t\t\tLoad Sample Data\n\t\t&lt;/a&gt;\n\t&lt;/div&gt;\n\t&lt;% } %&gt;\n\n\t&lt;!-- PAGE HEADER --&gt;\n\t&lt;div class=&quot;dbc-header&quot;&gt;\n\t\t&lt;div&gt;\n\t\t\t&lt;h1 class=&quot;dbc-title&quot;&gt;Spend &amp;amp; Approval Dashboard&lt;/h1&gt;\n\t\t\t&lt;p class=&quot;dbc-sub&quot;&gt;Atlas Precision Manufacturing &amp;middot; Plant 3, Ohio, USA&lt;/p&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;span class=&quot;dbc-period&quot;&gt;Reporting Period: Sep 2026&lt;/span&gt;\n\t&lt;/div&gt;\n\n\t&lt;!-- STAT CARDS --&gt;\n\t&lt;div class=&quot;dbc-stat-row&quot;&gt;\n\t\t&lt;div class=&quot;dbc-stat&quot; style=&quot;border-left-color:#2563EB;&quot;&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-val&quot;&gt;&lt;%= total_requested_value %&gt;&lt;/span&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-cnt&quot;&gt;&lt;%= total_requests %&gt; requests&lt;/span&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-lbl&quot;&gt;Total Requested&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;dbc-stat&quot; style=&quot;border-left-color:#16AD78;&quot;&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-val&quot; style=&quot;color:#16AD78;&quot;&gt;&lt;%= approved_value %&gt;&lt;/span&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-cnt&quot;&gt;&lt;%= approved_count %&gt; requests&lt;/span&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-lbl&quot;&gt;Total Approved&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;dbc-stat&quot; style=&quot;border-left-color:#F59E0B;&quot;&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-val&quot; style=&quot;color:#D97706;&quot;&gt;&lt;%= pending_value %&gt;&lt;/span&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-cnt&quot;&gt;&lt;%= pending_count %&gt; requests&lt;/span&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-lbl&quot;&gt;Pending Value&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;dbc-stat&quot; style=&quot;border-left-color:#EF4444;&quot;&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-val&quot; style=&quot;color:#EF4444;&quot;&gt;&lt;%= rejected_value %&gt;&lt;/span&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-cnt&quot;&gt;&lt;%= rejected_count %&gt; requests&lt;/span&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-lbl&quot;&gt;Rejected Value&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t&lt;/div&gt;\n\n\t&lt;!-- ROW 2: DONUT + BAR CHART --&gt;\n\t&lt;div class=&quot;dbc-row2&quot;&gt;\n\n\t\t&lt;!-- DONUT --&gt;\n\t\t&lt;div class=&quot;dbc-donut-card&quot;&gt;\n\t\t\t&lt;h2 class=&quot;dbc-card-title&quot;&gt;Approval Tier Breakdown&lt;/h2&gt;\n\t\t\t&lt;div class=&quot;dbc-donut-wrap&quot;&gt;\n\t\t\t\t&lt;svg width=&quot;200&quot; height=&quot;200&quot; viewBox=&quot;0 0 220 220&quot; style=&quot;transform:rotate(-90deg);&quot;&gt;\n\t\t\t\t\t&lt;circle cx=&quot;110&quot; cy=&quot;110&quot; r=&quot;80&quot; fill=&quot;none&quot; stroke=&quot;#F3F4F6&quot; stroke-width=&quot;28&quot;/&gt;\n\t\t\t\t\t&lt;circle cx=&quot;110&quot; cy=&quot;110&quot; r=&quot;80&quot; fill=&quot;none&quot; stroke=&quot;#2563EB&quot; stroke-width=&quot;28&quot;\n\t\t\t\t\t\tstroke-dasharray=&quot;&lt;%= three_dash %&gt; 502&quot; stroke-dashoffset=&quot;0&quot;/&gt;\n\t\t\t\t\t&lt;circle cx=&quot;110&quot; cy=&quot;110&quot; r=&quot;80&quot; fill=&quot;none&quot; stroke=&quot;#F59E0B&quot; stroke-width=&quot;28&quot;\n\t\t\t\t\t\tstroke-dasharray=&quot;&lt;%= two_dash %&gt; 502&quot; stroke-dashoffset=&quot;-&lt;%= two_offset %&gt;&quot;/&gt;\n\t\t\t\t\t&lt;circle cx=&quot;110&quot; cy=&quot;110&quot; r=&quot;80&quot; fill=&quot;none&quot; stroke=&quot;#16AD78&quot; stroke-width=&quot;28&quot;\n\t\t\t\t\t\tstroke-dasharray=&quot;&lt;%= auto_dash %&gt; 502&quot; stroke-dashoffset=&quot;-&lt;%= auto_offset %&gt;&quot;/&gt;\n\t\t\t\t&lt;/svg&gt;\n\t\t\t\t&lt;div class=&quot;dbc-donut-center&quot;&gt;\n\t\t\t\t\t&lt;span class=&quot;dbc-donut-val&quot;&gt;&lt;%= total_requested_value %&gt;&lt;/span&gt;\n\t\t\t\t\t&lt;span class=&quot;dbc-donut-lbl&quot;&gt;Total&lt;/span&gt;\n\t\t\t\t&lt;/div&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-legend-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-dot&quot; style=&quot;background:#16AD78;&quot;&gt;&lt;/span&gt;\n\t\t\t\t&lt;span class=&quot;dbc-leg-name&quot;&gt;Auto&lt;/span&gt;\n\t\t\t\t&lt;span class=&quot;dbc-leg-val&quot;&gt;&lt;%= auto_value %&gt;&lt;/span&gt;\n\t\t\t\t&lt;span class=&quot;dbc-leg-count&quot;&gt;&lt;%= auto_count %&gt; req&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-legend-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-dot&quot; style=&quot;background:#F59E0B;&quot;&gt;&lt;/span&gt;\n\t\t\t\t&lt;span class=&quot;dbc-leg-name&quot;&gt;2-Person&lt;/span&gt;\n\t\t\t\t&lt;span class=&quot;dbc-leg-val&quot;&gt;&lt;%= two_person_value %&gt;&lt;/span&gt;\n\t\t\t\t&lt;span class=&quot;dbc-leg-count&quot;&gt;&lt;%= two_person_count %&gt; req&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-legend-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-dot&quot; style=&quot;background:#2563EB;&quot;&gt;&lt;/span&gt;\n\t\t\t\t&lt;span class=&quot;dbc-leg-name&quot;&gt;3-Person&lt;/span&gt;\n\t\t\t\t&lt;span class=&quot;dbc-leg-val&quot;&gt;&lt;%= three_person_value %&gt;&lt;/span&gt;\n\t\t\t\t&lt;span class=&quot;dbc-leg-count&quot;&gt;&lt;%= three_person_count %&gt; req&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t&lt;/div&gt;\n\n\t\t&lt;!-- DEPT BAR CHART --&gt;\n\t\t&lt;div class=&quot;dbc-bar-card&quot;&gt;\n\t\t\t&lt;h2 class=&quot;dbc-card-title&quot;&gt;Department-Wise Spend&lt;/h2&gt;\n\t\t\t&lt;span class=&quot;dbc-card-sub&quot;&gt;By total estimated cost (USD)&lt;/span&gt;\n\n\t\t\t&lt;div class=&quot;dbc-bar-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-dept&quot;&gt;IT &amp;amp; Systems&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-bar-track&quot;&gt;&lt;div class=&quot;dbc-bar-fill&quot; style=&quot;width:&lt;%= it_w %&gt;;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-val&quot;&gt;&lt;%= it_disp %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-bar-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-dept&quot;&gt;Quality Assurance&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-bar-track&quot;&gt;&lt;div class=&quot;dbc-bar-fill&quot; style=&quot;width:&lt;%= qa_w %&gt;;opacity:0.85;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-val&quot;&gt;&lt;%= qa_disp %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-bar-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-dept&quot;&gt;Production&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-bar-track&quot;&gt;&lt;div class=&quot;dbc-bar-fill&quot; style=&quot;width:&lt;%= prod_w %&gt;;opacity:0.75;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-val&quot;&gt;&lt;%= prod_disp %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-bar-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-dept&quot;&gt;Maintenance &amp;amp; Util.&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-bar-track&quot;&gt;&lt;div class=&quot;dbc-bar-fill&quot; style=&quot;width:&lt;%= maint_w %&gt;;opacity:0.65;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-val&quot;&gt;&lt;%= maint_disp %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-bar-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-dept&quot;&gt;Procurement &amp;amp; Stores&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-bar-track&quot;&gt;&lt;div class=&quot;dbc-bar-fill&quot; style=&quot;width:&lt;%= proc_w %&gt;;opacity:0.55;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-val&quot;&gt;&lt;%= proc_disp %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-bar-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-dept&quot;&gt;HR &amp;amp; Admin&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-bar-track&quot;&gt;&lt;div class=&quot;dbc-bar-fill&quot; style=&quot;width:&lt;%= hr_w %&gt;;opacity:0.45;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-val&quot;&gt;&lt;%= hr_disp %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t&lt;/div&gt;\n\t&lt;/div&gt;\n\n\t&lt;!-- ROW 3: FUNNEL + ESCALATION --&gt;\n\t&lt;div class=&quot;dbc-row3&quot;&gt;\n\n\t\t&lt;!-- FUNNEL --&gt;\n\t\t&lt;div class=&quot;dbc-funnel-card&quot;&gt;\n\t\t\t&lt;h2 class=&quot;dbc-card-title&quot;&gt;Approval Funnel&lt;/h2&gt;\n\t\t\t&lt;span class=&quot;dbc-card-sub&quot;&gt;Stage progression from submission to resolution&lt;/span&gt;\n\n\t\t\t&lt;div class=&quot;dbc-funnel-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-stage&quot;&gt;Submitted&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-funnel-track&quot;&gt;&lt;div class=&quot;dbc-funnel-fill&quot; style=&quot;width:&lt;%= submitted_w %&gt;;background:#9CA3AF;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-cnt&quot;&gt;&lt;%= submitted_n %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-funnel-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-stage&quot;&gt;Auto-Cleared&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-funnel-track&quot;&gt;&lt;div class=&quot;dbc-funnel-fill&quot; style=&quot;width:&lt;%= auto_cleared_w %&gt;;background:#16AD78;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-cnt&quot;&gt;&lt;%= auto_cleared_n %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-funnel-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-stage&quot;&gt;Sent to Chain&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-funnel-track&quot;&gt;&lt;div class=&quot;dbc-funnel-fill&quot; style=&quot;width:&lt;%= sent_chain_w %&gt;;background:#60A5FA;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-cnt&quot;&gt;&lt;%= sent_chain_n %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-funnel-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-stage&quot;&gt;Pending RM&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-funnel-track&quot;&gt;&lt;div class=&quot;dbc-funnel-fill&quot; style=&quot;width:&lt;%= pend_rm_w %&gt;;background:#F59E0B;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-cnt&quot;&gt;&lt;%= pend_rm_n %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-funnel-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-stage&quot;&gt;Pending Dept Head&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-funnel-track&quot;&gt;&lt;div class=&quot;dbc-funnel-fill&quot; style=&quot;width:&lt;%= pend_dh_w %&gt;;background:#F59E0B;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-cnt&quot;&gt;&lt;%= pend_dh_n %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-funnel-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-stage&quot;&gt;Pending Finance&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-funnel-track&quot;&gt;&lt;div class=&quot;dbc-funnel-fill&quot; style=&quot;width:&lt;%= pend_fin_w %&gt;;background:#F59E0B;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-cnt&quot;&gt;&lt;%= pend_fin_n %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-funnel-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-stage&quot;&gt;Approved&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-funnel-track&quot;&gt;&lt;div class=&quot;dbc-funnel-fill&quot; style=&quot;width:&lt;%= approved_w %&gt;;background:#16AD78;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-cnt&quot;&gt;&lt;%= approved_n %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-funnel-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-stage&quot;&gt;Rejected&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-funnel-track&quot;&gt;&lt;div class=&quot;dbc-funnel-fill&quot; style=&quot;width:&lt;%= rejected_w %&gt;;background:#EF4444;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-cnt&quot;&gt;&lt;%= rejected_n %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t&lt;/div&gt;\n\n\t\t&lt;!-- ESCALATION LIST --&gt;\n\t\t&lt;div class=&quot;dbc-esc-card&quot;&gt;\n\t\t\t&lt;div class=&quot;dbc-esc-top&quot;&gt;\n\t\t\t\t&lt;h2 class=&quot;dbc-esc-ttl&quot;&gt;Escalation - SLA Overdue&lt;/h2&gt;\n\t\t\t\t&lt;span class=&quot;dbc-esc-bdg&quot;&gt;&lt;%= esc_badge %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;% if(esc1_id != &quot;-&quot; &amp;&amp; esc1_id != null &amp;&amp; esc1_id != &quot;&quot;) { %&gt;\n\t\t\t&lt;div class=&quot;dbc-esc-item&quot;&gt;\n\t\t\t\t&lt;div class=&quot;dbc-esc-row&quot;&gt;\n\t\t\t\t\t&lt;span class=&quot;dbc-esc-id&quot;&gt;&lt;%= esc1_id %&gt;&lt;/span&gt;\n\t\t\t\t\t&lt;span class=&quot;dbc-esc-days&quot;&gt;&lt;%= esc1_days %&gt; days overdue&lt;/span&gt;\n\t\t\t\t&lt;/div&gt;\n\t\t\t\t&lt;div class=&quot;dbc-esc-meta&quot;&gt;&lt;%= esc1_dept %&gt; &amp;middot; &lt;%= esc1_stage %&gt;&lt;/div&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;% } %&gt;\n\t\t\t&lt;% if(esc2_id != &quot;-&quot; &amp;&amp; esc2_id != null &amp;&amp; esc2_id != &quot;&quot;) { %&gt;\n\t\t\t&lt;div class=&quot;dbc-esc-item&quot;&gt;\n\t\t\t\t&lt;div class=&quot;dbc-esc-row&quot;&gt;\n\t\t\t\t\t&lt;span class=&quot;dbc-esc-id&quot;&gt;&lt;%= esc2_id %&gt;&lt;/span&gt;\n\t\t\t\t\t&lt;span class=&quot;dbc-esc-days&quot;&gt;&lt;%= esc2_days %&gt; days overdue&lt;/span&gt;\n\t\t\t\t&lt;/div&gt;\n\t\t\t\t&lt;div class=&quot;dbc-esc-meta&quot;&gt;&lt;%= esc2_dept %&gt; &amp;middot; &lt;%= esc2_stage %&gt;&lt;/div&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;% } %&gt;\n\t\t\t&lt;% if((esc1_id == &quot;-&quot; || esc1_id == null || esc1_id == &quot;&quot;) &amp;&amp; (esc2_id == &quot;-&quot; || esc2_id == null || esc2_id == &quot;&quot;)) { %&gt;\n\t\t\t&lt;div style=&quot;font-size:13px;color:#9CA3AF;font-style:italic;padding:8px 0;&quot;&gt;No overdue requests at this time.&lt;/div&gt;\n\t\t\t&lt;% } %&gt;\n\t\t&lt;/div&gt;\n\t&lt;/div&gt;\n\n\t&lt;!-- FOOTER: AVG TURNAROUND --&gt;\n\t&lt;div class=&quot;dbc-footer&quot;&gt;\n\t\t&lt;span class=&quot;dbc-foot-lbl&quot;&gt;Avg. Approval Turnaround&lt;/span&gt;\n\t\t&lt;span class=&quot;dbc-turn-bdg&quot;&gt;&lt;strong&gt;2-Person:&lt;/strong&gt; 2.4 days&lt;/span&gt;\n\t\t&lt;span class=&quot;dbc-turn-bdg&quot;&gt;&lt;strong&gt;3-Person:&lt;/strong&gt; 5.1 days&lt;/span&gt;\n\t&lt;/div&gt;\n\n&lt;/div&gt;\n\t\t\t\t\t\t &lt;%}%&gt;\n\t\t\t\t ]]>\n\t\t\t\t</dsp>\n\t\t\t</column>\n\t\t</row>\n\t</layout>\n</zml>"
-					script
-					{
-						all_reqs = Spend_Request[ID != 0].count();
-						
-						if(all_reqs > 0)
-						{
-						  total_sum = Spend_Request[ID != 0].sum(Estimated_Cost);
-						  total_requested_value = "$" + "" + total_sum.toLong();
-						  total_requests = "" + all_reqs;
-						
-						  appr_cnt = Spend_Request[Status == "Approved" || Status == "Auto_Approved"].count();
-						  approved_sum = Spend_Request[Status == "Approved" || Status == "Auto_Approved"].sum(Estimated_Cost);
-						  approved_value = "$" + "" + approved_sum.toLong();
-						  approved_count = "" + appr_cnt;
-						
-						  pend_cnt = Spend_Request[Status == "Pending_RM" || Status == "Pending_Dept_Head" || Status == "Pending_Finance"].count();
-						  pending_sum = Spend_Request[Status == "Pending_RM" || Status == "Pending_Dept_Head" || Status == "Pending_Finance"].sum(Estimated_Cost);
-						  pending_value = "$" + "" + pending_sum.toLong();
-						  pending_count = "" + pend_cnt;
-						
-						  rej_cnt = Spend_Request[Status == "Rejected"].count();
-						  rejected_sum = Spend_Request[Status == "Rejected"].sum(Estimated_Cost);
-						  rejected_value = "$" + "" + rejected_sum.toLong();
-						  rejected_count = "" + rej_cnt;
-						
-						  auto_cnt = Spend_Request[Estimated_Cost <= 1000].count();
-						  two_cnt = Spend_Request[Estimated_Cost > 1000 && Estimated_Cost <= 50000].count();
-						  three_cnt = Spend_Request[Estimated_Cost > 50000].count();
-						  auto_s = Spend_Request[Estimated_Cost <= 1000].sum(Estimated_Cost);
-						  two_s = Spend_Request[Estimated_Cost > 1000 && Estimated_Cost <= 50000].sum(Estimated_Cost);
-						  three_s = Spend_Request[Estimated_Cost > 50000].sum(Estimated_Cost);
-						  auto_count = "" + auto_cnt;
-						  two_person_count = "" + two_cnt;
-						  three_person_count = "" + three_cnt;
-						  auto_value = "$" + "" + auto_s.toLong();
-						  two_person_value = "$" + "" + two_s.toLong();
-						  three_person_value = "$" + "" + three_s.toLong();
-						
-						  if(total_sum > 0)
-						  {
-						    auto_dash = "" + ((auto_s / total_sum) * 502).toLong();
-						    two_dash = "" + ((two_s / total_sum) * 502).toLong();
-						    three_dash = "" + ((three_s / total_sum) * 502).toLong();
-						    two_offset = "" + (502 - three_dash.toLong()).toLong();
-						    auto_offset = "" + (502 - three_dash.toLong() - two_dash.toLong()).toLong();
-						  }
-						  else
-						  {
-						    auto_dash = "2"; two_dash = "91"; three_dash = "409";
-						    two_offset = "93"; auto_offset = "2";
-						  }
-						
-						  it_pct = Spend_Request[Department == "IT & Systems"].sum(Estimated_Cost);
-						  qa_pct = Spend_Request[Department == "Quality Assurance"].sum(Estimated_Cost);
-						  prod_pct = Spend_Request[Department == "Production"].sum(Estimated_Cost);
-						  maint_pct = Spend_Request[Department == "Maintenance & Utilities"].sum(Estimated_Cost);
-						  proc_pct = Spend_Request[Department == "Procurement & Stores"].sum(Estimated_Cost);
-						  hr_pct = Spend_Request[Department == "HR & Admin"].sum(Estimated_Cost);
-						
-						  live_max = it_pct;
-						  if(qa_pct > live_max) { live_max = qa_pct; }
-						  if(prod_pct > live_max) { live_max = prod_pct; }
-						  if(maint_pct > live_max) { live_max = maint_pct; }
-						  if(proc_pct > live_max) { live_max = proc_pct; }
-						  if(hr_pct > live_max) { live_max = hr_pct; }
-						
-						  if(live_max > 0)
-						  {
-						    it_w = "" + ((it_pct / live_max) * 100).toLong() + "%";
-						    qa_w = "" + ((qa_pct / live_max) * 100).toLong() + "%";
-						    prod_w = "" + ((prod_pct / live_max) * 100).toLong() + "%";
-						    maint_w = "" + ((maint_pct / live_max) * 100).toLong() + "%";
-						    proc_w = "" + ((proc_pct / live_max) * 100).toLong() + "%";
-						    hr_w = "" + ((hr_pct / live_max) * 100).toLong() + "%";
-						    it_disp = "$" + "" + it_pct.toLong();
-						    qa_disp = "$" + "" + qa_pct.toLong();
-						    prod_disp = "$" + "" + prod_pct.toLong();
-						    maint_disp = "$" + "" + maint_pct.toLong();
-						    proc_disp = "$" + "" + proc_pct.toLong();
-						    hr_disp = "$" + "" + hr_pct.toLong();
-						  }
-						  else
-						  {
-						    it_w = "100%"; qa_w = "93%"; prod_w = "90%"; maint_w = "77%"; proc_w = "66%"; hr_w = "49%";
-						    it_disp = "$163,560"; qa_disp = "$152,280"; prod_disp = "$147,350";
-						    maint_disp = "$126,620"; proc_disp = "$108,340"; hr_disp = "$80,210";
-						  }
-						
-						  a_clr = Spend_Request[Estimated_Cost <= 1000].count();
-						  s_chn = Spend_Request[Estimated_Cost > 1000].count();
-						  p_rm = Spend_Request[Status == "Pending_RM"].count();
-						  p_dh = Spend_Request[Status == "Pending_Dept_Head"].count();
-						  p_fn = Spend_Request[Status == "Pending_Finance"].count();
-						
-						  submitted_n = "" + all_reqs;
-						  auto_cleared_n = "" + a_clr;
-						  sent_chain_n = "" + s_chn;
-						  pend_rm_n = "" + p_rm;
-						  pend_dh_n = "" + p_dh;
-						  pend_fin_n = "" + p_fn;
-						  approved_n = "" + appr_cnt;
-						  rejected_n = "" + rej_cnt;
-						
-						  submitted_w = "100%";
-						  if(all_reqs > 0)
-						  {
-						    auto_cleared_w = "" + ((a_clr / all_reqs) * 100).toLong() + "%";
-						    sent_chain_w = "" + ((s_chn / all_reqs) * 100).toLong() + "%";
-						    pend_rm_w = "" + ((p_rm / all_reqs) * 100).toLong() + "%";
-						    pend_dh_w = "" + ((p_dh / all_reqs) * 100).toLong() + "%";
-						    pend_fin_w = "" + ((p_fn / all_reqs) * 100).toLong() + "%";
-						    approved_w = "" + ((appr_cnt / all_reqs) * 100).toLong() + "%";
-						    rejected_w = "" + ((rej_cnt / all_reqs) * 100).toLong() + "%";
-						  }
-						  else
-						  {
-						    auto_cleared_w = "33%"; sent_chain_w = "67%"; pend_rm_w = "11%";
-						    pend_dh_w = "11%"; pend_fin_w = "11%"; approved_w = "17%"; rejected_w = "17%";
-						  }
-						
-						  esc1_id = "BRQ-2026-0309"; esc1_dept = "Quality Assurance"; esc1_stage = "Pending RM"; esc1_days = "10";
-						  esc2_id = "BRQ-2026-0306"; esc2_dept = "Maintenance & Utilities"; esc2_stage = "Pending Dept Head"; esc2_days = "5";
-						  esc_badge = "2 overdue";
-						}
-						else
-						{
-						  total_requested_value = "$778,360"; approved_value = "$113,860";
-						  pending_value = "$519,500"; rejected_value = "$145,000";
-						  total_requests = "18"; approved_count = "9"; pending_count = "6"; rejected_count = "3";
-						  auto_count = "6"; auto_value = "$3,360";
-						  two_person_count = "6"; two_person_value = "$141,000";
-						  three_person_count = "6"; three_person_value = "$634,000";
-						  auto_dash = "2"; two_dash = "91"; three_dash = "409";
-						  two_offset = "93"; auto_offset = "2";
-						  it_w = "100%"; qa_w = "93%"; prod_w = "90%"; maint_w = "77%"; proc_w = "66%"; hr_w = "49%";
-						  it_disp = "$163,560"; qa_disp = "$152,280"; prod_disp = "$147,350";
-						  maint_disp = "$126,620"; proc_disp = "$108,340"; hr_disp = "$80,210";
-						  submitted_n = "18"; auto_cleared_n = "6"; sent_chain_n = "12";
-						  pend_rm_n = "2"; pend_dh_n = "2"; pend_fin_n = "2"; approved_n = "9"; rejected_n = "3";
-						  submitted_w = "100%"; auto_cleared_w = "33%"; sent_chain_w = "67%";
-						  pend_rm_w = "11%"; pend_dh_w = "11%"; pend_fin_w = "11%"; approved_w = "50%"; rejected_w = "17%";
-						  esc1_id = "BRQ-2026-0309"; esc1_dept = "Quality Assurance"; esc1_stage = "Pending RM"; esc1_days = "10";
-						  esc2_id = "BRQ-2026-0306"; esc2_dept = "Maintenance & Utilities"; esc2_stage = "Pending Dept Head"; esc2_days = "5";
-						  esc_badge = "2 overdue";
-						}
-					}
+					Content="<zml>\n\t<layout>\n\t\t<row>\n\t\t\t<column width='100%'>\n\t\t\t\t<dsp id='db_dashboard_content' elementName='Dashboard_Content'>\n\t\t\t\t\t<![CDATA[htmlpage db_dashboard_content()\n\t\t\t\t\t\t content\n\t\t\t\t\t\t &lt;%{%&gt;\n\t\t\t\t\t\t\t\t &lt;link href=&apos;https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&amp;display=swap&apos; rel=&apos;stylesheet&apos;&gt;\n&lt;style&gt;\n\t* { box-sizing: border-box; }\n\t.dbc-wrap {\n\t\tpadding: 24px 28px 40px 28px;\n\t\tbackground: #F8FAFC;\n\t\tmin-height: 100vh;\n\t\tfont-family: &apos;Lato&apos;, sans-serif;\n\t}\n\t.dbc-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }\n\t.dbc-title  { font-size: 22px; font-weight: 700; color: #111827; margin: 0 0 4px 0; }\n\t.dbc-sub    { font-size: 13px; color: #6B7280; margin: 0; }\n\t.dbc-period { background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 20px; padding: 6px 16px; font-size: 12px; color: #1D4ED8; font-weight: 600; white-space: nowrap; margin-top: 4px; }\n\t.dbc-banner {\n\t\tbackground: #EFF6FF; border: 1.5px solid #BFDBFE; border-radius: 10px;\n\t\tpadding: 18px 24px; display: flex; align-items: center; justify-content: space-between;\n\t\tmargin-bottom: 24px; flex-wrap: wrap; gap: 14px;\n\t}\n\t.dbc-banner-title { font-size: 15px; font-weight: 700; color: #1E40AF; margin-bottom: 4px; }\n\t.dbc-banner-sub   { font-size: 13px; color: #3B82F6; }\n\t.dbc-load-btn {\n\t\tbackground: #2563EB; color: #FFFFFF; font-size: 14px; font-weight: 700;\n\t\tfont-family: &apos;Lato&apos;, sans-serif; padding: 10px 22px;\n\t\tborder-radius: 6px; text-decoration: none; white-space: nowrap;\n\t\tdisplay: inline-flex; align-items: center; gap: 6px;\n\t}\n\t.dbc-stat-row { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }\n\t.dbc-stat {\n\t\tflex: 1; min-width: 150px; background: #FFFFFF; border-radius: 10px;\n\t\tbox-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 20px 20px 16px 20px;\n\t\tborder-left: 4px solid #E5E7EB; position: relative; overflow: hidden;\n\t}\n\t.dbc-stat-val { font-size: 22px; font-weight: 700; color: #111827; display: block; line-height: 1.2; }\n\t.dbc-stat-cnt { font-size: 12px; color: #6B7280; display: block; margin-top: 2px; }\n\t.dbc-stat-lbl { font-size: 11px; color: #9CA3AF; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 10px; display: block; }\n\t.dbc-row2 { display: flex; gap: 20px; margin-bottom: 24px; align-items: flex-start; flex-wrap: wrap; }\n\t.dbc-donut-card { width: 320px; flex-shrink: 0; background: #FFFFFF; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px; }\n\t.dbc-card-title { font-size: 15px; font-weight: 700; color: #111827; margin: 0 0 18px 0; }\n\t.dbc-donut-wrap { position: relative; display: flex; justify-content: center; align-items: center; margin-bottom: 16px; }\n\t.dbc-donut-center { position: absolute; text-align: center; pointer-events: none; }\n\t.dbc-donut-val { font-size: 15px; font-weight: 700; color: #111827; display: block; }\n\t.dbc-donut-lbl { font-size: 11px; color: #9CA3AF; display: block; }\n\t.dbc-legend-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }\n\t.dbc-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }\n\t.dbc-leg-name { font-size: 13px; color: #374151; flex: 1; }\n\t.dbc-leg-val  { font-size: 13px; font-weight: 700; color: #111827; }\n\t.dbc-leg-count { font-size: 12px; color: #9CA3AF; margin-left: 6px; }\n\t.dbc-bar-card { flex: 1; min-width: 0; background: #FFFFFF; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px; }\n\t.dbc-card-sub { font-size: 12px; color: #9CA3AF; display: block; margin-top: -14px; margin-bottom: 18px; }\n\t.dbc-bar-row  { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }\n\t.dbc-bar-dept { font-size: 13px; color: #374151; width: 165px; flex-shrink: 0; }\n\t.dbc-bar-track { flex: 1; background: #F1F5F9; border-radius: 4px; height: 26px; overflow: hidden; }\n\t.dbc-bar-fill  { height: 26px; border-radius: 4px; background: #2563EB; }\n\t.dbc-bar-val   { font-size: 12px; font-weight: 700; color: #374151; width: 80px; text-align: right; flex-shrink: 0; }\n\t.dbc-row3 { display: flex; gap: 20px; margin-bottom: 24px; align-items: flex-start; flex-wrap: wrap; }\n\t.dbc-funnel-card { flex: 1; min-width: 0; background: #FFFFFF; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px; }\n\t.dbc-funnel-row   { display: flex; align-items: center; gap: 12px; margin-bottom: 11px; }\n\t.dbc-funnel-stage { font-size: 13px; color: #374151; width: 148px; flex-shrink: 0; }\n\t.dbc-funnel-track { flex: 1; background: #F1F5F9; border-radius: 4px; height: 24px; overflow: hidden; }\n\t.dbc-funnel-fill  { height: 24px; border-radius: 4px; }\n\t.dbc-funnel-cnt   { font-size: 12px; font-weight: 700; color: #374151; width: 28px; text-align: right; flex-shrink: 0; }\n\t.dbc-esc-card { width: 360px; flex-shrink: 0; background: #FFFFFF; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); padding: 24px; }\n\t.dbc-esc-top  { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }\n\t.dbc-esc-ttl  { font-size: 15px; font-weight: 700; color: #111827; margin: 0; }\n\t.dbc-esc-bdg  { background: #FEE2E2; color: #EF4444; border-radius: 20px; padding: 3px 10px; font-size: 12px; font-weight: 700; }\n\t.dbc-esc-item { background: #FEF2F2; border-left: 3px solid #EF4444; border-radius: 8px; padding: 14px 16px; margin-bottom: 12px; }\n\t.dbc-esc-row  { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }\n\t.dbc-esc-id   { font-size: 14px; font-weight: 700; color: #111827; }\n\t.dbc-esc-days { font-size: 13px; font-weight: 700; color: #EF4444; }\n\t.dbc-esc-meta { font-size: 12px; color: #6B7280; }\n\t.dbc-footer { margin-top: 8px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }\n\t.dbc-foot-lbl { font-size: 13px; color: #374151; }\n\t.dbc-turn-bdg { background: #F3F4F6; border-radius: 20px; padding: 5px 14px; font-size: 13px; color: #374151; }\n\t.dbc-turn-bdg strong { font-weight: 700; }\n&lt;/style&gt;\n\n&lt;%\n\tall_reqs = Spend_Request[ID != 0].count();\n\n\tif(all_reqs &gt; 0)\n\t{\n\t\tshow_banner = false;\n\n\t\t/* KPI counts */\n\t\ttotal_sum   = Spend_Request[ID != 0].sum(Estimated_Cost);\n\t\tappr_cnt    = Spend_Request[Status == &quot;Approved&quot; || Status == &quot;Auto_Approved&quot;].count();\n\t\tapproved_sum = Spend_Request[Status == &quot;Approved&quot; || Status == &quot;Auto_Approved&quot;].sum(Estimated_Cost);\n\t\tpend_cnt    = Spend_Request[Status == &quot;Pending_RM&quot; || Status == &quot;Pending_Dept_Head&quot; || Status == &quot;Pending_Finance&quot;].count();\n\t\tpending_sum = Spend_Request[Status == &quot;Pending_RM&quot; || Status == &quot;Pending_Dept_Head&quot; || Status == &quot;Pending_Finance&quot;].sum(Estimated_Cost);\n\t\trej_cnt     = Spend_Request[Status == &quot;Rejected&quot;].count();\n\t\trejected_sum = Spend_Request[Status == &quot;Rejected&quot;].sum(Estimated_Cost);\n\n\t\ttotal_requested_value = &quot;$&quot; + total_sum.toLong();\n\t\ttotal_requests  = &quot;&quot; + all_reqs;\n\t\tapproved_value  = &quot;$&quot; + approved_sum.toLong();\n\t\tapproved_count  = &quot;&quot; + appr_cnt;\n\t\tpending_value   = &quot;$&quot; + pending_sum.toLong();\n\t\tpending_count   = &quot;&quot; + pend_cnt;\n\t\trejected_value  = &quot;$&quot; + rejected_sum.toLong();\n\t\trejected_count  = &quot;&quot; + rej_cnt;\n\n\t\t/* Tier breakdown */\n\t\tauto_s  = Spend_Request[Estimated_Cost &lt;= 1000].sum(Estimated_Cost);\n\t\ttwo_s   = Spend_Request[Estimated_Cost &gt; 1000 &amp;&amp; Estimated_Cost &lt;= 50000].sum(Estimated_Cost);\n\t\tthree_s = Spend_Request[Estimated_Cost &gt; 50000].sum(Estimated_Cost);\n\t\tauto_cnt  = Spend_Request[Estimated_Cost &lt;= 1000].count();\n\t\ttwo_cnt   = Spend_Request[Estimated_Cost &gt; 1000 &amp;&amp; Estimated_Cost &lt;= 50000].count();\n\t\tthree_cnt = Spend_Request[Estimated_Cost &gt; 50000].count();\n\t\tauto_value  = &quot;$&quot; + auto_s.toLong();\n\t\ttwo_value   = &quot;$&quot; + two_s.toLong();\n\t\tthree_value = &quot;$&quot; + three_s.toLong();\n\t\tauto_count  = &quot;&quot; + auto_cnt;\n\t\ttwo_count   = &quot;&quot; + two_cnt;\n\t\tthree_count = &quot;&quot; + three_cnt;\n\n\t\tif(total_sum &gt; 0)\n\t\t{\n\t\t\tthree_dash  = &quot;&quot; + ((three_s / total_sum) * 502).toLong();\n\t\t\ttwo_dash    = &quot;&quot; + ((two_s / total_sum) * 502).toLong();\n\t\t\tauto_dash   = &quot;&quot; + ((auto_s / total_sum) * 502).toLong();\n\t\t\ttwo_offset  = &quot;&quot; + (502 - three_dash.toLong()).toLong();\n\t\t\tauto_offset = &quot;&quot; + (502 - three_dash.toLong() - two_dash.toLong()).toLong();\n\t\t}\n\t\telse\n\t\t{\n\t\t\tthree_dash = &quot;502&quot;; two_dash = &quot;0&quot;; auto_dash = &quot;0&quot;;\n\t\t\ttwo_offset = &quot;0&quot;; auto_offset = &quot;0&quot;;\n\t\t}\n\n\t\t/* Department bar chart */\n\t\tit_pct    = Spend_Request[Department == &quot;IT &amp; Systems&quot;].sum(Estimated_Cost);\n\t\tqa_pct    = Spend_Request[Department == &quot;Quality Assurance&quot;].sum(Estimated_Cost);\n\t\tprod_pct  = Spend_Request[Department == &quot;Production&quot;].sum(Estimated_Cost);\n\t\tmaint_pct = Spend_Request[Department == &quot;Maintenance &amp; Utilities&quot;].sum(Estimated_Cost);\n\t\tproc_pct  = Spend_Request[Department == &quot;Procurement &amp; Stores&quot;].sum(Estimated_Cost);\n\t\thr_pct    = Spend_Request[Department == &quot;HR &amp; Admin&quot;].sum(Estimated_Cost);\n\t\tbar_max = it_pct;\n\t\tif(qa_pct &gt; bar_max)   { bar_max = qa_pct; }\n\t\tif(prod_pct &gt; bar_max) { bar_max = prod_pct; }\n\t\tif(maint_pct &gt; bar_max){ bar_max = maint_pct; }\n\t\tif(proc_pct &gt; bar_max) { bar_max = proc_pct; }\n\t\tif(hr_pct &gt; bar_max)   { bar_max = hr_pct; }\n\t\tif(bar_max &gt; 0)\n\t\t{\n\t\t\tit_w    = &quot;&quot; + ((it_pct / bar_max) * 100).toLong() + &quot;%&quot;;\n\t\t\tqa_w    = &quot;&quot; + ((qa_pct / bar_max) * 100).toLong() + &quot;%&quot;;\n\t\t\tprod_w  = &quot;&quot; + ((prod_pct / bar_max) * 100).toLong() + &quot;%&quot;;\n\t\t\tmaint_w = &quot;&quot; + ((maint_pct / bar_max) * 100).toLong() + &quot;%&quot;;\n\t\t\tproc_w  = &quot;&quot; + ((proc_pct / bar_max) * 100).toLong() + &quot;%&quot;;\n\t\t\thr_w    = &quot;&quot; + ((hr_pct / bar_max) * 100).toLong() + &quot;%&quot;;\n\t\t}\n\t\telse\n\t\t{\n\t\t\tit_w = &quot;100%&quot;; qa_w = &quot;93%&quot;; prod_w = &quot;90%&quot;; maint_w = &quot;77%&quot;; proc_w = &quot;66%&quot;; hr_w = &quot;49%&quot;;\n\t\t}\n\t\tit_disp    = &quot;$&quot; + it_pct.toLong();\n\t\tqa_disp    = &quot;$&quot; + qa_pct.toLong();\n\t\tprod_disp  = &quot;$&quot; + prod_pct.toLong();\n\t\tmaint_disp = &quot;$&quot; + maint_pct.toLong();\n\t\tproc_disp  = &quot;$&quot; + proc_pct.toLong();\n\t\thr_disp    = &quot;$&quot; + hr_pct.toLong();\n\n\t\t/* Funnel */\n\t\ta_clr = Spend_Request[Estimated_Cost &lt;= 1000].count();\n\t\ts_chn = Spend_Request[Estimated_Cost &gt; 1000].count();\n\t\tp_rm  = Spend_Request[Status == &quot;Pending_RM&quot;].count();\n\t\tp_dh  = Spend_Request[Status == &quot;Pending_Dept_Head&quot;].count();\n\t\tp_fn  = Spend_Request[Status == &quot;Pending_Finance&quot;].count();\n\t\tsubmitted_n    = &quot;&quot; + all_reqs;\n\t\tauto_cleared_n = &quot;&quot; + a_clr;\n\t\tsent_chain_n   = &quot;&quot; + s_chn;\n\t\tpend_rm_n      = &quot;&quot; + p_rm;\n\t\tpend_dh_n      = &quot;&quot; + p_dh;\n\t\tpend_fin_n     = &quot;&quot; + p_fn;\n\t\tapproved_n     = &quot;&quot; + appr_cnt;\n\t\trejected_n     = &quot;&quot; + rej_cnt;\n\t\tsubmitted_w    = &quot;100%&quot;;\n\t\tauto_cleared_w = &quot;&quot; + ((a_clr / all_reqs) * 100).toLong() + &quot;%&quot;;\n\t\tsent_chain_w   = &quot;&quot; + ((s_chn / all_reqs) * 100).toLong() + &quot;%&quot;;\n\t\tpend_rm_w      = &quot;&quot; + ((p_rm / all_reqs) * 100).toLong() + &quot;%&quot;;\n\t\tpend_dh_w      = &quot;&quot; + ((p_dh / all_reqs) * 100).toLong() + &quot;%&quot;;\n\t\tpend_fin_w     = &quot;&quot; + ((p_fn / all_reqs) * 100).toLong() + &quot;%&quot;;\n\t\tapproved_w     = &quot;&quot; + ((appr_cnt / all_reqs) * 100).toLong() + &quot;%&quot;;\n\t\trejected_w     = &quot;&quot; + ((rej_cnt / all_reqs) * 100).toLong() + &quot;%&quot;;\n\n\t\t/* Escalation - live overdue records */\n\t\toverdue_recs = Spend_Request[SLA_Due_Date &lt; zoho.currentdate &amp;&amp; (Status == &quot;Pending_RM&quot; || Status == &quot;Pending_Dept_Head&quot; || Status == &quot;Pending_Finance&quot;)];\n\t\tesc_count = overdue_recs.count();\n\t\tesc_badge = &quot;&quot; + esc_count + &quot; overdue&quot;;\n\t\tesc1_id = &quot;-&quot;; esc1_dept = &quot;-&quot;; esc1_stage = &quot;-&quot;; esc1_days = &quot;0&quot;;\n\t\tesc2_id = &quot;-&quot;; esc2_dept = &quot;-&quot;; esc2_stage = &quot;-&quot;; esc2_days = &quot;0&quot;;\n\t\tesc_idx = 0;\n\t\tfor each r in overdue_recs\n\t\t{\n\t\t\tdays_val = &quot;&quot; + (zoho.currentdate - r.SLA_Due_Date);\n\t\t\tif(esc_idx == 0)\n\t\t\t{\n\t\t\t\tesc1_id = r.Request_ID; esc1_dept = r.Department; esc1_stage = r.Status; esc1_days = days_val;\n\t\t\t\tesc_idx = esc_idx + 1;\n\t\t\t}\n\t\t\telse if(esc_idx == 1)\n\t\t\t{\n\t\t\t\tesc2_id = r.Request_ID; esc2_dept = r.Department; esc2_stage = r.Status; esc2_days = days_val;\n\t\t\t\tbreak;\n\t\t\t}\n\t\t}\n\t}\n\telse\n\t{\n\t\t/* No data yet - show banner and hardcoded BRD preview values */\n\t\tshow_banner = true;\n\t\ttotal_requested_value = &quot;$778,360&quot;; total_requests = &quot;18&quot;;\n\t\tapproved_value = &quot;$113,860&quot;;   approved_count = &quot;9&quot;;\n\t\tpending_value  = &quot;$519,500&quot;;   pending_count  = &quot;6&quot;;\n\t\trejected_value = &quot;$145,000&quot;;   rejected_count = &quot;3&quot;;\n\t\tauto_value = &quot;$3,360&quot;;  auto_count = &quot;6&quot;;\n\t\ttwo_value  = &quot;$141,000&quot;; two_count  = &quot;6&quot;;\n\t\tthree_value = &quot;$634,000&quot;; three_count = &quot;6&quot;;\n\t\tthree_dash = &quot;409&quot;; two_dash = &quot;91&quot;; auto_dash = &quot;2&quot;;\n\t\ttwo_offset = &quot;93&quot;; auto_offset = &quot;2&quot;;\n\t\tit_w = &quot;100%&quot;; qa_w = &quot;93%&quot;; prod_w = &quot;90%&quot;; maint_w = &quot;77%&quot;; proc_w = &quot;66%&quot;; hr_w = &quot;49%&quot;;\n\t\tit_disp = &quot;$163,560&quot;; qa_disp = &quot;$152,280&quot;; prod_disp = &quot;$147,350&quot;;\n\t\tmaint_disp = &quot;$126,620&quot;; proc_disp = &quot;$108,340&quot;; hr_disp = &quot;$80,210&quot;;\n\t\tsubmitted_n = &quot;18&quot;; auto_cleared_n = &quot;6&quot;; sent_chain_n = &quot;12&quot;;\n\t\tpend_rm_n = &quot;2&quot;; pend_dh_n = &quot;2&quot;; pend_fin_n = &quot;2&quot;; approved_n = &quot;9&quot;; rejected_n = &quot;3&quot;;\n\t\tsubmitted_w = &quot;100%&quot;; auto_cleared_w = &quot;33%&quot;; sent_chain_w = &quot;67%&quot;;\n\t\tpend_rm_w = &quot;11%&quot;; pend_dh_w = &quot;11%&quot;; pend_fin_w = &quot;11%&quot;; approved_w = &quot;50%&quot;; rejected_w = &quot;17%&quot;;\n\t\tesc_badge = &quot;2 overdue&quot;;\n\t\tesc1_id = &quot;BRQ-2026-0309&quot;; esc1_dept = &quot;Quality Assurance&quot;; esc1_stage = &quot;Pending RM&quot;; esc1_days = &quot;10&quot;;\n\t\tesc2_id = &quot;BRQ-2026-0306&quot;; esc2_dept = &quot;Maintenance &amp;amp; Utilities&quot;; esc2_stage = &quot;Pending Dept Head&quot;; esc2_days = &quot;5&quot;;\n\t}\n%&gt;\n\n&lt;div class=&quot;dbc-wrap&quot;&gt;\n\n\t&lt;% if(show_banner) { %&gt;\n\t&lt;div class=&quot;dbc-banner&quot;&gt;\n\t\t&lt;div&gt;\n\t\t\t&lt;div class=&quot;dbc-banner-title&quot;&gt;No data yet - Load sample data to get started&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-banner-sub&quot;&gt;Loads 18 BRD spend requests, 6 employees, 18 catalog items, and a full approval log in one click. The preview below shows what the dashboard will look like.&lt;/div&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;a class=&quot;dbc-load-btn&quot; href=&quot;#Form:Seed_Data&quot;&gt;\n\t\t\tLoad Sample Data\n\t\t&lt;/a&gt;\n\t&lt;/div&gt;\n\t&lt;% } %&gt;\n\n\t&lt;div class=&quot;dbc-header&quot;&gt;\n\t\t&lt;div&gt;\n\t\t\t&lt;h1 class=&quot;dbc-title&quot;&gt;Spend &amp;amp; Approval Dashboard&lt;/h1&gt;\n\t\t\t&lt;p class=&quot;dbc-sub&quot;&gt;Atlas Precision Manufacturing &amp;middot; Plant 3, Ohio, USA&lt;/p&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;span class=&quot;dbc-period&quot;&gt;Reporting Period: Sep 2026&lt;/span&gt;\n\t&lt;/div&gt;\n\n\t&lt;div class=&quot;dbc-stat-row&quot;&gt;\n\t\t&lt;div class=&quot;dbc-stat&quot; style=&quot;border-left-color:#2563EB;&quot;&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-val&quot;&gt;&lt;%= total_requested_value %&gt;&lt;/span&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-cnt&quot;&gt;&lt;%= total_requests %&gt; requests&lt;/span&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-lbl&quot;&gt;Total Requested&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;dbc-stat&quot; style=&quot;border-left-color:#16AD78;&quot;&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-val&quot; style=&quot;color:#16AD78;&quot;&gt;&lt;%= approved_value %&gt;&lt;/span&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-cnt&quot;&gt;&lt;%= approved_count %&gt; requests&lt;/span&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-lbl&quot;&gt;Total Approved&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;dbc-stat&quot; style=&quot;border-left-color:#F59E0B;&quot;&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-val&quot; style=&quot;color:#D97706;&quot;&gt;&lt;%= pending_value %&gt;&lt;/span&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-cnt&quot;&gt;&lt;%= pending_count %&gt; requests&lt;/span&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-lbl&quot;&gt;Pending Value&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;div class=&quot;dbc-stat&quot; style=&quot;border-left-color:#EF4444;&quot;&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-val&quot; style=&quot;color:#EF4444;&quot;&gt;&lt;%= rejected_value %&gt;&lt;/span&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-cnt&quot;&gt;&lt;%= rejected_count %&gt; requests&lt;/span&gt;\n\t\t\t&lt;span class=&quot;dbc-stat-lbl&quot;&gt;Rejected Value&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t&lt;/div&gt;\n\n\t&lt;div class=&quot;dbc-row2&quot;&gt;\n\t\t&lt;div class=&quot;dbc-donut-card&quot;&gt;\n\t\t\t&lt;h2 class=&quot;dbc-card-title&quot;&gt;Approval Tier Breakdown&lt;/h2&gt;\n\t\t\t&lt;div class=&quot;dbc-donut-wrap&quot;&gt;\n\t\t\t\t&lt;svg width=&quot;200&quot; height=&quot;200&quot; viewBox=&quot;0 0 220 220&quot; style=&quot;transform:rotate(-90deg);&quot;&gt;\n\t\t\t\t\t&lt;circle cx=&quot;110&quot; cy=&quot;110&quot; r=&quot;80&quot; fill=&quot;none&quot; stroke=&quot;#F3F4F6&quot; stroke-width=&quot;28&quot;/&gt;\n\t\t\t\t\t&lt;circle cx=&quot;110&quot; cy=&quot;110&quot; r=&quot;80&quot; fill=&quot;none&quot; stroke=&quot;#2563EB&quot; stroke-width=&quot;28&quot;\n\t\t\t\t\t\tstroke-dasharray=&quot;&lt;%= three_dash %&gt; 502&quot; stroke-dashoffset=&quot;0&quot;/&gt;\n\t\t\t\t\t&lt;circle cx=&quot;110&quot; cy=&quot;110&quot; r=&quot;80&quot; fill=&quot;none&quot; stroke=&quot;#F59E0B&quot; stroke-width=&quot;28&quot;\n\t\t\t\t\t\tstroke-dasharray=&quot;&lt;%= two_dash %&gt; 502&quot; stroke-dashoffset=&quot;-&lt;%= two_offset %&gt;&quot;/&gt;\n\t\t\t\t\t&lt;circle cx=&quot;110&quot; cy=&quot;110&quot; r=&quot;80&quot; fill=&quot;none&quot; stroke=&quot;#16AD78&quot; stroke-width=&quot;28&quot;\n\t\t\t\t\t\tstroke-dasharray=&quot;&lt;%= auto_dash %&gt; 502&quot; stroke-dashoffset=&quot;-&lt;%= auto_offset %&gt;&quot;/&gt;\n\t\t\t\t&lt;/svg&gt;\n\t\t\t\t&lt;div class=&quot;dbc-donut-center&quot;&gt;\n\t\t\t\t\t&lt;span class=&quot;dbc-donut-val&quot;&gt;&lt;%= total_requested_value %&gt;&lt;/span&gt;\n\t\t\t\t\t&lt;span class=&quot;dbc-donut-lbl&quot;&gt;Total&lt;/span&gt;\n\t\t\t\t&lt;/div&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-legend-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-dot&quot; style=&quot;background:#16AD78;&quot;&gt;&lt;/span&gt;\n\t\t\t\t&lt;span class=&quot;dbc-leg-name&quot;&gt;Auto&lt;/span&gt;\n\t\t\t\t&lt;span class=&quot;dbc-leg-val&quot;&gt;&lt;%= auto_value %&gt;&lt;/span&gt;\n\t\t\t\t&lt;span class=&quot;dbc-leg-count&quot;&gt;&lt;%= auto_count %&gt; req&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-legend-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-dot&quot; style=&quot;background:#F59E0B;&quot;&gt;&lt;/span&gt;\n\t\t\t\t&lt;span class=&quot;dbc-leg-name&quot;&gt;2-Person&lt;/span&gt;\n\t\t\t\t&lt;span class=&quot;dbc-leg-val&quot;&gt;&lt;%= two_value %&gt;&lt;/span&gt;\n\t\t\t\t&lt;span class=&quot;dbc-leg-count&quot;&gt;&lt;%= two_count %&gt; req&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-legend-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-dot&quot; style=&quot;background:#2563EB;&quot;&gt;&lt;/span&gt;\n\t\t\t\t&lt;span class=&quot;dbc-leg-name&quot;&gt;3-Person&lt;/span&gt;\n\t\t\t\t&lt;span class=&quot;dbc-leg-val&quot;&gt;&lt;%= three_value %&gt;&lt;/span&gt;\n\t\t\t\t&lt;span class=&quot;dbc-leg-count&quot;&gt;&lt;%= three_count %&gt; req&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t&lt;/div&gt;\n\n\t\t&lt;div class=&quot;dbc-bar-card&quot;&gt;\n\t\t\t&lt;h2 class=&quot;dbc-card-title&quot;&gt;Department-Wise Spend&lt;/h2&gt;\n\t\t\t&lt;span class=&quot;dbc-card-sub&quot;&gt;By total estimated cost (USD)&lt;/span&gt;\n\t\t\t&lt;div class=&quot;dbc-bar-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-dept&quot;&gt;IT &amp;amp; Systems&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-bar-track&quot;&gt;&lt;div class=&quot;dbc-bar-fill&quot; style=&quot;width:&lt;%= it_w %&gt;;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-val&quot;&gt;&lt;%= it_disp %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-bar-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-dept&quot;&gt;Quality Assurance&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-bar-track&quot;&gt;&lt;div class=&quot;dbc-bar-fill&quot; style=&quot;width:&lt;%= qa_w %&gt;;opacity:0.85;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-val&quot;&gt;&lt;%= qa_disp %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-bar-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-dept&quot;&gt;Production&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-bar-track&quot;&gt;&lt;div class=&quot;dbc-bar-fill&quot; style=&quot;width:&lt;%= prod_w %&gt;;opacity:0.75;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-val&quot;&gt;&lt;%= prod_disp %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-bar-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-dept&quot;&gt;Maintenance &amp;amp; Util.&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-bar-track&quot;&gt;&lt;div class=&quot;dbc-bar-fill&quot; style=&quot;width:&lt;%= maint_w %&gt;;opacity:0.65;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-val&quot;&gt;&lt;%= maint_disp %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-bar-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-dept&quot;&gt;Procurement &amp;amp; Stores&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-bar-track&quot;&gt;&lt;div class=&quot;dbc-bar-fill&quot; style=&quot;width:&lt;%= proc_w %&gt;;opacity:0.55;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-val&quot;&gt;&lt;%= proc_disp %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-bar-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-dept&quot;&gt;HR &amp;amp; Admin&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-bar-track&quot;&gt;&lt;div class=&quot;dbc-bar-fill&quot; style=&quot;width:&lt;%= hr_w %&gt;;opacity:0.45;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-bar-val&quot;&gt;&lt;%= hr_disp %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t&lt;/div&gt;\n\t&lt;/div&gt;\n\n\t&lt;div class=&quot;dbc-row3&quot;&gt;\n\t\t&lt;div class=&quot;dbc-funnel-card&quot;&gt;\n\t\t\t&lt;h2 class=&quot;dbc-card-title&quot;&gt;Approval Funnel&lt;/h2&gt;\n\t\t\t&lt;span class=&quot;dbc-card-sub&quot;&gt;Stage progression from submission to resolution&lt;/span&gt;\n\t\t\t&lt;div class=&quot;dbc-funnel-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-stage&quot;&gt;Submitted&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-funnel-track&quot;&gt;&lt;div class=&quot;dbc-funnel-fill&quot; style=&quot;width:&lt;%= submitted_w %&gt;;background:#9CA3AF;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-cnt&quot;&gt;&lt;%= submitted_n %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-funnel-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-stage&quot;&gt;Auto-Cleared&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-funnel-track&quot;&gt;&lt;div class=&quot;dbc-funnel-fill&quot; style=&quot;width:&lt;%= auto_cleared_w %&gt;;background:#16AD78;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-cnt&quot;&gt;&lt;%= auto_cleared_n %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-funnel-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-stage&quot;&gt;Sent to Chain&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-funnel-track&quot;&gt;&lt;div class=&quot;dbc-funnel-fill&quot; style=&quot;width:&lt;%= sent_chain_w %&gt;;background:#60A5FA;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-cnt&quot;&gt;&lt;%= sent_chain_n %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-funnel-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-stage&quot;&gt;Pending RM&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-funnel-track&quot;&gt;&lt;div class=&quot;dbc-funnel-fill&quot; style=&quot;width:&lt;%= pend_rm_w %&gt;;background:#F59E0B;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-cnt&quot;&gt;&lt;%= pend_rm_n %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-funnel-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-stage&quot;&gt;Pending Dept Head&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-funnel-track&quot;&gt;&lt;div class=&quot;dbc-funnel-fill&quot; style=&quot;width:&lt;%= pend_dh_w %&gt;;background:#F59E0B;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-cnt&quot;&gt;&lt;%= pend_dh_n %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-funnel-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-stage&quot;&gt;Pending Finance&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-funnel-track&quot;&gt;&lt;div class=&quot;dbc-funnel-fill&quot; style=&quot;width:&lt;%= pend_fin_w %&gt;;background:#F59E0B;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-cnt&quot;&gt;&lt;%= pend_fin_n %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-funnel-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-stage&quot;&gt;Approved&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-funnel-track&quot;&gt;&lt;div class=&quot;dbc-funnel-fill&quot; style=&quot;width:&lt;%= approved_w %&gt;;background:#16AD78;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-cnt&quot;&gt;&lt;%= approved_n %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;div class=&quot;dbc-funnel-row&quot;&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-stage&quot;&gt;Rejected&lt;/span&gt;\n\t\t\t\t&lt;div class=&quot;dbc-funnel-track&quot;&gt;&lt;div class=&quot;dbc-funnel-fill&quot; style=&quot;width:&lt;%= rejected_w %&gt;;background:#EF4444;&quot;&gt;&lt;/div&gt;&lt;/div&gt;\n\t\t\t\t&lt;span class=&quot;dbc-funnel-cnt&quot;&gt;&lt;%= rejected_n %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t&lt;/div&gt;\n\n\t\t&lt;div class=&quot;dbc-esc-card&quot;&gt;\n\t\t\t&lt;div class=&quot;dbc-esc-top&quot;&gt;\n\t\t\t\t&lt;h2 class=&quot;dbc-esc-ttl&quot;&gt;Escalation - SLA Overdue&lt;/h2&gt;\n\t\t\t\t&lt;span class=&quot;dbc-esc-bdg&quot;&gt;&lt;%= esc_badge %&gt;&lt;/span&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;% if(esc1_id != &quot;-&quot;) { %&gt;\n\t\t\t&lt;div class=&quot;dbc-esc-item&quot;&gt;\n\t\t\t\t&lt;div class=&quot;dbc-esc-row&quot;&gt;\n\t\t\t\t\t&lt;span class=&quot;dbc-esc-id&quot;&gt;&lt;%= esc1_id %&gt;&lt;/span&gt;\n\t\t\t\t\t&lt;span class=&quot;dbc-esc-days&quot;&gt;&lt;%= esc1_days %&gt; days overdue&lt;/span&gt;\n\t\t\t\t&lt;/div&gt;\n\t\t\t\t&lt;div class=&quot;dbc-esc-meta&quot;&gt;&lt;%= esc1_dept %&gt; &amp;middot; &lt;%= esc1_stage %&gt;&lt;/div&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;% } %&gt;\n\t\t\t&lt;% if(esc2_id != &quot;-&quot;) { %&gt;\n\t\t\t&lt;div class=&quot;dbc-esc-item&quot;&gt;\n\t\t\t\t&lt;div class=&quot;dbc-esc-row&quot;&gt;\n\t\t\t\t\t&lt;span class=&quot;dbc-esc-id&quot;&gt;&lt;%= esc2_id %&gt;&lt;/span&gt;\n\t\t\t\t\t&lt;span class=&quot;dbc-esc-days&quot;&gt;&lt;%= esc2_days %&gt; days overdue&lt;/span&gt;\n\t\t\t\t&lt;/div&gt;\n\t\t\t\t&lt;div class=&quot;dbc-esc-meta&quot;&gt;&lt;%= esc2_dept %&gt; &amp;middot; &lt;%= esc2_stage %&gt;&lt;/div&gt;\n\t\t\t&lt;/div&gt;\n\t\t\t&lt;% } %&gt;\n\t\t\t&lt;% if(esc1_id == &quot;-&quot; &amp;&amp; esc2_id == &quot;-&quot;) { %&gt;\n\t\t\t&lt;div style=&quot;font-size:13px;color:#9CA3AF;font-style:italic;padding:8px 0;&quot;&gt;No overdue requests at this time.&lt;/div&gt;\n\t\t\t&lt;% } %&gt;\n\t\t&lt;/div&gt;\n\t&lt;/div&gt;\n\n\t&lt;div class=&quot;dbc-footer&quot;&gt;\n\t\t&lt;span class=&quot;dbc-foot-lbl&quot;&gt;Avg. Approval Turnaround&lt;/span&gt;\n\t\t&lt;span class=&quot;dbc-turn-bdg&quot;&gt;&lt;strong&gt;2-Person:&lt;/strong&gt; 2.4 days&lt;/span&gt;\n\t\t&lt;span class=&quot;dbc-turn-bdg&quot;&gt;&lt;strong&gt;3-Person:&lt;/strong&gt; 5.1 days&lt;/span&gt;\n\t&lt;/div&gt;\n\n&lt;/div&gt;\n\t\t\t\t\t\t &lt;%}%&gt;\n\t\t\t\t ]]>\n\t\t\t\t</dsp>\n\t\t\t</column>\n\t\t</row>\n\t</layout>\n</zml>"
 		}
 
 		page Request_Intake
 		{
 					displayname = "Request Intake"
-					Content="<zml>\n\t<layout>\n\t\t<row>\n\t\t\t<column width='100%'>\n\t\t\t\t<dsp id='ri_form_info' elementName='Form_Card'>\n\t\t\t\t\t<![CDATA[htmlpage ri_form_info()\n\t\t\t\t\t\t content\n\t\t\t\t\t\t &lt;%{%&gt;\n\t\t\t\t\t\t\t\t &lt;link href=&apos;https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&amp;display=swap&apos; rel=&apos;stylesheet&apos;&gt;\n&lt;style&gt;\n\t.ri-wrap {\n\t\tpadding: 24px 28px 16px 28px;\n\t\tbackground: #F8FAFC;\n\t\tfont-family: &apos;Lato&apos;, sans-serif;\n\t\tbox-sizing: border-box;\n\t}\n\t.ri-page-title {\n\t\tfont-size: 22px;\n\t\tfont-weight: 700;\n\t\tcolor: #111827;\n\t\tmargin: 0 0 4px 0;\n\t\tline-height: 1.3;\n\t}\n\t.ri-page-sub {\n\t\tfont-size: 13px;\n\t\tcolor: #6B7280;\n\t\tmargin: 0 0 20px 0;\n\t}\n\t.ri-context-card {\n\t\tbackground: #FFFFFF;\n\t\tborder-radius: 10px;\n\t\tbox-shadow: 0 1px 4px rgba(0,0,0,0.08);\n\t\tpadding: 20px 24px;\n\t\tmax-width: 920px;\n\t\tmargin-bottom: 4px;\n\t}\n\t.ri-info-strip {\n\t\tdisplay: flex;\n\t\talign-items: flex-start;\n\t\tgap: 10px;\n\t\tbackground: #EFF6FF;\n\t\tborder: 1px solid #BFDBFE;\n\t\tborder-radius: 8px;\n\t\tpadding: 12px 16px;\n\t\tmargin-bottom: 20px;\n\t}\n\t.ri-info-text {\n\t\tfont-size: 13px;\n\t\tcolor: #1D4ED8;\n\t\tfont-style: italic;\n\t\tline-height: 1.5;\n\t\tmargin: 0;\n\t\tfont-family: &apos;Lato&apos;, sans-serif;\n\t}\n\t.ri-divider {\n\t\tborder: none;\n\t\tborder-top: 1px solid #E5E7EB;\n\t\tmargin: 0 0 16px 0;\n\t}\n\t.ri-tier-lbl {\n\t\tfont-size: 11px;\n\t\tcolor: #6B7280;\n\t\ttext-transform: uppercase;\n\t\tletter-spacing: 0.5px;\n\t\tfont-weight: 700;\n\t\tdisplay: block;\n\t\tmargin-bottom: 10px;\n\t\tfont-family: &apos;Lato&apos;, sans-serif;\n\t}\n\t.ri-tier-row {\n\t\tdisplay: flex;\n\t\tgap: 10px;\n\t\tflex-wrap: wrap;\n\t\talign-items: center;\n\t}\n\t.ri-badge {\n\t\tborder-radius: 20px;\n\t\tpadding: 5px 14px;\n\t\tfont-size: 12px;\n\t\tfont-weight: 700;\n\t\tdisplay: inline-block;\n\t\tfont-family: &apos;Lato&apos;, sans-serif;\n\t\tline-height: 1.4;\n\t}\n\t.ri-auto  { background: #DCFCE7; color: #16AD78; }\n\t.ri-two   { background: #FEF9C3; color: #D97706; }\n\t.ri-three { background: #EFF6FF; color: #2563EB; }\n&lt;/style&gt;\n\n&lt;div class=&quot;ri-wrap&quot;&gt;\n\t&lt;h1 class=&quot;ri-page-title&quot;&gt;New Spend Request&lt;/h1&gt;\n\t&lt;p class=&quot;ri-page-sub&quot;&gt;Atlas Precision Manufacturing Inc. &amp;middot; Plant 3, Ohio, USA&lt;/p&gt;\n\n\t&lt;div class=&quot;ri-context-card&quot;&gt;\n\t\t&lt;div class=&quot;ri-info-strip&quot;&gt;\n\t\t\t&lt;i class=&quot;zc-li-outline ui-1-info-circle&quot; style=&quot;font-size:16px;color:#2563EB;flex-shrink:0;margin-top:2px;&quot;&gt;&lt;/i&gt;\n\t\t\t&lt;p class=&quot;ri-info-text&quot;&gt;Requester ID, Reporting Manager, and Department Head auto-resolve when your name and department match the Employee Directory. Item cost auto-fills from the Request Catalog when you select an item. The Approval Tier is calculated automatically from the cost entered.&lt;/p&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;hr class=&quot;ri-divider&quot;&gt;\n\t\t&lt;span class=&quot;ri-tier-lbl&quot;&gt;Approval Tier Thresholds&lt;/span&gt;\n\t\t&lt;div class=&quot;ri-tier-row&quot;&gt;\n\t\t\t&lt;span class=&quot;ri-badge ri-auto&quot;&gt;Auto - Up to $1,000&lt;/span&gt;\n\t\t\t&lt;span class=&quot;ri-badge ri-two&quot;&gt;2-Person - $1,001 to $50,000&lt;/span&gt;\n\t\t\t&lt;span class=&quot;ri-badge ri-three&quot;&gt;3-Person - $50,001 and above&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t&lt;/div&gt;\n&lt;/div&gt;\n\t\t\t\t\t\t &lt;%}%&gt;\n\t\t\t\t ]]>\n\t\t\t\t</dsp>\n\t\t\t\t<form elementName='Spend_Request_Form'\n\t\t\t\t\t\t\tappLinkName='thisapp'\n\t\t\t\t\t\t\tlinkName='Spend_Request'\n\t\t\t\t\t\t\theightType='auto'\n\t\t\t\t\t\t\tzc_Header='false'\n\t\t\t\t\t\t\turlType='page'\n\t\t\t\t\t\t\turlAppLinkName='thisapp'\n\t\t\t\t\t\t\tzc_NextUrl='#Page:Approvals'\n\t\t\t\t\t\t\tzc_OpenUrlIn='same window'\n\t\t\t\t\t\t\tzc_SuccMsg='Your spend request has been submitted successfully.'\n\t\t\t\t\t\t\tzc_SubmitVal='Submit Request'\n\t\t\t\t\t\t\tzc_ResetVal='Clear' />\n\t\t\t</column>\n\t\t</row>\n\t</layout>\n</zml>"
+					Content="<zml>\n\t<layout>\n\t\t<row>\n\t\t\t<column width='100%'>\n\t\t\t\t<dsp id='ri_form_info' elementName='Form_Card'>\n\t\t\t\t\t<![CDATA[htmlpage ri_form_info()\n\t\t\t\t\t\t content\n\t\t\t\t\t\t &lt;%{%&gt;\n\t\t\t\t\t\t\t\t &lt;link href=&apos;https://fonts.googleapis.com/css2?family=Lato:wght@400;600;700&amp;display=swap&apos; rel=&apos;stylesheet&apos;&gt;\n&lt;style&gt;\n\t.ri-wrap {\n\t\tpadding: 24px 28px 16px 28px;\n\t\tbackground: #F8FAFC;\n\t\tfont-family: &apos;Lato&apos;, sans-serif;\n\t\tbox-sizing: border-box;\n\t}\n\t.ri-page-title {\n\t\tfont-size: 22px;\n\t\tfont-weight: 700;\n\t\tcolor: #111827;\n\t\tmargin: 0 0 4px 0;\n\t\tline-height: 1.3;\n\t}\n\t.ri-page-sub {\n\t\tfont-size: 13px;\n\t\tcolor: #6B7280;\n\t\tmargin: 0 0 20px 0;\n\t}\n\t.ri-context-card {\n\t\tbackground: #FFFFFF;\n\t\tborder-radius: 10px;\n\t\tbox-shadow: 0 1px 4px rgba(0,0,0,0.08);\n\t\tpadding: 20px 24px;\n\t\tmax-width: 920px;\n\t\tmargin-bottom: 4px;\n\t}\n\t.ri-info-strip {\n\t\tdisplay: flex;\n\t\talign-items: flex-start;\n\t\tgap: 10px;\n\t\tbackground: #EFF6FF;\n\t\tborder: 1px solid #BFDBFE;\n\t\tborder-radius: 8px;\n\t\tpadding: 12px 16px;\n\t\tmargin-bottom: 20px;\n\t}\n\t.ri-info-text {\n\t\tfont-size: 13px;\n\t\tcolor: #1D4ED8;\n\t\tfont-style: italic;\n\t\tline-height: 1.5;\n\t\tmargin: 0;\n\t\tfont-family: &apos;Lato&apos;, sans-serif;\n\t}\n\t.ri-divider {\n\t\tborder: none;\n\t\tborder-top: 1px solid #E5E7EB;\n\t\tmargin: 0 0 16px 0;\n\t}\n\t.ri-tier-lbl {\n\t\tfont-size: 11px;\n\t\tcolor: #6B7280;\n\t\ttext-transform: uppercase;\n\t\tletter-spacing: 0.5px;\n\t\tfont-weight: 700;\n\t\tdisplay: block;\n\t\tmargin-bottom: 10px;\n\t\tfont-family: &apos;Lato&apos;, sans-serif;\n\t}\n\t.ri-tier-row {\n\t\tdisplay: flex;\n\t\tgap: 10px;\n\t\tflex-wrap: wrap;\n\t\talign-items: center;\n\t}\n\t.ri-badge {\n\t\tborder-radius: 20px;\n\t\tpadding: 5px 14px;\n\t\tfont-size: 12px;\n\t\tfont-weight: 700;\n\t\tdisplay: inline-block;\n\t\tfont-family: &apos;Lato&apos;, sans-serif;\n\t\tline-height: 1.4;\n\t}\n\t.ri-auto  { background: #DCFCE7; color: #16AD78; }\n\t.ri-two   { background: #FEF9C3; color: #D97706; }\n\t.ri-three { background: #EFF6FF; color: #2563EB; }\n&lt;/style&gt;\n\n&lt;div class=&quot;ri-wrap&quot;&gt;\n\t&lt;h1 class=&quot;ri-page-title&quot;&gt;New Spend Request&lt;/h1&gt;\n\t&lt;p class=&quot;ri-page-sub&quot;&gt;Atlas Precision Manufacturing Inc. &amp;middot; Plant 3, Ohio, USA&lt;/p&gt;\n\n\t&lt;div class=&quot;ri-context-card&quot;&gt;\n\t\t&lt;div class=&quot;ri-info-strip&quot;&gt;\n\t\t\t&lt;i class=&quot;zc-li-outline ui-1-info-circle&quot; style=&quot;font-size:16px;color:#2563EB;flex-shrink:0;margin-top:2px;&quot;&gt;&lt;/i&gt;\n\t\t\t&lt;p class=&quot;ri-info-text&quot;&gt;Requester ID, Reporting Manager, and Department Head auto-resolve when your name and department match the Employee Directory. Item cost auto-fills from the Request Catalog when you select an item. The Approval Tier is calculated automatically from the cost entered.&lt;/p&gt;\n\t\t&lt;/div&gt;\n\t\t&lt;hr class=&quot;ri-divider&quot;&gt;\n\t\t&lt;span class=&quot;ri-tier-lbl&quot;&gt;Approval Tier Thresholds&lt;/span&gt;\n\t\t&lt;div class=&quot;ri-tier-row&quot;&gt;\n\t\t\t&lt;span class=&quot;ri-badge ri-auto&quot;&gt;Auto - Up to $1,000&lt;/span&gt;\n\t\t\t&lt;span class=&quot;ri-badge ri-two&quot;&gt;2-Person - $1,001 to $50,000&lt;/span&gt;\n\t\t\t&lt;span class=&quot;ri-badge ri-three&quot;&gt;3-Person - $50,001 and above&lt;/span&gt;\n\t\t&lt;/div&gt;\n\t&lt;/div&gt;\n&lt;/div&gt;\n\t\t\t\t\t\t &lt;%}%&gt;\n\t\t\t\t ]]>\n\t\t\t\t</dsp>\n\t\t\t\t<form elementName='Spend_Request_Form'\n\t\t\t\t\t\t\tappLinkName='thisapp'\n\t\t\t\t\t\t\tlinkName='Spend_Request'\n\t\t\t\t\t\t\theightType='auto'\n\t\t\t\t\t\t\tzc_Header='false'\n\t\t\t\t\t\t\turlType='report'\n\t\t\t\t\t\t\turlAppLinkName='thisapp'\n\t\t\t\t\t\t\tzc_NextUrl='#Report:Pending_Requests'\n\t\t\t\t\t\t\tzc_OpenUrlIn='same window'\n\t\t\t\t\t\t\tzc_SuccMsg='Your spend request has been submitted successfully.'\n\t\t\t\t\t\t\tzc_SubmitVal='Submit Request'\n\t\t\t\t\t\t\tzc_ResetVal='Clear' />\n\t\t\t</column>\n\t\t</row>\n\t</layout>\n</zml>"
 		}
 	}
 
@@ -944,6 +899,497 @@ application "Zylker-Budget-Approval"
 			    }
 			}
 
+			Seed_Data_On_Success as "Load BRD Sample Data"
+			{
+			    type = form
+			    form = Seed_Data
+			    record event = on add
+			
+			    on success
+			    {
+			        actions
+			        {
+			            custom deluge script
+			            (
+			                /* ---- Guard: skip if data already loaded ---- */
+			                existing = Spend_Request[ID != 0].count();
+			                if(existing > 0) { return; }
+			
+			                /* ======================================================
+			                   EMPLOYEE DIRECTORY (6 employees)
+			                   Correct mapping per BRD:
+			                   Carlos Medina   - Production
+			                   Wei Zhang       - Maintenance & Utilities
+			                   Amara Okafor   - Quality Assurance
+			                   Elena Petrova  - Procurement & Stores
+			                   Daniel Cohen   - IT & Systems
+			                   Priya Nair     - HR & Admin
+			                ====================================================== */
+			                insert into Employee_Directory
+			                [
+			                    Employee_Name = "Carlos Medina"
+			                    Department = "Production"
+			                    Requester_ID = "EMP-001"
+			                    Reporting_Manager = "Jason Miller"
+			                    Department_Head = "Henrik Larsson"
+			                ];
+			                insert into Employee_Directory
+			                [
+			                    Employee_Name = "Wei Zhang"
+			                    Department = "Maintenance & Utilities"
+			                    Requester_ID = "EMP-002"
+			                    Reporting_Manager = "Fatima Al-Sayed"
+			                    Department_Head = "Aisha Bello"
+			                ];
+			                insert into Employee_Directory
+			                [
+			                    Employee_Name = "Amara Okafor"
+			                    Department = "Quality Assurance"
+			                    Requester_ID = "EMP-003"
+			                    Reporting_Manager = "Marco Rossi"
+			                    Department_Head = "Takeshi Yamamoto"
+			                ];
+			                insert into Employee_Directory
+			                [
+			                    Employee_Name = "Elena Petrova"
+			                    Department = "Procurement & Stores"
+			                    Requester_ID = "EMP-004"
+			                    Reporting_Manager = "Grace Kim"
+			                    Department_Head = "Isabella Fischer"
+			                ];
+			                insert into Employee_Directory
+			                [
+			                    Employee_Name = "Daniel Cohen"
+			                    Department = "IT & Systems"
+			                    Requester_ID = "EMP-005"
+			                    Reporting_Manager = "Liam O'Connor"
+			                    Department_Head = "Noah Bergstrom"
+			                ];
+			                insert into Employee_Directory
+			                [
+			                    Employee_Name = "Priya Nair"
+			                    Department = "HR & Admin"
+			                    Requester_ID = "EMP-006"
+			                    Reporting_Manager = "Sofia Martins"
+			                    Department_Head = "Chidi Eze"
+			                ];
+			
+			                /* ======================================================
+			                   REQUEST CATALOG (18 items - 3 per department)
+			                ====================================================== */
+			                /* Production */
+			                insert into Request_Catalog [ Department = "Production" Item_Description = "Safety Gloves Bulk Order" Catalog_Cost = 450 ];
+			                insert into Request_Catalog [ Department = "Production" Item_Description = "CNC Tooling Set" Catalog_Cost = 12000 ];
+			                insert into Request_Catalog [ Department = "Production" Item_Description = "Industrial Conveyor Belt Replacement" Catalog_Cost = 85000 ];
+			                /* Maintenance & Utilities */
+			                insert into Request_Catalog [ Department = "Maintenance & Utilities" Item_Description = "HVAC Filter Replacement" Catalog_Cost = 600 ];
+			                insert into Request_Catalog [ Department = "Maintenance & Utilities" Item_Description = "Hydraulic Press Repair Kit" Catalog_Cost = 22000 ];
+			                insert into Request_Catalog [ Department = "Maintenance & Utilities" Item_Description = "Generator Overhaul" Catalog_Cost = 95000 ];
+			                /* Quality Assurance */
+			                insert into Request_Catalog [ Department = "Quality Assurance" Item_Description = "Lab Reagents Supply" Catalog_Cost = 800 ];
+			                insert into Request_Catalog [ Department = "Quality Assurance" Item_Description = "Calibration Equipment" Catalog_Cost = 9500 ];
+			                insert into Request_Catalog [ Department = "Quality Assurance" Item_Description = "Inspection Microscope" Catalog_Cost = 62000 ];
+			                /* Procurement & Stores */
+			                insert into Request_Catalog [ Department = "Procurement & Stores" Item_Description = "Bulk Packaging Materials" Catalog_Cost = 350 ];
+			                insert into Request_Catalog [ Department = "Procurement & Stores" Item_Description = "Pallet Jack" Catalog_Cost = 2800 ];
+			                insert into Request_Catalog [ Department = "Procurement & Stores" Item_Description = "Warehouse Shelving Units" Catalog_Cost = 7500 ];
+			                /* IT & Systems */
+			                insert into Request_Catalog [ Department = "IT & Systems" Item_Description = "Laptop - Dell XPS 15" Catalog_Cost = 1850 ];
+			                insert into Request_Catalog [ Department = "IT & Systems" Item_Description = "Network Switch - Cisco 24-port" Catalog_Cost = 3200 ];
+			                insert into Request_Catalog [ Department = "IT & Systems" Item_Description = "Server RAM Upgrade 64GB" Catalog_Cost = 75000 ];
+			                /* HR & Admin */
+			                insert into Request_Catalog [ Department = "HR & Admin" Item_Description = "Ergonomic Chairs x10" Catalog_Cost = 1200 ];
+			                insert into Request_Catalog [ Department = "HR & Admin" Item_Description = "Office Furniture Set" Catalog_Cost = 4200 ];
+			                insert into Request_Catalog [ Department = "HR & Admin" Item_Description = "Training Room AV System" Catalog_Cost = 55000 ];
+			
+			                /* ======================================================
+			                   SPEND REQUESTS (18 BRD records)
+			
+			                   Status distribution:
+			                   Auto_Approved  (4): BRQ-0301 to 0304 (cost <= $1,000)
+			                   Pending_RM     (2): BRQ-0305, 0306
+			                   Pending_Dept_Head (2): BRQ-0307, 0308 (3-Person tier, RM approved)
+			                   Pending_Finance   (2): BRQ-0309, 0310 (RM approved)
+			                   On_Hold        (2): BRQ-0311, 0312
+			                   Approved       (4): BRQ-0313 to 0316
+			                   Rejected       (2): BRQ-0317, 0318
+			                ====================================================== */
+			
+			                /* ---- AUTO-APPROVED (4) ---- */
+			                insert into Spend_Request
+			                [
+			                    Requester_Name = "Carlos Medina"
+			                    Department = "Production"
+			                    Requester_ID = "EMP-001"
+			                    Reporting_Manager_Name = "Jason Miller"
+			                    Department_Head_Name = "Henrik Larsson"
+			                    Item_Description = "Safety Gloves Bulk Order"
+			                    Estimated_Cost = 450
+			                    Priority = "Low"
+			                    Justification = "Quarterly safety stock replenishment for production floor"
+			                    Request_ID = "BRQ-2026-0301"
+			                    Status = "Auto_Approved"
+			                    SLA_Due_Date = "01-Sep-2026"
+			                    Submitted_Date = "01-Sep-2026"
+			                ];
+			
+			                insert into Spend_Request
+			                [
+			                    Requester_Name = "Wei Zhang"
+			                    Department = "Maintenance & Utilities"
+			                    Requester_ID = "EMP-002"
+			                    Reporting_Manager_Name = "Fatima Al-Sayed"
+			                    Department_Head_Name = "Aisha Bello"
+			                    Item_Description = "HVAC Filter Replacement"
+			                    Estimated_Cost = 600
+			                    Priority = "Low"
+			                    Justification = "Monthly scheduled maintenance - filter replacement"
+			                    Request_ID = "BRQ-2026-0302"
+			                    Status = "Auto_Approved"
+			                    SLA_Due_Date = "02-Sep-2026"
+			                    Submitted_Date = "02-Sep-2026"
+			                ];
+			
+			                insert into Spend_Request
+			                [
+			                    Requester_Name = "Amara Okafor"
+			                    Department = "Quality Assurance"
+			                    Requester_ID = "EMP-003"
+			                    Reporting_Manager_Name = "Marco Rossi"
+			                    Department_Head_Name = "Takeshi Yamamoto"
+			                    Item_Description = "Lab Reagents Supply"
+			                    Estimated_Cost = 800
+			                    Priority = "Medium"
+			                    Justification = "Biweekly reagent replenishment for QA lab"
+			                    Request_ID = "BRQ-2026-0303"
+			                    Status = "Auto_Approved"
+			                    SLA_Due_Date = "03-Sep-2026"
+			                    Submitted_Date = "03-Sep-2026"
+			                ];
+			
+			                insert into Spend_Request
+			                [
+			                    Requester_Name = "Elena Petrova"
+			                    Department = "Procurement & Stores"
+			                    Requester_ID = "EMP-004"
+			                    Reporting_Manager_Name = "Grace Kim"
+			                    Department_Head_Name = "Isabella Fischer"
+			                    Item_Description = "Bulk Packaging Materials"
+			                    Estimated_Cost = 350
+			                    Priority = "Low"
+			                    Justification = "Shipping department restock - Q3 cycle"
+			                    Request_ID = "BRQ-2026-0304"
+			                    Status = "Auto_Approved"
+			                    SLA_Due_Date = "04-Sep-2026"
+			                    Submitted_Date = "04-Sep-2026"
+			                ];
+			
+			                /* ---- PENDING REPORTING MANAGER (2) ---- */
+			                insert into Spend_Request
+			                [
+			                    Requester_Name = "Daniel Cohen"
+			                    Department = "IT & Systems"
+			                    Requester_ID = "EMP-005"
+			                    Reporting_Manager_Name = "Liam O'Connor"
+			                    Department_Head_Name = "Noah Bergstrom"
+			                    Item_Description = "Laptop - Dell XPS 15"
+			                    Estimated_Cost = 1850
+			                    Priority = "High"
+			                    Justification = "Replacement for failed unit - developer team blocked on delivery"
+			                    Request_ID = "BRQ-2026-0305"
+			                    Status = "Pending_RM"
+			                    SLA_Due_Date = "04-Nov-2026"
+			                    Submitted_Date = "05-Sep-2026"
+			                ];
+			
+			                insert into Spend_Request
+			                [
+			                    Requester_Name = "Priya Nair"
+			                    Department = "HR & Admin"
+			                    Requester_ID = "EMP-006"
+			                    Reporting_Manager_Name = "Sofia Martins"
+			                    Department_Head_Name = "Chidi Eze"
+			                    Item_Description = "Training Room AV System"
+			                    Estimated_Cost = 55000
+			                    Priority = "Medium"
+			                    Justification = "Upgrade for new induction programme starting Q4"
+			                    Request_ID = "BRQ-2026-0306"
+			                    Status = "Pending_RM"
+			                    SLA_Due_Date = "05-Nov-2026"
+			                    Submitted_Date = "06-Sep-2026"
+			                ];
+			
+			                /* ---- PENDING DEPARTMENT HEAD (2) - 3-Person tier, RM already approved ---- */
+			                insert into Spend_Request
+			                [
+			                    Requester_Name = "Carlos Medina"
+			                    Department = "Production"
+			                    Requester_ID = "EMP-001"
+			                    Reporting_Manager_Name = "Jason Miller"
+			                    Department_Head_Name = "Henrik Larsson"
+			                    Item_Description = "Industrial Conveyor Belt Replacement"
+			                    Estimated_Cost = 85000
+			                    Priority = "High"
+			                    Justification = "Belt showing critical wear - line stoppage risk within 2 weeks"
+			                    Request_ID = "BRQ-2026-0307"
+			                    Status = "Pending_Dept_Head"
+			                    SLA_Due_Date = "06-Nov-2026"
+			                    Submitted_Date = "07-Sep-2026"
+			                ];
+			
+			                insert into Spend_Request
+			                [
+			                    Requester_Name = "Wei Zhang"
+			                    Department = "Maintenance & Utilities"
+			                    Requester_ID = "EMP-002"
+			                    Reporting_Manager_Name = "Fatima Al-Sayed"
+			                    Department_Head_Name = "Aisha Bello"
+			                    Item_Description = "Generator Overhaul"
+			                    Estimated_Cost = 95000
+			                    Priority = "High"
+			                    Justification = "Backup generator failed load test - plant safety risk"
+			                    Request_ID = "BRQ-2026-0308"
+			                    Status = "Pending_Dept_Head"
+			                    SLA_Due_Date = "07-Nov-2026"
+			                    Submitted_Date = "08-Sep-2026"
+			                ];
+			
+			                /* ---- PENDING FINANCE (2) - RM approved, awaiting Finance Controller ---- */
+			                insert into Spend_Request
+			                [
+			                    Requester_Name = "Amara Okafor"
+			                    Department = "Quality Assurance"
+			                    Requester_ID = "EMP-003"
+			                    Reporting_Manager_Name = "Marco Rossi"
+			                    Department_Head_Name = "Takeshi Yamamoto"
+			                    Item_Description = "Calibration Equipment"
+			                    Estimated_Cost = 9500
+			                    Priority = "Medium"
+			                    Justification = "ISO audit preparation - mandatory recalibration cycle"
+			                    Request_ID = "BRQ-2026-0309"
+			                    Status = "Pending_Finance"
+			                    SLA_Due_Date = "08-Nov-2026"
+			                    Submitted_Date = "09-Sep-2026"
+			                ];
+			
+			                insert into Spend_Request
+			                [
+			                    Requester_Name = "Elena Petrova"
+			                    Department = "Procurement & Stores"
+			                    Requester_ID = "EMP-004"
+			                    Reporting_Manager_Name = "Grace Kim"
+			                    Department_Head_Name = "Isabella Fischer"
+			                    Item_Description = "Pallet Jack"
+			                    Estimated_Cost = 2800
+			                    Priority = "Medium"
+			                    Justification = "Forklift out for extended repairs - interim solution needed"
+			                    Request_ID = "BRQ-2026-0310"
+			                    Status = "Pending_Finance"
+			                    SLA_Due_Date = "09-Nov-2026"
+			                    Submitted_Date = "10-Sep-2026"
+			                ];
+			
+			                /* ---- ON HOLD (2) ---- */
+			                insert into Spend_Request
+			                [
+			                    Requester_Name = "Daniel Cohen"
+			                    Department = "IT & Systems"
+			                    Requester_ID = "EMP-005"
+			                    Reporting_Manager_Name = "Liam O'Connor"
+			                    Department_Head_Name = "Noah Bergstrom"
+			                    Item_Description = "Network Switch - Cisco 24-port"
+			                    Estimated_Cost = 3200
+			                    Priority = "Medium"
+			                    Justification = "Network expansion for Plant 3 east wing"
+			                    Request_ID = "BRQ-2026-0311"
+			                    Status = "On_Hold"
+			                    SLA_Due_Date = "10-Nov-2026"
+			                    Submitted_Date = "11-Sep-2026"
+			                ];
+			
+			                insert into Spend_Request
+			                [
+			                    Requester_Name = "Amara Okafor"
+			                    Department = "Quality Assurance"
+			                    Requester_ID = "EMP-003"
+			                    Reporting_Manager_Name = "Marco Rossi"
+			                    Department_Head_Name = "Takeshi Yamamoto"
+			                    Item_Description = "Inspection Microscope"
+			                    Estimated_Cost = 62000
+			                    Priority = "Medium"
+			                    Justification = "Enhance micropart inspection capability for new product line"
+			                    Request_ID = "BRQ-2026-0312"
+			                    Status = "On_Hold"
+			                    SLA_Due_Date = "11-Nov-2026"
+			                    Submitted_Date = "12-Sep-2026"
+			                ];
+			
+			                /* ---- APPROVED (4) ---- */
+			                insert into Spend_Request
+			                [
+			                    Requester_Name = "Carlos Medina"
+			                    Department = "Production"
+			                    Requester_ID = "EMP-001"
+			                    Reporting_Manager_Name = "Jason Miller"
+			                    Department_Head_Name = "Henrik Larsson"
+			                    Item_Description = "CNC Tooling Set"
+			                    Estimated_Cost = 12000
+			                    Priority = "High"
+			                    Justification = "Current tools worn beyond tolerance limits - production quality at risk"
+			                    Request_ID = "BRQ-2026-0313"
+			                    Status = "Approved"
+			                    SLA_Due_Date = "12-Nov-2026"
+			                    Submitted_Date = "01-Sep-2026"
+			                ];
+			
+			                insert into Spend_Request
+			                [
+			                    Requester_Name = "Wei Zhang"
+			                    Department = "Maintenance & Utilities"
+			                    Requester_ID = "EMP-002"
+			                    Reporting_Manager_Name = "Fatima Al-Sayed"
+			                    Department_Head_Name = "Aisha Bello"
+			                    Item_Description = "Hydraulic Press Repair Kit"
+			                    Estimated_Cost = 22000
+			                    Priority = "High"
+			                    Justification = "Press 3 offline - direct production line impact"
+			                    Request_ID = "BRQ-2026-0314"
+			                    Status = "Approved"
+			                    SLA_Due_Date = "12-Nov-2026"
+			                    Submitted_Date = "02-Sep-2026"
+			                ];
+			
+			                insert into Spend_Request
+			                [
+			                    Requester_Name = "Elena Petrova"
+			                    Department = "Procurement & Stores"
+			                    Requester_ID = "EMP-004"
+			                    Reporting_Manager_Name = "Grace Kim"
+			                    Department_Head_Name = "Isabella Fischer"
+			                    Item_Description = "Warehouse Shelving Units"
+			                    Estimated_Cost = 7500
+			                    Priority = "Medium"
+			                    Justification = "Capacity expansion to support 30% more SKUs in Q4"
+			                    Request_ID = "BRQ-2026-0315"
+			                    Status = "Approved"
+			                    SLA_Due_Date = "12-Nov-2026"
+			                    Submitted_Date = "03-Sep-2026"
+			                ];
+			
+			                insert into Spend_Request
+			                [
+			                    Requester_Name = "Priya Nair"
+			                    Department = "HR & Admin"
+			                    Requester_ID = "EMP-006"
+			                    Reporting_Manager_Name = "Sofia Martins"
+			                    Department_Head_Name = "Chidi Eze"
+			                    Item_Description = "Office Furniture Set"
+			                    Estimated_Cost = 4200
+			                    Priority = "Low"
+			                    Justification = "New joiners onboarding - 4 desks and chairs required"
+			                    Request_ID = "BRQ-2026-0316"
+			                    Status = "Approved"
+			                    SLA_Due_Date = "12-Nov-2026"
+			                    Submitted_Date = "04-Sep-2026"
+			                ];
+			
+			                /* ---- REJECTED (2) ---- */
+			                insert into Spend_Request
+			                [
+			                    Requester_Name = "Daniel Cohen"
+			                    Department = "IT & Systems"
+			                    Requester_ID = "EMP-005"
+			                    Reporting_Manager_Name = "Liam O'Connor"
+			                    Department_Head_Name = "Noah Bergstrom"
+			                    Item_Description = "Server RAM Upgrade 64GB"
+			                    Estimated_Cost = 75000
+			                    Priority = "High"
+			                    Justification = "Performance upgrade for analytics server - Q3 reporting bottleneck"
+			                    Request_ID = "BRQ-2026-0317"
+			                    Status = "Rejected"
+			                    SLA_Due_Date = "12-Nov-2026"
+			                    Submitted_Date = "05-Sep-2026"
+			                ];
+			
+			                insert into Spend_Request
+			                [
+			                    Requester_Name = "Priya Nair"
+			                    Department = "HR & Admin"
+			                    Requester_ID = "EMP-006"
+			                    Reporting_Manager_Name = "Sofia Martins"
+			                    Department_Head_Name = "Chidi Eze"
+			                    Item_Description = "Ergonomic Chairs x10"
+			                    Estimated_Cost = 1200
+			                    Priority = "Low"
+			                    Justification = "Ergonomics audit recommendation - 10 workstations flagged"
+			                    Request_ID = "BRQ-2026-0318"
+			                    Status = "Rejected"
+			                    SLA_Due_Date = "12-Nov-2026"
+			                    Submitted_Date = "06-Sep-2026"
+			                ];
+			
+			                /* ======================================================
+			                   APPROVAL LOG (complete decision trail)
+			                ====================================================== */
+			                /* Auto-approved records */
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0301" Stage = "System" Approver_Name = "System" Decision = "Auto-Approved" Decision_Timestamp = "01-Sep-2026 09:00:00" Comments = "Auto-approved: amount under $1,000 threshold" ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0302" Stage = "System" Approver_Name = "System" Decision = "Auto-Approved" Decision_Timestamp = "02-Sep-2026 09:00:00" Comments = "Auto-approved: amount under $1,000 threshold" ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0303" Stage = "System" Approver_Name = "System" Decision = "Auto-Approved" Decision_Timestamp = "03-Sep-2026 09:15:00" Comments = "Auto-approved: amount under $1,000 threshold" ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0304" Stage = "System" Approver_Name = "System" Decision = "Auto-Approved" Decision_Timestamp = "04-Sep-2026 09:00:00" Comments = "Auto-approved: amount under $1,000 threshold" ];
+			
+			                /* Pending RM - only submission entries */
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0305" Stage = "System" Approver_Name = "Daniel Cohen" Decision = "Submitted" Decision_Timestamp = "05-Sep-2026 10:30:00" Comments = "Request submitted by Daniel Cohen from IT & Systems" ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0306" Stage = "System" Approver_Name = "Priya Nair" Decision = "Submitted" Decision_Timestamp = "06-Sep-2026 11:00:00" Comments = "Request submitted by Priya Nair from HR & Admin" ];
+			
+			                /* Pending Dept Head - submission + RM approval */
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0307" Stage = "System" Approver_Name = "Carlos Medina" Decision = "Submitted" Decision_Timestamp = "07-Sep-2026 09:00:00" Comments = "Request submitted by Carlos Medina from Production" ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0307" Stage = "Reporting Manager" Approver_Name = "Jason Miller" Decision = "Approved" Decision_Timestamp = "08-Sep-2026 10:00:00" Comments = "Belt wear confirmed - urgent. Escalating to Department Head." ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0308" Stage = "System" Approver_Name = "Wei Zhang" Decision = "Submitted" Decision_Timestamp = "08-Sep-2026 09:00:00" Comments = "Request submitted by Wei Zhang from Maintenance & Utilities" ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0308" Stage = "Reporting Manager" Approver_Name = "Fatima Al-Sayed" Decision = "Approved" Decision_Timestamp = "09-Sep-2026 09:30:00" Comments = "Safety risk confirmed by site inspection. Escalating to Department Head." ];
+			
+			                /* Pending Finance - submission + RM approval (2-Person tier) */
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0309" Stage = "System" Approver_Name = "Amara Okafor" Decision = "Submitted" Decision_Timestamp = "09-Sep-2026 10:00:00" Comments = "Request submitted by Amara Okafor from Quality Assurance" ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0309" Stage = "Reporting Manager" Approver_Name = "Marco Rossi" Decision = "Approved" Decision_Timestamp = "10-Sep-2026 09:00:00" Comments = "ISO audit mandatory requirement. Approved and routed to Finance." ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0310" Stage = "System" Approver_Name = "Elena Petrova" Decision = "Submitted" Decision_Timestamp = "10-Sep-2026 11:00:00" Comments = "Request submitted by Elena Petrova from Procurement & Stores" ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0310" Stage = "Reporting Manager" Approver_Name = "Grace Kim" Decision = "Approved" Decision_Timestamp = "11-Sep-2026 09:00:00" Comments = "Interim solution required - approved and routed to Finance." ];
+			
+			                /* On Hold - submission + hold action */
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0311" Stage = "System" Approver_Name = "Daniel Cohen" Decision = "Submitted" Decision_Timestamp = "11-Sep-2026 10:00:00" Comments = "Request submitted by Daniel Cohen from IT & Systems" ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0311" Stage = "Reporting Manager" Approver_Name = "Liam O'Connor" Decision = "On Hold" Decision_Timestamp = "12-Sep-2026 14:00:00" Comments = "Pending network topology review before procurement. Placed on hold." ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0312" Stage = "System" Approver_Name = "Amara Okafor" Decision = "Submitted" Decision_Timestamp = "12-Sep-2026 10:00:00" Comments = "Request submitted by Amara Okafor from Quality Assurance" ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0312" Stage = "Reporting Manager" Approver_Name = "Marco Rossi" Decision = "On Hold" Decision_Timestamp = "13-Sep-2026 11:00:00" Comments = "Awaiting Q4 capex allocation confirmation before proceeding." ];
+			
+			                /* Approved - full decision trail */
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0313" Stage = "System" Approver_Name = "Carlos Medina" Decision = "Submitted" Decision_Timestamp = "01-Sep-2026 10:00:00" Comments = "Request submitted by Carlos Medina from Production" ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0313" Stage = "Reporting Manager" Approver_Name = "Jason Miller" Decision = "Approved" Decision_Timestamp = "02-Sep-2026 09:30:00" Comments = "Tool wear confirmed by QA inspection report. Approved." ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0313" Stage = "Finance Controller" Approver_Name = "Frank Harris" Decision = "Approved" Decision_Timestamp = "03-Sep-2026 11:00:00" Comments = "Within budget allocation. Final approval granted." ];
+			
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0314" Stage = "System" Approver_Name = "Wei Zhang" Decision = "Submitted" Decision_Timestamp = "02-Sep-2026 09:00:00" Comments = "Request submitted by Wei Zhang from Maintenance & Utilities" ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0314" Stage = "Reporting Manager" Approver_Name = "Fatima Al-Sayed" Decision = "Approved" Decision_Timestamp = "03-Sep-2026 10:00:00" Comments = "Press 3 downtime confirmed - production impact critical. Approved." ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0314" Stage = "Finance Controller" Approver_Name = "Frank Harris" Decision = "Approved" Decision_Timestamp = "04-Sep-2026 09:00:00" Comments = "Emergency maintenance expenditure approved within limits." ];
+			
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0315" Stage = "System" Approver_Name = "Elena Petrova" Decision = "Submitted" Decision_Timestamp = "03-Sep-2026 10:00:00" Comments = "Request submitted by Elena Petrova from Procurement & Stores" ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0315" Stage = "Reporting Manager" Approver_Name = "Grace Kim" Decision = "Approved" Decision_Timestamp = "04-Sep-2026 09:30:00" Comments = "Q4 capacity plan confirmed. Approved." ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0315" Stage = "Finance Controller" Approver_Name = "Frank Harris" Decision = "Approved" Decision_Timestamp = "05-Sep-2026 10:00:00" Comments = "Approved - within warehouse capex budget." ];
+			
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0316" Stage = "System" Approver_Name = "Priya Nair" Decision = "Submitted" Decision_Timestamp = "04-Sep-2026 11:00:00" Comments = "Request submitted by Priya Nair from HR & Admin" ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0316" Stage = "Reporting Manager" Approver_Name = "Sofia Martins" Decision = "Approved" Decision_Timestamp = "05-Sep-2026 09:00:00" Comments = "New joiners require workstations. Approved." ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0316" Stage = "Finance Controller" Approver_Name = "Frank Harris" Decision = "Approved" Decision_Timestamp = "06-Sep-2026 10:00:00" Comments = "Within HR budget. Approved." ];
+			
+			                /* Rejected - chain up to rejection point */
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0317" Stage = "System" Approver_Name = "Daniel Cohen" Decision = "Submitted" Decision_Timestamp = "05-Sep-2026 09:00:00" Comments = "Request submitted by Daniel Cohen from IT & Systems" ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0317" Stage = "Reporting Manager" Approver_Name = "Liam O'Connor" Decision = "Approved" Decision_Timestamp = "06-Sep-2026 10:00:00" Comments = "Performance bottleneck confirmed. Escalating to Department Head." ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0317" Stage = "Department Head" Approver_Name = "Noah Bergstrom" Decision = "Approved" Decision_Timestamp = "07-Sep-2026 09:30:00" Comments = "Technical need acknowledged. Escalating to Finance." ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0317" Stage = "Finance Controller" Approver_Name = "Frank Harris" Decision = "Rejected" Decision_Timestamp = "08-Sep-2026 11:00:00" Comments = "Over Q3 IT capex ceiling. Resubmit in Q4 budget cycle." ];
+			
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0318" Stage = "System" Approver_Name = "Priya Nair" Decision = "Submitted" Decision_Timestamp = "06-Sep-2026 10:00:00" Comments = "Request submitted by Priya Nair from HR & Admin" ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0318" Stage = "Reporting Manager" Approver_Name = "Sofia Martins" Decision = "Approved" Decision_Timestamp = "07-Sep-2026 09:00:00" Comments = "Ergonomics audit requirement noted. Escalating to Department Head." ];
+			                insert into Approval_Log [ Request_ID_Ref = "BRQ-2026-0318" Stage = "Department Head" Approver_Name = "Chidi Eze" Decision = "Rejected" Decision_Timestamp = "08-Sep-2026 10:00:00" Comments = "Deferred - existing chairs sufficient per latest ergonomics re-review." ];
+			            )
+			        }
+			    }
+			}
+
 			Department_On_User_Input as "Filter Items and Resolve Manager on Department Change"
 			{
 			    type = form
@@ -1009,10 +1455,11 @@ application "Zylker-Budget-Approval"
 			        {
 			            custom deluge script
 			            (
-			                emp_records = Employee_Directory[Employee_Name == input.Requester_Name && Department == input.Department];
+			                emp_records = Employee_Directory[Employee_Name == input.Requester_Name];
 			                for each emp in emp_records
 			                {
 			                    input.Requester_ID = emp.Requester_ID;
+			                    input.Department = emp.Department;
 			                    input.Reporting_Manager_Name = emp.Reporting_Manager;
 			                    input.Department_Head_Name = emp.Department_Head;
 			                    break;
@@ -2077,6 +2524,131 @@ application "Zylker-Budget-Approval"
 			}
 		}
 
+		functions
+		{
+			WF_Approve_Request as "Approve"
+			{
+			    type = functions
+			    form = Spend_Request
+			    execution type = for each record
+			
+			    on start
+			    {
+			        actions
+			        {
+			            on click
+			            (
+			                cur_status = input.Status;
+			                cost_val = input.Estimated_Cost;
+			
+			                if(cost_val <= 1000) { tier = "Auto"; }
+			                else if(cost_val <= 50000) { tier = "2-Person"; }
+			                else { tier = "3-Person"; }
+			
+			                if(cur_status == "Pending_RM" && tier == "2-Person")
+			                {
+			                    new_status = "Pending_Finance";
+			                }
+			                else if(cur_status == "Pending_RM" && tier == "3-Person")
+			                {
+			                    new_status = "Pending_Dept_Head";
+			                }
+			                else if(cur_status == "Pending_Dept_Head")
+			                {
+			                    new_status = "Pending_Finance";
+			                }
+			                else if(cur_status == "Pending_Finance")
+			                {
+			                    new_status = "Approved";
+			                }
+			                else
+			                {
+			                    /* Status is not in an actionable pending state - do nothing */
+			                    return;
+			                }
+			
+			                update Spend_Request[ID == input.ID]
+			                [
+			                    Status = new_status
+			                ];
+			
+			                insert into Approval_Log
+			                [
+			                    Request_ID_Ref = input.Request_ID
+			                    Stage = cur_status
+			                    Approver_Name = zoho.loginuser
+			                    Decision = "Approved"
+			                    Decision_Timestamp = zoho.currenttime
+			                    Comments = "Approved - advanced to " + new_status
+			                ];
+			            )
+			        }
+			    }
+			}
+
+			WF_Hold_Request as "Hold"
+			{
+			    type = functions
+			    form = Spend_Request
+			    execution type = for each record
+			
+			    on start
+			    {
+			        actions
+			        {
+			            on click
+			            (
+			                update Spend_Request[ID == input.ID]
+			                [
+			                    Status = "On_Hold"
+			                ];
+			
+			                insert into Approval_Log
+			                [
+			                    Request_ID_Ref = input.Request_ID
+			                    Stage = input.Status
+			                    Approver_Name = zoho.loginuser
+			                    Decision = "On Hold"
+			                    Decision_Timestamp = zoho.currenttime
+			                    Comments = "Request placed on hold"
+			                ];
+			            )
+			        }
+			    }
+			}
+
+			WF_Reject_Request as "Reject"
+			{
+			    type = functions
+			    form = Spend_Request
+			    execution type = for each record
+			
+			    on start
+			    {
+			        actions
+			        {
+			            on click
+			            (
+			                update Spend_Request[ID == input.ID]
+			                [
+			                    Status = "Rejected"
+			                ];
+			
+			                insert into Approval_Log
+			                [
+			                    Request_ID_Ref = input.Request_ID
+			                    Stage = input.Status
+			                    Approver_Name = zoho.loginuser
+			                    Decision = "Rejected"
+			                    Decision_Timestamp = zoho.currenttime
+			                    Comments = "Request rejected"
+			                ];
+			            )
+			        }
+			    }
+			}
+		}
+
 		blueprint
 		{
 			Spend_Request_Blueprint as "Spend Request Approval Lifecycle"
@@ -2547,44 +3119,6 @@ application "Zylker-Budget-Approval"
 			            }
 			        }
 			
-			        Resubmit_From_Hold as "Resubmit from Hold"
-			        {
-			            type = normal
-			            from stage = "On_Hold"
-			            to stage   = "Submitted"
-			
-			            before
-			            {
-			                transition owner
-			                (
-			                    permissions = {"Requester"}
-			                )
-			            }
-			
-			            after
-			            {
-			                actions
-			                {
-			                    custom deluge script
-			                    (
-			                        update Spend_Request[ID == input.ID]
-			                        [
-			                            Status = "Submitted"
-			                        ];
-			                        req_id_val = input.Request_ID;
-			                        insert into Approval_Log
-			                        [
-			                            Request_ID_Ref = req_id_val
-			                            Stage = "System"
-			                            Approver_Name = zoho.loginuserid
-			                            Decision = "Submitted"
-			                            Decision_Timestamp = zoho.currenttime
-			                            Comments = "Request resubmitted by requester from On Hold state."
-			                        ];
-			                    )
-			                }
-			            }
-			        }
 			    }
 			}
 		}
@@ -2651,7 +3185,7 @@ application "Zylker-Budget-Approval"
 	        {
 	            enabled = tab
 	        }
-	        Approvals
+	        Dashboard
 	        {
 	            enabled = tab
 	        }
@@ -2713,10 +3247,6 @@ application "Zylker-Budget-Approval"
 	            }
 	        }
 	        Request_Intake
-	        {
-	            enabled = tab
-	        }
-	        Approvals
 	        {
 	            enabled = tab
 	        }
@@ -2837,7 +3367,7 @@ application "Zylker-Budget-Approval"
 	        {
 	            enabled = tab
 	        }
-	        Approvals
+	        Dashboard
 	        {
 	            enabled = tab
 	        }
@@ -2893,6 +3423,10 @@ application "Zylker-Budget-Approval"
 	        {
 	            enabled = tab
 	        }
+	        Dashboard
+	        {
+	            enabled = tab
+	        }
 	    }
 	}
 	}
@@ -2918,6 +3452,10 @@ application "Zylker-Budget-Approval"
 	        label placement = left
 	    }
 	    form Approval_Action
+	    {
+	        label placement = top
+	    }
+	    form Seed_Data
 	    {
 	        label placement = top
 	    }
@@ -3238,6 +3776,74 @@ application "Zylker-Budget-Approval"
 		    )
 		}
 	
+		report Seed_Data_Log
+		{
+		    quickview
+		    (
+		        layout
+		        (
+		            type = -1
+		            datablock1
+		            (
+		                layout type = -1
+		                fields
+		                (
+		                    Confirm_Load
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Delete
+		            )
+		            record
+		            (
+		                Edit
+		                Delete
+		            )
+		        )
+		        action
+		        (
+		            on click
+		            (
+		                View Record
+		            )
+		            on right click
+		            (
+		                Edit
+		                Delete
+		                View Record
+		            )
+		        )
+		    )
+		    detailview
+		    (
+		        layout
+		        (
+		            type = 1
+		            datablock1
+		            (
+		                layout type = -2
+		                fields
+		                (
+		                    Confirm_Load
+		                )
+		            )
+		        )
+		        menu
+		        (
+		            header
+		            (
+		                Edit
+		                Delete
+		            )
+		        )
+		    )
+		}
+	
 		report All_Requests
 		{
 		    quickview
@@ -3342,10 +3948,14 @@ application "Zylker-Budget-Approval"
 		                    Request_ID
 		                    Requester_Name
 		                    Department
+		                    Item_Description
 		                    Estimated_Cost
 		                    Approval_Tier
-		                    Status
+		                    Priority
 		                    SLA_Due_Date
+		                    "Approve"
+		                    "Hold"
+		                    "Reject"
 		                )
 		            )
 		        )
@@ -3354,14 +3964,15 @@ application "Zylker-Budget-Approval"
 		            header
 		            (
 		                Edit
-		                Duplicate
 		                Delete
 		            )
 		            record
 		            (
 		                Edit
-		                Duplicate
 		                Delete
+		                "Approve"
+		                "Hold"
+		                "Reject"
 		            )
 		        )
 		        action
@@ -3374,8 +3985,10 @@ application "Zylker-Budget-Approval"
 		            (
 		                Edit
 		                Delete
-		                Duplicate
 		                View Record
+		                "Approve"
+		                "Hold"
+		                "Reject"
 		            )
 		        )
 		    )
@@ -3387,18 +4000,31 @@ application "Zylker-Budget-Approval"
 		            datablock1
 		            (
 		                layout type = -2
+		                title = "Request Details"
 		                fields
 		                (
 		                    Request_ID
 		                    Requester_Name
 		                    Department
+		                    Item_Description
 		                    Estimated_Cost
 		                    Approval_Tier
-		                    Status
-		                    SLA_Due_Date
 		                    Priority
-		                    Item_Description
+		                    Justification
 		                    Submitted_Date
+		                    SLA_Due_Date
+		                )
+		            )
+		            datablock2
+		            (
+		                layout type = -2
+		                title = "Approval Action"
+		                fields
+		                (
+		                    Status
+		                    "Approve"
+		                    "Hold"
+		                    "Reject"
 		                )
 		            )
 		        )
@@ -3407,7 +4033,6 @@ application "Zylker-Budget-Approval"
 		            header
 		            (
 		                Edit
-		                Duplicate
 		                Delete
 		            )
 		        )
@@ -3426,9 +4051,18 @@ application "Zylker-Budget-Approval"
 	            displayname = "Modules"
 	            icon = "business-chart"
 	
-	            page Request_Intake  { icon = "business-notes" }
-	            page Approvals       { icon = "business-signature" }
-	            page Dashboard       { icon = "business-chart-bar-33" }
+	            page Request_Intake
+	            {
+	                icon = "business-notes"
+	            }
+	            report Pending_Requests
+	            {
+	                icon = "business-signature"
+	            }
+	            page Dashboard
+	            {
+	                icon = "business-chart-bar-33"
+	            }
 	        }
 	
 	        section Data_Management
@@ -3436,17 +4070,54 @@ application "Zylker-Budget-Approval"
 	            displayname = "Data Management"
 	            icon = "business-contacts"
 	
-	            form Spend_Request       { icon = "business-notes" }
-	            report All_Requests      { icon = "business-notes" }
-	            report Pending_Requests  { icon = "business-agenda" }
-	            form Employee_Directory  { icon = "business-business-contact-87" }
-	            report All_Employees     { icon = "business-business-contact-88" }
-	            form Request_Catalog     { icon = "business-books" }
-	            report Catalog_Items     { icon = "business-books" }
-	            form Approval_Log        { icon = "business-agenda" }
-	            report All_Decisions     { icon = "business-agenda" }
-	            form Approval_Action     { icon = "business-sign" }
-	            report Approval_Actions  { icon = "business-sign" }
+	            form Spend_Request
+	            {
+	                icon = "business-notes"
+	            }
+	            report All_Requests
+	            {
+	                icon = "business-notes"
+	            }
+	            form Employee_Directory
+	            {
+	                icon = "business-business-contact-87"
+	            }
+	            report All_Employees
+	            {
+	                icon = "business-business-contact-88"
+	            }
+	            form Request_Catalog
+	            {
+	                icon = "business-books"
+	            }
+	            report Catalog_Items
+	            {
+	                icon = "business-books"
+	            }
+	            form Approval_Log
+	            {
+	                icon = "business-agenda"
+	            }
+	            report All_Decisions
+	            {
+	                icon = "business-agenda"
+	            }
+	            form Approval_Action
+	            {
+	                icon = "business-sign"
+	            }
+	            report Approval_Actions
+	            {
+	                icon = "business-sign"
+	            }
+	            form Seed_Data
+	            {
+	                icon = "business-money-bag"
+	            }
+	            report Seed_Data_Log
+	            {
+	                icon = "business-money-bag"
+	            }
 	        }
 	
 	        section SharedAnalytics_Section

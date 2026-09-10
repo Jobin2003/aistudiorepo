@@ -10,9 +10,18 @@ menu
             displayname = "Modules"
             icon = "business-chart"
 
-            page Request_Intake  { icon = "business-notes" }
-            page Approvals       { icon = "business-signature" }
-            page Dashboard       { icon = "business-chart-bar-33" }
+            page Request_Intake
+            {
+                icon = "business-notes"
+            }
+            report Pending_Requests
+            {
+                icon = "business-signature"
+            }
+            page Dashboard
+            {
+                icon = "business-chart-bar-33"
+            }
         }
 
         section Data_Management
@@ -20,17 +29,54 @@ menu
             displayname = "Data Management"
             icon = "business-contacts"
 
-            form Spend_Request       { icon = "business-notes" }
-            report All_Requests      { icon = "business-notes" }
-            report Pending_Requests  { icon = "business-agenda" }
-            form Employee_Directory  { icon = "business-business-contact-87" }
-            report All_Employees     { icon = "business-business-contact-88" }
-            form Request_Catalog     { icon = "business-books" }
-            report Catalog_Items     { icon = "business-books" }
-            form Approval_Log        { icon = "business-agenda" }
-            report All_Decisions     { icon = "business-agenda" }
-            form Approval_Action     { icon = "business-sign" }
-            report Approval_Actions  { icon = "business-sign" }
+            form Spend_Request
+            {
+                icon = "business-notes"
+            }
+            report All_Requests
+            {
+                icon = "business-notes"
+            }
+            form Employee_Directory
+            {
+                icon = "business-business-contact-87"
+            }
+            report All_Employees
+            {
+                icon = "business-business-contact-88"
+            }
+            form Request_Catalog
+            {
+                icon = "business-books"
+            }
+            report Catalog_Items
+            {
+                icon = "business-books"
+            }
+            form Approval_Log
+            {
+                icon = "business-agenda"
+            }
+            report All_Decisions
+            {
+                icon = "business-agenda"
+            }
+            form Approval_Action
+            {
+                icon = "business-sign"
+            }
+            report Approval_Actions
+            {
+                icon = "business-sign"
+            }
+            form Seed_Data
+            {
+                icon = "business-money-bag"
+            }
+            report Seed_Data_Log
+            {
+                icon = "business-money-bag"
+            }
         }
 
         section SharedAnalytics_Section

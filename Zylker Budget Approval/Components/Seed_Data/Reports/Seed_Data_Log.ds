@@ -1,0 +1,8 @@
+list Seed_Data_Log
+{
+    displayName = "Sample Data Loader"
+    show all rows from Seed_Data
+    (
+        Confirm_Load
+    )
+}

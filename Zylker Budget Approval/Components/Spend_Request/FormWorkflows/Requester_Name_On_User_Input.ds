@@ -10,10 +10,11 @@ Requester_Name_On_User_Input as "Resolve Requester ID on Name Input"
         {
             custom deluge script
             (
-                emp_records = Employee_Directory[Employee_Name == input.Requester_Name && Department == input.Department];
+                emp_records = Employee_Directory[Employee_Name == input.Requester_Name];
                 for each emp in emp_records
                 {
                     input.Requester_ID = emp.Requester_ID;
+                    input.Department = emp.Department;
                     input.Reporting_Manager_Name = emp.Reporting_Manager;
                     input.Department_Head_Name = emp.Department_Head;
                     break;
